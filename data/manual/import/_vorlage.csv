@@ -1,0 +1,2 @@
+provider,name,street,postalCode,city,district,latitude,longitude,website,sourceId,categories,sourceNote
+wellpass,Beispielstudio (Vorlage – wird nicht importiert),Musterstraße 1,10115,Berlin,Mitte,,,https://example.org,beispiel-1,Fitness|Yoga,"Wellpass Gym-Finder, abgerufen am TT.MM.JJJJ"

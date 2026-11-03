@@ -1,0 +1,75 @@
+.leaflet-container {
+  font: inherit;
+  background: #e8eef3;
+}
+
+.studio-marker {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--c);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35), 0 1px 3px rgb(0 0 0 / 0.3);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.studio-marker--wellpass {
+  border-radius: 3px;
+  transform: rotate(45deg) scale(0.86);
+}
+.studio-marker--both {
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35), 0 1px 4px rgb(0 0 0 / 0.35), inset 0 0 0 4px var(--c), inset 0 0 0 8px #fff;
+}
+.studio-marker--approx {
+  border-style: dashed;
+  opacity: 0.8;
+}
+
+.studio-marker-selected {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid #111827;
+  background: rgb(17 24 39 / 0.12);
+  box-shadow: 0 0 0 2px #fff;
+  pointer-events: none;
+}
+
+.user-marker {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #0ea5e9;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.3), 0 0 0 8px rgb(14 165 233 / 0.2);
+}
+
+.studio-cluster {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+  cursor: pointer;
+}
+.studio-cluster span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  border-radius: 50%;
+  background: #fff;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Abstand der Leaflet-Bedienelemente auf kleinen Bildschirmen */
+@media (max-width: 767px) {
+  .leaflet-top.leaflet-right {
+    margin-top: 4px;
+  }
+}

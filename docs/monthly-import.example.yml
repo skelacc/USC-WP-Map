@@ -1,0 +1,33 @@
+# Beispiel für eine spätere monatliche Automatisierung (GitHub Actions).
+# NICHT aktiv. Zum Aktivieren nach .github/workflows/monthly-import.yml kopieren.
+#
+# Ablauf: Quellen abrufen → bei Plausibilitätswarnungen abbrechen →
+# Änderungen als Pull Request vorschlagen (nichts wird ungeprüft übernommen).
+name: Monatlicher Datenimport
+on:
+  schedule:
+    - cron: "17 3 1 * *" # am 1. jedes Monats, 03:17 UTC
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Quellen abrufen
+        working-directory: scripts
+        run: python -m studiomap fetch --sources usc,wellpass,manual
+      - name: Übernehmen (bricht bei Warnungen ab)
+        working-directory: scripts
+        run: python -m studiomap apply
+      - name: Pull Request erstellen
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: data/monthly-import
+          title: "Daten: monatlicher Import"
+          body: "Automatischer Import. Bitte Bericht und Zuordnungsvorschläge prüfen."
+          commit-message: "Daten: monatlicher Import"
