@@ -18,9 +18,10 @@ interface Props {
   hasUserLocation: boolean
   onLocate: () => void
   locating: boolean
+  searching?: boolean
 }
 
-export function StudioList({ items, selectedId, onPick, sort, onSortChange, hasUserLocation, onLocate, locating }: Props) {
+export function StudioList({ items, selectedId, onPick, sort, onSortChange, hasUserLocation, onLocate, locating, searching }: Props) {
   // Bei neuen Ergebnissen wieder mit der ersten Seite beginnen
   const [paging, setPaging] = useState({ items, limit: PAGE })
   const limit = paging.items === items ? paging.limit : PAGE
@@ -42,13 +43,13 @@ export function StudioList({ items, selectedId, onPick, sort, onSortChange, hasU
         <span className="font-medium tabular-nums">{items.length.toLocaleString('de-DE')} Studios</span>
         <div className="ml-auto flex items-center gap-1" role="group" aria-label="Sortierung">
           <span className="text-muted-foreground">Sortieren:</span>
-          <Button size="xs" variant={sort === 'name' ? 'secondary' : 'ghost'} onClick={() => onSortChange('name')} aria-pressed={sort === 'name'}>
-            A–Z
+          <Button size="xs" className="h-8 md:h-6" variant={sort === 'name' ? 'secondary' : 'ghost'} onClick={() => onSortChange('name')} aria-pressed={sort === 'name'}>
+            {searching ? 'Relevanz' : 'A–Z'}
           </Button>
-          <Button size="xs" variant={sort === 'distance' ? 'secondary' : 'ghost'} onClick={() => onSortChange('distance')} aria-pressed={sort === 'distance'}>
+          <Button size="xs" className="h-8 md:h-6" variant={sort === 'distance' ? 'secondary' : 'ghost'} onClick={() => onSortChange('distance')} aria-pressed={sort === 'distance'}>
             Entfernung
           </Button>
-          <Button size="icon-xs" variant="ghost" onClick={onLocate} disabled={locating} title="Meinen Standort verwenden" aria-label="Meinen Standort verwenden">
+          <Button size="icon-xs" className="size-8 md:size-6" variant="ghost" onClick={onLocate} disabled={locating} title="Meinen Standort verwenden" aria-label="Meinen Standort verwenden">
             <LocateFixed className={cn(hasUserLocation && 'text-sky-600', locating && 'animate-pulse')} />
           </Button>
         </div>
@@ -65,7 +66,7 @@ export function StudioList({ items, selectedId, onPick, sort, onSortChange, hasU
               type="button"
               onClick={() => onPick(s.id)}
               className={cn(
-                'flex w-full items-start gap-2.5 border-b px-3 py-2 text-left hover:bg-muted/60 focus-visible:bg-muted focus-visible:outline-none',
+                'flex w-full items-start gap-2.5 border-b px-3 py-2.5 text-left hover:bg-muted/60 focus-visible:bg-muted focus-visible:outline-none',
                 selectedId === s.id && 'bg-muted',
               )}
             >

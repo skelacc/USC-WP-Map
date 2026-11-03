@@ -15,7 +15,7 @@ from studiomap.diff import diff, plausibility_warnings  # noqa: E402
 from studiomap.merge import compare, merge  # noqa: E402
 from studiomap.normalize import address_key, name_similarity  # noqa: E402
 from studiomap.records import SourceRecord  # noqa: E402
-from studiomap.sources import manual, usc, wellpass_fff  # noqa: E402
+from studiomap.sources import manual, usc, wellpass_egym, wellpass_fff  # noqa: E402
 
 
 def usc_rec(sid, name, street=None, lat=None, lng=None, **kw):
@@ -179,6 +179,26 @@ class SourceParserTests(unittest.TestCase):
         self.assertEqual((pin.street, pin.postalCode), ("Wilhelmstraße 14", "10963"))
         with self.assertRaises(Exception):
             wellpass_fff.parse_response({"foo": 1}, "x")
+
+
+class WellpassOfficialTests(unittest.TestCase):
+    def test_parse(self):
+        data = {"gyms": [
+            {"gymId": 1, "alias": "Gym A", "qualitrainGym": True, "website": "https://a.de",
+             "address": {"street": "Torstraße", "streetNumber": "1", "zipCode": "10119", "city": "Berlin", "coordinates": [13.40, 52.53]},
+             "options": {"activities": [{"activity": "YOGA_STUDIO"}]}},
+            {"gymId": 2, "alias": "Potsdam", "qualitrainGym": True, "address": {"zipCode": "14467", "city": "Potsdam", "coordinates": [13.06, 52.40]}},
+            {"gymId": 3, "alias": "Nur Frankreich", "qualitrainGym": False, "address": {"zipCode": "10115", "city": "Berlin"}},
+            {"gymId": 4, "alias": "Ohne Koordinaten", "address": {"street": "Weg", "streetNumber": "2", "zipCode": "10115", "city": "Berlin"}},
+        ]}
+        recs = wellpass_egym.parse_response(data, "2026-11-03T00:00:00Z")
+        self.assertEqual(sorted(r.name for r in recs), ["Gym A", "Ohne Koordinaten"])
+        a = next(r for r in recs if r.name == "Gym A")
+        self.assertEqual((a.street, a.postalCode, a.latitude, a.longitude), ("Torstraße 1", "10119", 52.53, 13.40))
+        self.assertEqual(a.source, "official")
+        self.assertEqual(a.categories, ["Yoga Studio"])
+        with self.assertRaises(Exception):
+            wellpass_egym.parse_response({"foo": []}, "x")
 
 
 class DiffTests(unittest.TestCase):

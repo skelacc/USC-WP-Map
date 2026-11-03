@@ -15,6 +15,8 @@ def main(argv: list[str] | None = None) -> int:
 
     f = sub.add_parser("fetch", help="Quellen abrufen und Import vorbereiten (Staging)")
     f.add_argument("--sources", default="usc,wellpass,manual", help="Komma-Liste: usc,wellpass,manual")
+    f.add_argument("--wellpass-official", action="store_true",
+                   help="Wellpass einmalig direkt vom offiziellen Gym-Finder abrufen (statt Fair for Fitness)")
     f.add_argument("--geocode", action="store_true", help="fehlende Koordinaten manueller Einträge per Nominatim ermitteln")
 
     a = sub.add_parser("apply", help="geprüften Import übernehmen")
@@ -38,7 +40,7 @@ def main(argv: list[str] | None = None) -> int:
         unknown = [n for n in names if n not in pipeline.SOURCES]
         if unknown:
             p.error(f"unbekannte Quelle(n): {', '.join(unknown)}")
-        return pipeline.cmd_fetch(names, geocode=args.geocode)
+        return pipeline.cmd_fetch(names, geocode=args.geocode, wellpass_official=args.wellpass_official)
     if args.cmd == "apply":
         return pipeline.cmd_apply(force=args.force)
     if args.cmd == "discard":

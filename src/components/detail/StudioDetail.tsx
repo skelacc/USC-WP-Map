@@ -3,7 +3,8 @@ import { AlertTriangle, ChevronDown, ExternalLink, Globe, MapPin, Phone, X } fro
 import { Button } from '@/components/ui/button'
 import { CATEGORY_META, SOURCE_LABEL, categoryOf, pairIdOf } from '@/lib/categories'
 import { cn } from '@/lib/utils'
-import type { MatchCandidate, ProviderKey, Studio } from '@/types/studio'
+import type { MatchCandidate, ProviderKey } from '@/types/studio'
+import { minUscPlan, planLabel, type UscPlan, type ViewStudio } from '@/lib/plans'
 import { ProviderBadges } from '../ProviderBadges'
 
 const PROVIDER_NAME: Record<ProviderKey, string> = { urbanSportsClub: 'Urban Sports Club', wellpass: 'Wellpass' }
@@ -15,7 +16,8 @@ function formatDate(iso: string | null | undefined) {
 }
 
 interface Props {
-  studio: Studio
+  studio: ViewStudio
+  plan: UscPlan
   candidates: MatchCandidate[]
   canEdit: boolean
   onClose: () => void
@@ -24,12 +26,13 @@ interface Props {
   className?: string
 }
 
-export function StudioDetail({ studio: s, candidates, canEdit, onClose, onDecide, onShowStudio, className }: Props) {
+export function StudioDetail({ studio: s, plan, candidates, canEdit, onClose, onDecide, onShowStudio, className }: Props) {
   const [showReasons, setShowReasons] = useState(false)
   const [busy, setBusy] = useState(false)
   const category = categoryOf(s)
   const a = s.address
   const pair = pairIdOf(s)
+  const uscMin = minUscPlan(s)
 
   const decide = async (p: string, d: 'confirm' | 'reject' | 'reset') => {
     setBusy(true)
@@ -49,6 +52,14 @@ export function StudioDetail({ studio: s, candidates, canEdit, onClose, onDecide
         <div className="min-w-0 flex-1">
           <h2 className="text-base leading-tight font-semibold">{s.name}</h2>
           <ProviderBadges studio={s} className="mt-1.5" />
+          {s.uscNotInPlan && uscMin && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              Auch bei Urban Sports Club – aber erst ab {uscMin.size} ({uscMin.id}), nicht mit deiner Stufe {planLabel(plan)}.
+            </p>
+          )}
+          {!s.uscNotInPlan && s.providers.urbanSportsClub && uscMin && (
+            <p className="mt-1 text-xs text-muted-foreground">USC ab Stufe {uscMin.size} ({uscMin.id})</p>
+          )}
         </div>
         <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Details schließen">
           <X />

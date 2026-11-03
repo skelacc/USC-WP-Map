@@ -1,15 +1,30 @@
 import type { Category, Studio } from '@/types/studio'
 import { categoryOf } from './categories'
 import { distanceM, type LatLng } from './geo'
-import { matchesQuery } from './search'
+import { searchScore } from './search'
 
 export type CategoryFilter = Record<Category, boolean>
 export type SortMode = 'name' | 'distance'
 
 export const DEFAULT_FILTER: CategoryFilter = { both: true, usc: true, wellpass: true }
 
-export function filterStudios(studios: Studio[], filter: CategoryFilter, query: string): Studio[] {
-  return studios.filter((s) => filter[categoryOf(s)] && matchesQuery(s, query))
+export function filterStudios<T extends Studio>(studios: T[], filter: CategoryFilter, query: string): T[] {
+  return studios.filter((s) => filter[categoryOf(s)] && searchScore(s, query) > 0)
+}
+
+/** Suchtreffer mit Relevanz (für die Sortierung der Liste). */
+export function searchStudios<T extends Studio>(studios: T[], query: string): { matches: T[]; scores: Map<string, number> } {
+  const scores = new Map<string, number>()
+  if (!query.trim()) return { matches: studios, scores }
+  const matches: T[] = []
+  for (const s of studios) {
+    const sc = searchScore(s, query)
+    if (sc > 0) {
+      matches.push(s)
+      scores.set(s.id, sc)
+    }
+  }
+  return { matches, scores }
 }
 
 export function countByCategory(studios: Studio[]): Record<Category, number> {
@@ -27,7 +42,7 @@ const collator = new Intl.Collator('de', { sensitivity: 'base', numeric: true })
 
 /** Sortiert nach Name oder Entfernung; Studios ohne Koordinaten stehen bei
  *  Entfernungssortierung am Ende. */
-export function sortStudios(studios: Studio[], mode: SortMode, origin: LatLng | null): SortedStudio[] {
+export function sortStudios(studios: Studio[], mode: SortMode, origin: LatLng | null, relevance?: Map<string, number>): SortedStudio[] {
   const items = studios.map((studio) => ({
     studio,
     distance:
@@ -35,6 +50,9 @@ export function sortStudios(studios: Studio[], mode: SortMode, origin: LatLng | 
   }))
   if (mode === 'distance' && origin) {
     items.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity) || collator.compare(a.studio.name, b.studio.name))
+  } else if (relevance?.size) {
+    // bei aktiver Suche: beste Treffer zuerst
+    items.sort((a, b) => (relevance.get(b.studio.id) ?? 0) - (relevance.get(a.studio.id) ?? 0) || collator.compare(a.studio.name, b.studio.name))
   } else {
     items.sort((a, b) => collator.compare(a.studio.name, b.studio.name))
   }

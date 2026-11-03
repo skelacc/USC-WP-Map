@@ -18,6 +18,13 @@ export interface FitRequest {
   nonce: number
 }
 
+export interface FlyRequest {
+  lat: number
+  lng: number
+  zoom: number
+  nonce: number
+}
+
 interface Props {
   studios: Studio[]
   selected: Studio | null
@@ -26,11 +33,15 @@ interface Props {
   fit: FitRequest | null
   userLocation: LatLng | null
   onCenterChange: (c: LatLng) => void
+  flyTo?: FlyRequest | null
+  /** Höhe (px), die unten von einem Bottom-Sheet verdeckt wird (mobil). */
+  bottomInset?: number
+  showZoomControl?: boolean
 }
 
 type CategoryMarker = L.Marker & { options: L.MarkerOptions & { category: Category } }
 
-function ClusterLayer({ studios, onSelect, focus, fit }: Pick<Props, 'studios' | 'onSelect' | 'focus' | 'fit'>) {
+function ClusterLayer({ studios, onSelect, focus, fit, bottomInset = 0 }: Pick<Props, 'studios' | 'onSelect' | 'focus' | 'fit' | 'bottomInset'>) {
   const map = useMap()
   const groupRef = useRef<L.MarkerClusterGroup | null>(null)
   const markersRef = useRef(new Map<string, L.Marker>())
@@ -92,9 +103,13 @@ function ClusterLayer({ studios, onSelect, focus, fit }: Pick<Props, 'studios' |
     const group = groupRef.current
     if (!m || !group) return
     group.zoomToShowLayer(m, () => {
-      map.setView(m.getLatLng(), Math.max(map.getZoom(), 16), { animate: true })
+      const zoom = Math.max(map.getZoom(), 16)
+      // Marker oberhalb eines Bottom-Sheets zentrieren
+      const target = map.unproject(map.project(m.getLatLng(), zoom).add([0, bottomInset / 2]), zoom)
+      map.setView(target, zoom, { animate: true })
     })
-  }, [focus, map])
+    // bottomInset nur beim Fokussieren relevant
+  }, [focus, map]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Kartenausschnitt an Suchergebnisse anpassen – nur bei neuer Anforderung
   const studiosRef = useRef(studios)
@@ -106,9 +121,29 @@ function ClusterLayer({ studios, onSelect, focus, fit }: Pick<Props, 'studios' |
     const pts = studiosRef.current.filter((s) => s.coordinates).map((s) => [s.coordinates!.latitude, s.coordinates!.longitude] as [number, number])
     if (!pts.length) return
     if (pts.length === 1) map.setView(pts[0], 16)
-    else map.fitBounds(L.latLngBounds(pts), { padding: [40, 40], maxZoom: 16 })
+    else map.fitBounds(L.latLngBounds(pts), { paddingTopLeft: [30, 30], paddingBottomRight: [30, 30 + 60], maxZoom: 16 })
   }, [fit, map])
 
+  return null
+}
+
+/** Hält das ausgewählte Studio sichtbar, wenn unten ein Bottom-Sheet liegt. */
+function KeepVisible({ selected, bottomInset = 0 }: Pick<Props, 'selected' | 'bottomInset'>) {
+  const map = useMap()
+  useEffect(() => {
+    if (!selected?.coordinates || !bottomInset) return
+    const p = map.latLngToContainerPoint([selected.coordinates.latitude, selected.coordinates.longitude])
+    const visibleHeight = map.getSize().y - bottomInset
+    if (p.y > visibleHeight - 30 || p.y < 30) map.panBy([0, p.y - visibleHeight / 2], { animate: true })
+  }, [selected, bottomInset, map])
+  return null
+}
+
+function FlyTo({ flyTo }: Pick<Props, 'flyTo'>) {
+  const map = useMap()
+  useEffect(() => {
+    if (flyTo) map.flyTo([flyTo.lat, flyTo.lng], flyTo.zoom, { duration: 0.8 })
+  }, [flyTo, map])
   return null
 }
 
@@ -123,7 +158,7 @@ function MapEvents({ onSelect, onCenterChange }: Pick<Props, 'onSelect' | 'onCen
   return null
 }
 
-export function StudioMap({ studios, selected, onSelect, focus, fit, userLocation, onCenterChange }: Props) {
+export function StudioMap({ studios, selected, onSelect, focus, fit, userLocation, onCenterChange, flyTo, bottomInset = 0, showZoomControl = true }: Props) {
   return (
     <MapContainer
       center={[BERLIN_CENTER.lat, BERLIN_CENTER.lng]}
@@ -139,8 +174,10 @@ export function StudioMap({ studios, selected, onSelect, focus, fit, userLocatio
         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         maxZoom={19}
       />
-      <ZoomControl position="topright" />
-      <ClusterLayer studios={studios} onSelect={onSelect} focus={focus} fit={fit} />
+      {showZoomControl && <ZoomControl position="topright" />}
+      <ClusterLayer studios={studios} onSelect={onSelect} focus={focus} fit={fit} bottomInset={bottomInset} />
+      <KeepVisible selected={selected} bottomInset={bottomInset} />
+      <FlyTo flyTo={flyTo} />
       <MapEvents onSelect={onSelect} onCenterChange={onCenterChange} />
       {selected?.coordinates && (
         <Marker

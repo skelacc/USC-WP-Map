@@ -27,7 +27,7 @@ from .http import FetchError, PoliteClient
 from .io import emit, now_iso, read_json, write_json_atomic
 from .merge import merge
 from .records import SourceRecord, validate_record
-from .sources import manual, usc, wellpass_fff
+from .sources import manual, usc, wellpass_egym, wellpass_fff
 
 STAGING_RAW = paths.STAGING / "raw"
 
@@ -88,10 +88,20 @@ def _save_raw(path: Path, records: list[SourceRecord], meta: dict) -> None:
     write_json_atomic(path, {"meta": meta, "records": [r.to_dict() for r in records]})
 
 
-def fetch_source(name: str, client: PoliteClient, progress: Callable[[str], None], geocode: bool) -> tuple[list[SourceRecord], list[str]]:
+WELLPASS_OFFICIAL_META = {
+    "label": "EGYM Wellpass – offizieller Gym-Finder (einmaliger Abgleich)",
+    "url": "https://de.egym-wellpass.com/de-de/gym-finder",
+    "kind": "official",
+    "note": "Daten des offiziellen Wellpass-Gym-Finders, einmalig für den privaten Gebrauch abgerufen.",
+}
+
+
+def fetch_source(name: str, client: PoliteClient, progress: Callable[[str], None], geocode: bool, wellpass_official: bool = False) -> tuple[list[SourceRecord], list[str]]:
     if name == "usc":
         return usc.fetch(client, progress, should_stop), []
     if name == "wellpass":
+        if wellpass_official:
+            return wellpass_egym.fetch(client, progress, should_stop), []
         return wellpass_fff.fetch(client, progress, should_stop), []
     if name == "manual":
         records, errors = manual.import_dir(MANUAL_IMPORT_DIR)
@@ -116,7 +126,7 @@ def _published_dataset(records_by_source: dict[str, tuple[list[SourceRecord], di
     return dataset
 
 
-def cmd_fetch(source_names: list[str], geocode: bool = False) -> int:
+def cmd_fetch(source_names: list[str], geocode: bool = False, wellpass_official: bool = False) -> int:
     _install_signal_handlers()
     paths.ensure_dirs()
     STAGING_RAW.mkdir(parents=True, exist_ok=True)
@@ -132,7 +142,7 @@ def cmd_fetch(source_names: list[str], geocode: bool = False) -> int:
             records_by_source[name] = _load_raw(published_path)
             continue
         try:
-            recs, row_errors = fetch_source(name, client, lambda m: emit("progress", m), geocode)
+            recs, row_errors = fetch_source(name, client, lambda m: emit("progress", m), geocode, wellpass_official)
             if should_stop():
                 raise InterruptedError
             invalid = []
@@ -142,6 +152,8 @@ def cmd_fetch(source_names: list[str], geocode: bool = False) -> int:
                 (invalid if problems else valid).append((r, problems))
             errors = row_errors + [f"{r.name or r.sourceId}: {'; '.join(p)}" for r, p in invalid]
             meta = {"fetchedAt": now_iso(), "count": len(valid), "status": "ok", "skipped": len(invalid)}
+            if name == "wellpass" and wellpass_official:
+                meta.update(WELLPASS_OFFICIAL_META)
             records = [r for r, _ in valid]
             _save_raw(STAGING_RAW / f"{name}.json", records, meta)
             records_by_source[name] = (records, meta)

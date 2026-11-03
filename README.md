@@ -17,13 +17,14 @@ Farbe **und** Form unterscheiden die Kategorien, damit sie auch bei Farbsehschw�
 ## Funktionen (MVP)
 
 - **Karte** (Leaflet + OpenStreetMap). Startet mit Berlin im Ausschnitt, ist zoom- und verschiebbar und fasst nahe Standorte zu Clustern zusammen.
+- **USC-Mitgliedschaft** (Standard: **M / Classic**, wählbar S, M, L, XL oder alle). Studios, die bei USC erst in einer höheren Stufe enthalten sind, zählen nicht als USC-Studio. Ein solches Studio mit Wellpass erscheint dann als „Nur Wellpass“, eines ohne Wellpass wird ausgeblendet.
 - **Filter** für „Beide“, „Nur USC“ und „Nur Wellpass“, einzeln oder kombiniert. Ein Doppelklick zeigt nur diese Kategorie. Die Filter dienen zugleich als Legende mit Anzahl.
-- **Suche** nach Name, Straße, PLZ oder Bezirk. Sie ist tolerant bei Umlauten („Schoneberg“, „Schöneberg“ und „Schoeneberg“ finden dasselbe). Die Karte zoomt auf die Treffer.
+- **Fehlertolerante Suche** nach Name, Straße, PLZ oder Bezirk. Jeder Suchbegriff passt als Teilstring, ohne Leerzeichen, Bindestriche und Punkte („speedfit“ findet „SPEED.FIT“) oder unscharf. Unscharf heißt: 1 Tippfehler ab 4 Buchstaben, 2 ab 8 Buchstaben (falscher, fehlender, zusätzlicher oder vertauschter Buchstabe; Damerau-Levenshtein-Abstand). Auch Wortanfänge zählen, und Umlaute gehen in jeder Schreibweise. Beispiel: „homes plce“ findet „Holmes Place“. Die Treffer werden nach Relevanz sortiert, die Karte zoomt auf sie.
 - **Studioliste**: am Desktop als Seitenleiste, mobil als ausklappbare Liste. Sie lässt sich alphabetisch oder nach Entfernung sortieren (ab dem eigenen Standort oder ab der Kartenmitte). Ein Klick auf einen Eintrag springt zum Marker. Filter und Suche gelten auch hier.
 - **Detailansicht**: am Desktop als Karte über der Landkarte, mobil als Bottom-Sheet. Sie zeigt Name, Adresse, Anbieter, Website und Telefon (soweit vorhanden), die Sportarten und die USC-Stufen laut USC. Pro Anbieter stehen Datenquelle und Prüfdatum dabei. Bei zusammengeführten Studios werden die Gründe der Zuordnung angezeigt.
 - **Datenbereich** („Daten“): Datenbestand und Quellen, „Daten aktualisieren“ mit Live-Status und Abbruch, Prüfbericht (neu, entfernt, geändert, Fehlerprotokoll) vor dem Übernehmen, Prüfung der Zuordnungsvorschläge sowie der Import eigener CSV- oder JSON-Dateien.
 - Filter und Sortierung werden im **LocalStorage** gespeichert.
-- Läuft auf Android in Chrome und Firefox (siehe Hinweis zum Standort unten).
+- **Für das Smartphone optimiert:** einzeilige, wischbare Filterleiste, Bottom-Sheet für Details und Liste, Knopf „Zu meinem Standort“, große Tippflächen. Die Seite lässt sich als App auf den Startbildschirm legen (Chrome/Firefox → Menü → „Zum Startbildschirm hinzufügen“).
 
 ## Voraussetzungen
 
@@ -43,12 +44,26 @@ Die Studiodaten liegen bereits in `public/data/studios.json`, die App ist also s
 - **Auf dem Smartphone im WLAN:** `npm run dev` zeigt zusätzlich eine Netzwerk-Adresse an (z. B. `http://192.168.x.x:5173`). Browser erlauben die Standortbestimmung nur über HTTPS oder `localhost`. Über die LAN-Adresse sortiert die Liste deshalb nach Entfernung zur Kartenmitte.
 - **Statischer Build (ohne Node-Server):** `npm run build` erzeugt `dist/`, das sich mit jedem statischen Webserver ausliefern lässt (z. B. `npx vite preview` oder `python3 -m http.server -d dist`). Im statischen Build gibt es keine Aktualisierung per Knopfdruck. Die App zeigt dann die passenden Kommandozeilenbefehle an.
 
+## Online stellen (GitHub Pages)
+
+Das Repository ist öffentlich, GitHub Pages ist dafür kostenlos. Der Workflow `.github/workflows/pages.yml` baut die App bei jedem Push auf den Standard-Branch und veröffentlicht sie.
+
+1. Auf GitHub im Repository: **Settings → Pages → Build and deployment → Source: „GitHub Actions“** wählen (einmalig).
+2. Den Branch mit dem Code zum Standard-Branch machen bzw. in ihn mergen (Settings → General → Default branch, oder Pull Request mergen).
+3. Unter **Actions → GitHub Pages** läuft dann der Build (ca. 1 Minute). Danach ist die Seite unter `https://skelacc.github.io/USC-WP-Map/` erreichbar. Neu starten lässt er sich dort auch per „Run workflow“.
+
+Hinweise:
+- Die Seite ist **öffentlich**, inklusive der Studiodaten.
+- Über HTTPS funktioniert am Handy auch der Standort-Knopf.
+- „Daten aktualisieren“ gibt es online nicht (kein Server). Aktualisiert wird lokal (siehe unten), danach committen und pushen, und die Seite baut sich neu.
+
 ## Datenquellen – Ergebnis der Recherche
 
 | Quelle | Öffentliche API? | Gewählter Weg | Was zuverlässig verfügbar ist |
 |---|---|---|---|
 | **Urban Sports Club**<br>urbansportsclub.com/de/venues | Keine dokumentierte API, kein Export | Die öffentliche Standortsuche lädt ihre Daten ohne Login selbst nach: `/de/studios-map?city_id=1&plan_type=N` (JSON mit Name, Koordinaten, Slug) und `/de/venues?…&page=N` (HTML-Liste mit Straße, Bezirk, Sportarten). Diese Abfragen stellt der Import auf die gleiche Weise. | Name, Koordinaten, Straße (ohne PLZ), Bezirk, Sportarten, Link zur Studioseite, **USC-Stufen** (pro Stufe abgefragt) |
 | **EGYM Wellpass**<br>de.egym-wellpass.com/de-de/gym-finder | Keine dokumentierte API, kein Export | Der Gym-Finder bettet `locations.egym.com` ein. **Deren robots.txt sperrt alle automatisierten Zugriffe (`Disallow: /`)**, daher gibt es keinen direkten Abruf. Stattdessen wird die **dokumentierte öffentliche API von Fair for Fitness** verwendet (siehe nächste Zeile). | – |
+| **EGYM Wellpass – offiziell** (optional) | Nicht dokumentiert: `gymfinder.int.api.egym.com/v1/gym/overview` (vom Gym-Finder genutzt) | Nur mit `--wellpass-official`, gedacht für einen **einmaligen** privaten Abgleich, weil die robots.txt automatisierte Zugriffe untersagt. Eine Anfrage für Berlin, 30 km Radius. | Name, Adresse mit PLZ, Koordinaten, Website, Telefon, Sportarten. Vollständiger als Fair for Fitness. |
 | **Fair for Fitness**<br>fair-for-fitness.de | **Ja**: OpenAPI unter `/openapi.json`; robots.txt erlaubt `/api/search` ausdrücklich. Lizenz: „Daten ohne Gewähr; Nutzung mit Attribution + Link erlaubt“ | `GET /api/search?lat=…&lng=…&radius=30&networks=wellpass`, gefiltert auf Berliner PLZ | Name, Koordinaten, Adresse (meist mit PLZ), teils Website und Telefon. Die Wellpass-Zuordnung stammt von Fair for Fitness (**Drittquelle**) und ist überall so gekennzeichnet. |
 | **Eigene Dateien** | – | CSV/JSON in `data/manual/import/` oder Upload über die App | was man selbst einträgt (z. B. aus dem offiziellen Wellpass-Gym-Finder abgeschrieben) |
 
@@ -73,6 +88,7 @@ data/raw/*.json (veröffentlichter Stand) ───┘                         �
 ```bash
 npm run data:fetch                         # alle Quellen → Staging + Bericht
 npm run data:fetch -- --sources wellpass   # nur einzelne Quellen
+npm run data:fetch -- --sources wellpass --wellpass-official   # Wellpass einmalig vom offiziellen Gym-Finder
 npm run data:fetch -- --sources manual --geocode   # fehlende Koordinaten per Nominatim ergänzen (als „ungefähr“ markiert)
 npm run data:apply                         # geprüften Stand veröffentlichen
 npm run data:discard                       # vorbereiteten Stand verwerfen
@@ -191,7 +207,7 @@ Außerdem im Browser geprüft (Playwright, Desktop und Pixel 7): Marker, Cluster
 
 ## Bekannte Einschränkungen
 
-- **Wellpass-Daten stammen aus einer Drittquelle.** Fair for Fitness listet für Berlin 239 Wellpass-Studios. Ob das vollständig ist, lässt sich ohne offizielle Schnittstelle nicht prüfen. Fehlende Studios kann man per CSV aus dem offiziellen Gym-Finder ergänzen.
+- **Wellpass-Daten stammen standardmäßig aus einer Drittquelle.** Fair for Fitness erfasst nur einen Teil der Wellpass-Studios (Berlin: 239). Der Grund ist, dass Fair for Fitness ein Preisvergleich ist und Netzwerke nur bei bereits erfassten Studios zuordnet. Vollständiger ist der einmalige Abgleich mit `--wellpass-official`.
 - **USC hat keine dokumentierte API.** Ändert USC seine Website, schlägt der Import mit klarer Meldung fehl, und der bisherige Stand bleibt erhalten. Dann muss `sources/usc.py` angepasst werden.
 - USC liefert in den öffentlichen Listen **keine Postleitzahlen**. Bei rund 25 Standorten fehlt die Straße, bei 5 fehlen Koordinaten (diese stehen nur in der Liste).
 - USC listet viele **Kurse oder Anbieter innerhalb eines Hauses** als eigene „Venues“, z. B. „… @ Sarasvati“. Sie bleiben getrennte Einträge, und pro Wellpass-Studio wird höchstens ein USC-Eintrag zugeordnet.

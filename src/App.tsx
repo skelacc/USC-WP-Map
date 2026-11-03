@@ -1,54 +1,66 @@
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, Dumbbell, List, Loader2 } from 'lucide-react'
+import { AlertTriangle, Dumbbell, List, Loader2, LocateFixed } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { DataDialog } from '@/components/data/DataDialog'
 import { StudioDetail } from '@/components/detail/StudioDetail'
+import { PlanSelect } from '@/components/filters/PlanSelect'
 import { ProviderFilter } from '@/components/filters/ProviderFilter'
 import { SearchBox } from '@/components/filters/SearchBox'
 import { StudioList } from '@/components/list/StudioList'
-import { StudioMap, type FitRequest, type FocusRequest } from '@/components/map/StudioMap'
+import { StudioMap, type FitRequest, type FlyRequest, type FocusRequest } from '@/components/map/StudioMap'
 import { useDataset } from '@/hooks/useDataset'
+import { useElementHeight } from '@/hooks/useElementHeight'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { usePersistentState } from '@/hooks/usePersistentState'
-import { DEFAULT_FILTER, countByCategory, filterStudios, sortStudios, type CategoryFilter, type SortMode } from '@/lib/filter'
+import { DEFAULT_FILTER, countByCategory, filterStudios, searchStudios, sortStudios, type CategoryFilter, type SortMode } from '@/lib/filter'
 import { BERLIN_CENTER, type LatLng } from '@/lib/geo'
 import { decideMatch, getStatus, type ApiStatus } from '@/lib/importApi'
-import { matchesQuery } from '@/lib/search'
+import { DEFAULT_USC_PLAN, applyUscPlan, type UscPlan, type ViewStudio } from '@/lib/plans'
+import { cn } from '@/lib/utils'
 
 export default function App() {
   const { dataset, error, loading, reload } = useDataset()
   const isDesktop = useMediaQuery('(min-width: 768px)')
 
   const [filter, setFilter] = usePersistentState<CategoryFilter>('filter', DEFAULT_FILTER)
+  const [plan, setPlan] = usePersistentState<UscPlan>('uscPlan', DEFAULT_USC_PLAN)
   const [sort, setSort] = usePersistentState<SortMode>('sort', 'name')
   const [query, setQuery] = useState('')
   const deferredQuery = useDeferredValue(query)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [focus, setFocus] = useState<FocusRequest | null>(null)
   const [fit, setFit] = useState<FitRequest | null>(null)
+  const [flyTo, setFlyTo] = useState<FlyRequest | null>(null)
   const [mapCenter, setMapCenter] = useState<LatLng>(BERLIN_CENTER)
   const [userLocation, setUserLocation] = useState<LatLng | null>(null)
   const [locating, setLocating] = useState(false)
   const [listOpen, setListOpen] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [api, setApi] = useState<ApiStatus>({ available: false, running: false, staging: null })
+  const [detailRef, detailHeight] = useElementHeight<HTMLDivElement>()
 
   useEffect(() => {
     void getStatus().then(setApi)
   }, [])
 
-  const studios = useMemo(() => dataset?.studios ?? [], [dataset])
-  const byId = useMemo(() => new Map(studios.map((s) => [s.id, s])), [studios])
+  const allStudios = useMemo(() => dataset?.studios ?? [], [dataset])
+  // Gewählte USC-Mitgliedschaft anwenden (Studios höherer Stufen zählen nicht als USC)
+  const studios = useMemo<ViewStudio[]>(() => applyUscPlan(allStudios, plan), [allStudios, plan])
+  const byId = useMemo(() => new Map<string, ViewStudio>(studios.map((s) => [s.id, s])), [studios])
+  const allById = useMemo(() => new Map(allStudios.map((s) => [s.id, s])), [allStudios])
 
-  // Zähler in den Filtern berücksichtigen die Suche, nicht aber den Filter selbst
-  const searchMatches = useMemo(() => studios.filter((s) => matchesQuery(s, deferredQuery)), [studios, deferredQuery])
-  const counts = useMemo(() => countByCategory(searchMatches), [searchMatches])
-  const visible = useMemo(() => filterStudios(searchMatches, filter, ''), [searchMatches, filter])
+  // Zähler in den Filtern berücksichtigen Suche und Tarif, nicht aber den Kategorienfilter selbst
+  const search = useMemo(() => searchStudios(studios, deferredQuery), [studios, deferredQuery])
+  const counts = useMemo(() => countByCategory(search.matches), [search])
+  const visible = useMemo(() => filterStudios(search.matches, filter, ''), [search, filter])
   const origin = userLocation ?? mapCenter
-  const sorted = useMemo(() => sortStudios(visible, sort, sort === 'distance' ? origin : null), [visible, sort, origin])
+  const sorted = useMemo(
+    () => sortStudios(visible, sort, sort === 'distance' ? origin : null, search.scores),
+    [visible, sort, origin, search],
+  )
 
-  const selected = selectedId ? (byId.get(selectedId) ?? null) : null
+  const selected: ViewStudio | null = selectedId ? (byId.get(selectedId) ?? allById.get(selectedId) ?? null) : null
   const selectedCandidates = useMemo(
     () =>
       selected
@@ -68,29 +80,34 @@ export default function App() {
     setListOpen(false)
   }, [])
 
-  const locate = useCallback(() => {
-    if (!('geolocation' in navigator)) {
-      setMessage('Standortbestimmung wird von diesem Browser nicht unterstützt.')
-      return
-    }
-    setLocating(true)
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude })
-        setSort('distance')
-        setLocating(false)
-      },
-      (err) => {
-        setLocating(false)
-        setMessage(
-          err.code === err.PERMISSION_DENIED
-            ? 'Standortzugriff verweigert (oder Seite nicht über HTTPS/localhost geöffnet). Entfernungen werden ab Kartenmitte berechnet.'
-            : 'Standort konnte nicht ermittelt werden. Entfernungen werden ab Kartenmitte berechnet.',
-        )
-      },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 },
-    )
-  }, [setSort])
+  const locate = useCallback(
+    (fly: boolean) => {
+      if (!('geolocation' in navigator)) {
+        setMessage('Standortbestimmung wird von diesem Browser nicht unterstützt.')
+        return
+      }
+      setLocating(true)
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+          setUserLocation(loc)
+          setLocating(false)
+          if (fly) setFlyTo({ ...loc, zoom: 15, nonce: Date.now() })
+          else setSort('distance')
+        },
+        (err) => {
+          setLocating(false)
+          setMessage(
+            err.code === err.PERMISSION_DENIED
+              ? 'Standortzugriff verweigert (oder Seite nicht über HTTPS geöffnet). Entfernungen werden ab Kartenmitte berechnet.'
+              : 'Standort konnte nicht ermittelt werden. Entfernungen werden ab Kartenmitte berechnet.',
+          )
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
+      )
+    },
+    [setSort],
+  )
 
   const decide = useCallback(
     async (pair: string, decision: 'confirm' | 'reject' | 'reset') => {
@@ -113,17 +130,18 @@ export default function App() {
       sort={sort}
       onSortChange={setSort}
       hasUserLocation={!!userLocation}
-      onLocate={locate}
+      onLocate={() => locate(false)}
       locating={locating}
+      searching={!!deferredQuery.trim()}
     />
   )
 
   return (
     <div className="flex h-dvh flex-col bg-background text-foreground">
-      <header className="z-10 flex flex-col gap-2 border-b px-3 py-2 md:flex-row md:items-center">
+      <header className="z-10 flex flex-col gap-2 border-b px-2 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 md:flex-row md:items-center md:px-3">
         <div className="flex items-center gap-2 md:contents">
           <h1 className="flex shrink-0 items-center gap-1.5 text-sm font-semibold md:w-77">
-            <Dumbbell className="size-4" />
+            <Dumbbell className="size-4" aria-hidden />
             <span className="hidden sm:inline">Studio Map Berlin</span>
           </h1>
           <div className="min-w-0 flex-1 md:max-w-md">
@@ -133,7 +151,11 @@ export default function App() {
             <DataDialog dataset={dataset} api={api} onDataChanged={reload} onDecide={decide} onShowStudio={showStudio} />
           </div>
         </div>
-        <ProviderFilter value={filter} counts={counts} onChange={setFilter} />
+        {/* mobil: eine Zeile, horizontal scrollbar */}
+        <div className="-mx-2 flex gap-1.5 overflow-x-auto px-2 [scrollbar-width:none] md:mx-0 md:px-0 [&::-webkit-scrollbar]:hidden">
+          <PlanSelect value={plan} onChange={setPlan} />
+          <ProviderFilter value={filter} counts={counts} onChange={setFilter} />
+        </div>
       </header>
 
       <main className="relative flex min-h-0 flex-1">
@@ -146,8 +168,11 @@ export default function App() {
             onSelect={setSelectedId}
             focus={focus}
             fit={fit}
+            flyTo={flyTo}
             userLocation={userLocation}
             onCenterChange={setMapCenter}
+            bottomInset={!isDesktop && selected ? detailHeight + 8 : 0}
+            showZoomControl={isDesktop}
           />
 
           {loading && !dataset && (
@@ -169,25 +194,52 @@ export default function App() {
           )}
 
           {selected && (
-            <StudioDetail
-              key={selected.id}
-              studio={selected}
-              candidates={selectedCandidates}
-              canEdit={api.available}
-              onClose={() => setSelectedId(null)}
-              onDecide={decide}
-              onShowStudio={showStudio}
+            <div
+              ref={detailRef}
               className={
                 isDesktop
-                  ? 'absolute top-3 left-3 z-[1000] w-96 max-h-[calc(100%-1.5rem)]'
-                  : 'absolute inset-x-2 bottom-2 z-[1000] max-h-[60%]'
+                  ? 'absolute top-3 left-3 z-[1000] flex max-h-[calc(100%-1.5rem)] w-96'
+                  : 'absolute inset-x-0 bottom-0 z-[1000] flex max-h-[60%] px-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]'
               }
-            />
+            >
+              <StudioDetail
+                key={selected.id}
+                studio={selected}
+                plan={plan}
+                candidates={selectedCandidates}
+                canEdit={api.available}
+                onClose={() => setSelectedId(null)}
+                onDecide={decide}
+                onShowStudio={showStudio}
+                className="w-full"
+              />
+            </div>
+          )}
+
+          {!selected && (
+            <Button
+              variant="outline"
+              size="icon-lg"
+              className={cn(
+                'absolute right-3 z-[1000] size-11 rounded-full bg-background shadow-lg',
+                isDesktop ? 'bottom-8' : 'bottom-[max(1.75rem,calc(env(safe-area-inset-bottom)+1rem))]',
+              )}
+              onClick={() => locate(true)}
+              disabled={locating}
+              aria-label="Zu meinem Standort"
+              title="Zu meinem Standort"
+            >
+              <LocateFixed className={cn('size-5', userLocation && 'text-sky-600', locating && 'animate-pulse')} />
+            </Button>
           )}
 
           {!isDesktop && !selected && (
-            <Button className="absolute bottom-4 left-1/2 z-[1000] -translate-x-1/2 shadow-lg" onClick={() => setListOpen(true)}>
-              <List /> Liste ({visible.length.toLocaleString('de-DE')})
+            <Button
+              size="lg"
+              className="absolute bottom-[max(1.75rem,calc(env(safe-area-inset-bottom)+1rem))] left-1/2 z-[1000] h-11 -translate-x-1/2 rounded-full px-5 shadow-lg"
+              onClick={() => setListOpen(true)}
+            >
+              <List /> {deferredQuery.trim() ? 'Treffer' : 'Liste'} ({visible.length.toLocaleString('de-DE')})
             </Button>
           )}
         </div>
@@ -195,8 +247,8 @@ export default function App() {
 
       {!isDesktop && (
         <Sheet open={listOpen} onOpenChange={setListOpen}>
-          <SheetContent side="bottom" className="flex flex-col gap-0 p-0 data-[side=bottom]:h-[75dvh]">
-            <SheetHeader className="border-b p-3">
+          <SheetContent side="bottom" className="flex flex-col gap-0 rounded-t-2xl p-0 pb-[env(safe-area-inset-bottom)] data-[side=bottom]:h-[80dvh]">
+            <SheetHeader className="border-b px-3 py-2.5">
               <SheetTitle>Studios</SheetTitle>
               <SheetDescription className="sr-only">Gefilterte Studioliste</SheetDescription>
             </SheetHeader>
