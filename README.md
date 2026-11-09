@@ -10,7 +10,7 @@ Persönliche, lokal laufende Webanwendung, die Fitness- und Sportstudios in Berl
 
 Farbe **und** Form unterscheiden die Kategorien, damit sie auch bei Farbsehschwäche erkennbar sind. Cluster zeigen die Anzahl und als Farbring die Anteile der drei Kategorien.
 
-**Datenstand im Repository:** 3. November 2026, 2.314 Standorte (2.221 USC, 239 Wellpass, davon 146 bei beiden Anbietern). Dazu kommen 20 unsichere Zuordnungsvorschläge, die auf eine manuelle Prüfung warten.
+**Datenstand im Repository:** 3. November 2026 (Standorte), 9. November 2026 (USC-Details). 2.314 Standorte (2.221 USC, 239 Wellpass, davon 146 bei beiden Anbietern). Für alle 2.221 USC-Studios liegen Plus-Kennzeichen (310 Plus-Studios), Besuchs- und Aktivitätslimits je Stufe, PLZ und Bewertung vor. Beispiel: Massage ist mit M in 32 Studios buchbar. Dazu kommen 20 unsichere Zuordnungsvorschläge, die auf eine manuelle Prüfung warten.
 
 ---
 
@@ -231,7 +231,8 @@ Außerdem im Browser geprüft (Playwright, Desktop und Pixel 7): Marker, Cluster
 
 - **Wellpass-Daten stammen standardmäßig aus einer Drittquelle.** Fair for Fitness erfasst nur einen Teil der Wellpass-Studios (Berlin: 239). Der Grund ist, dass Fair for Fitness ein Preisvergleich ist und Netzwerke nur bei bereits erfassten Studios zuordnet. Vollständiger ist der einmalige Abgleich mit `--wellpass-official`.
 - **USC hat keine dokumentierte API.** Ändert USC seine Website, schlägt der Import mit klarer Meldung fehl, und der bisherige Stand bleibt erhalten. Dann muss `sources/usc.py` angepasst werden.
-- USC liefert in den öffentlichen Listen **keine Postleitzahlen**. Bei rund 25 Standorten fehlt die Straße, bei 5 fehlen Koordinaten (diese stehen nur in der Liste).
+- Postleitzahlen stammen bei USC von den Studioseiten (bei 81 Standorten fehlen sie noch). Bei rund 25 Standorten fehlt die Straße, bei 5 fehlen Koordinaten (diese stehen nur in der Liste).
+- Die Aktivitätslimits je Stufe gelten laut USC für Privatmitgliedschaften (B2C). Firmenmitgliedschaften können abweichen.
 - USC listet viele **Kurse oder Anbieter innerhalb eines Hauses** als eigene „Venues“, z. B. „… @ Sarasvati“. Sie bleiben getrennte Einträge, und pro Wellpass-Studio wird höchstens ein USC-Eintrag zugeordnet.
 - Die Zuordnung ist bewusst **konservativ**. Einige echte Dubletten erscheinen zunächst als Prüfvorschlag statt automatisch zusammengeführt.
 - Die USC-Stufen werden angezeigt, aber noch nicht gefiltert (Phase 4).

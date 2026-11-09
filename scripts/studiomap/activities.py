@@ -30,6 +30,12 @@ USC_EN_DE = {
     "Vibration Training": "Vibrationstraining", "Hiking": "Wandern", "Wellness": "Wellness",
     "Yoga": "Yoga", "Live Class": "Live-Online-Kurs", "Volleyball": "Volleyball",
     "Basketball": "Basketball", "Rowing": "Rudern", "Sailing": "Segeln", "Kickboxing": "Kickboxen",
+    # tatsächlich von USC verwendete Varianten
+    "Boxing Sports": "Boxsport", "Dancing": "Tanzen", "EMS Strength": "EMS Kraft", "Family Sports": "Familiensport",
+    "Game of Golf": "Golfspielen", "Health Courses": "Gesundheitskurse", "Modern Self Defence": "Moderne Selbstverteidigung",
+    "Online Course": "Live-Online-Kurs", "Indoor Sports": "Hallensport", "Waterski and Wakeboard": "Wasserski und Wakeboard",
+    "Urban Sports Club - Community Event": "Community Event", "USC - Community Event": "Community Event",
+    "Urban Sports Club – Community Event": "Community Event",
 }
 
 # Fair for Fitness "kategorie"
@@ -85,7 +91,7 @@ def usc_activities(categories: list[str], details: dict | None) -> list[dict[str
         for p in limits
         if p.get("size") in SIZES
     }
-    for cat in categories:
+    for cat in (usc_activity(c) for c in categories):
         if cat in out:
             continue
         out[cat] = {"name": cat, "limits": {s: venue_limit.get(s, 0) for s in SIZES} if limits else None}
