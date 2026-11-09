@@ -127,12 +127,35 @@ export function buildStudio(
   }
 }
 
+/** Ersetzt veraltete Eintragsschlüssel (z. B. Fair for Fitness → offizieller
+ *  Gym-Finder), damit frühere Zusammenführungen weiter gelten. `pair` bleibt
+ *  unverändert (Kennung für Sync). */
+export function translateDecision(d: Decision, aliases: Record<string, string> | undefined): Decision {
+  if (!aliases) return d
+  const keys = keysOf(d)
+  if (!keys.some((k) => k in aliases)) return d
+  const map = (k: string) => aliases[k] ?? k
+  const fields = d.fields
+    ? (Object.fromEntries(Object.entries(d.fields).map(([f, v]) => [f, typeof v === 'string' ? map(v) : v])) as FieldChoices)
+    : undefined
+  return { ...d, keys: keys.map(map), fields }
+}
+
 /** Wendet die Entscheidungen auf den Datenbestand an (idempotent, in Reihenfolge). */
-export function applyDecisions(ds: Dataset, decisions: Decision[]): Dataset {
-  if (!decisions.length) return ds
+export function applyDecisions(ds: Dataset, rawDecisions: Decision[]): Dataset {
+  if (!rawDecisions.length) return ds
+  const decisions = rawDecisions.map((d) => translateDecision(d, ds.keyAliases))
   let studios = [...ds.studios]
   let counter = 0
-  const containing = (key: string) => studios.find((s) => membersOf(s).some((m) => memberKey(m) === key))
+  // Schlüssel → Studio (bei vielen Studios schneller als wiederholtes Durchsuchen)
+  let byKey: Map<string, Studio> | null = null
+  const containing = (key: string) => {
+    if (!byKey) {
+      byKey = new Map()
+      for (const s of studios) for (const m of membersOf(s)) byKey.set(memberKey(m), s)
+    }
+    return byKey.get(key)
+  }
 
   for (const d of decisions) {
     const keys = keysOf(d)
@@ -151,6 +174,7 @@ export function applyDecisions(ds: Dataset, decisions: Decision[]): Dataset {
       const tIds = new Set(touched.map((s) => s.id))
       for (const s of touched) membersOf(s).forEach((m, i) => added.push(single(m, s, i)))
       studios = [...studios.filter((s) => !tIds.has(s.id)), ...added]
+      byKey = null
       continue
     }
 
@@ -168,6 +192,7 @@ export function applyDecisions(ds: Dataset, decisions: Decision[]): Dataset {
       added.push(ms.length > 1 ? buildStudio(ms, rid, from.fieldChoices, from.matchConfidence) : single(ms[0], { ...from, id: rid }, 0))
     }
     studios = [...studios.filter((s) => !ids.has(s.id)), ...added]
+    byKey = null
   }
   const decided = new Set(decisions.flatMap((d) => (keysOf(d).length === 2 ? [keysOf(d).join('~')] : [])))
   const present = new Set(studios.map((s) => s.id))

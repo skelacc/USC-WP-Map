@@ -7,6 +7,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getStatus, type ApiStatus } from '@/lib/importApi'
 import type { Decision } from '@/lib/merges'
+import type { LoadMode } from '@/lib/filter'
+import type { TileState } from '@/hooks/useDataset'
 import type { Dataset, MatchCandidate } from '@/types/studio'
 import { FileImport } from './FileImport'
 import { ImportPanel } from './ImportPanel'
@@ -30,6 +32,9 @@ interface Props {
   onSyncConfigChange: (c: SyncConfig) => void
   onSync: () => Promise<void>
   syncStatus: { state: 'idle' | 'busy' | 'ok' | 'error'; message?: string; at?: string; url?: string }
+  loadMode: LoadMode
+  onLoadModeChange: (m: LoadMode) => void
+  tiles: TileState
 }
 
 function fmt(iso?: string) {
@@ -85,7 +90,7 @@ export function DataDialog(props: Props) {
           </TabsList>
           <div ref={scrollRef} onScroll={onScroll} className="min-h-0 overflow-y-auto pt-2">
             <TabsContent value="hints">
-              <InfoPanel dataset={dataset} />
+              <InfoPanel dataset={dataset} tiles={props.tiles} />
             </TabsContent>
             <TabsContent value="sync">
               <SyncPanel
@@ -98,10 +103,11 @@ export function DataDialog(props: Props) {
               />
             </TabsContent>
             <TabsContent value="data" className="space-y-4 text-sm">
+              <LoadModeSetting value={props.loadMode} onChange={props.onLoadModeChange} tiles={props.tiles} />
               {dataset ? (
                 <>
                   <p>
-                    Stand: <b>{fmt(dataset.generatedAt)}</b> · {dataset.studios.length.toLocaleString('de-DE')} Studios
+                    Stand: <b>{fmt(dataset.generatedAt)}</b> · {(dataset.studios.length - props.tiles.loadedStudios + (props.tiles.index?.total ?? 0)).toLocaleString('de-DE')} Studios
                   </p>
                   <ul className="space-y-2">
                     {dataset.sources.map((s) => (
@@ -157,5 +163,31 @@ export function DataDialog(props: Props) {
         </Tabs>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function LoadModeSetting({ value, onChange, tiles }: { value: LoadMode; onChange: (m: LoadMode) => void; tiles: TileState }) {
+  if (!tiles.index) return null
+  const total = tiles.index.total
+  const cells = Object.keys(tiles.index.cells).length
+  const opt = (v: LoadMode, title: string, text: string) => (
+    <label className="flex cursor-pointer gap-2 rounded-md border p-2 has-[:checked]:border-foreground has-[:checked]:bg-muted/60">
+      <input type="radio" name="loadMode" className="mt-0.5" checked={value === v} onChange={() => onChange(v)} />
+      <span>
+        <span className="font-medium">{title}</span>
+        <span className="block text-xs text-muted-foreground">{text}</span>
+      </span>
+    </label>
+  )
+  return (
+    <fieldset className="space-y-1.5">
+      <legend className="mb-1 font-semibold">Wellpass außerhalb Berlins laden</legend>
+      {opt('viewport', 'Nur Kartenausschnitt (empfohlen)', 'Schneller Start: Berlin sofort, andere Regionen erst, wenn du dorthin schiebst.')}
+      {opt('all', 'Alles beim Start', `Alle ${total.toLocaleString('de-DE')} Studios sofort (ca. 0,6 MB zusätzlich). Praktisch für die Suche in ganz Deutschland.`)}
+      <p className="text-xs text-muted-foreground">
+        Geladen: {tiles.loadedCells} von {cells} Kacheln ({tiles.loadedStudios.toLocaleString('de-DE')} Studios).
+        {tiles.error && <span className="text-red-700"> {tiles.error}</span>} Der Bereich „Alle“ in der Liste lädt ebenfalls alles.
+      </p>
+    </fieldset>
   )
 }

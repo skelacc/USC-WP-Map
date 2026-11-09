@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 
 const SOURCE_OPTIONS = [
   { id: 'usc', label: 'Urban Sports Club (offizielle Website, ca. 2–3 Min.)' },
-  { id: 'wellpass', label: 'Wellpass (über Fair for Fitness)' },
+  { id: 'wellpass', label: 'Wellpass (neuester Gym-Finder-Export in data/WP-network)' },
   { id: 'manual', label: 'Manuelle Dateien (data/manual/import)' },
 ]
 
@@ -203,6 +203,8 @@ function ReportView({ report }: { report: ImportReport }) {
             <b>{k}</b>:{' '}
             {s.status === 'failed'
               ? `fehlgeschlagen – ${s.error}. Bisheriger Stand (${s.keptPrevious} Datensätze) wird beibehalten.`
+              : s.status === 'unchanged'
+              ? `unverändert (${s.count} Datensätze) – ${s.note}`
               : `${s.count} Datensätze${s.skipped ? `, ${s.skipped} ungültig übersprungen` : ''}${s.errors?.length ? `, ${s.errors.length} Hinweise` : ''}`}
           </li>
         ))}
@@ -235,9 +237,9 @@ function ReportView({ report }: { report: ImportReport }) {
               ))}
             </tbody>
           </table>
-          <DiffList title="Neu hinzugekommen" items={d.added} />
-          <DiffList title="Entfernt" items={d.removed} />
-          <DiffList title="Anbieter geändert" items={d.providersChanged} />
+          <DiffList title="Neu hinzugekommen" items={d.added} total={d.totals?.added} />
+          <DiffList title="Entfernt" items={d.removed} total={d.totals?.removed} />
+          <DiffList title="Anbieter geändert" items={d.providersChanged} total={d.totals?.providersChanged} />
           {!!report.matchCandidates && <p className="text-xs">{report.matchCandidates} unsichere Zuordnungen warten auf Prüfung (Reiter „Zuordnungen“ nach dem Übernehmen).</p>}
         </>
       )}
@@ -253,12 +255,14 @@ function ReportView({ report }: { report: ImportReport }) {
   )
 }
 
-function DiffList({ title, items }: { title: string; items: { id: string; name: string; street: string | null }[] }) {
+function DiffList({ title, items, total }: { title: string; items: { id: string; name: string; street: string | null }[]; total?: number }) {
   if (!items.length) return <p className="text-xs text-muted-foreground">{title}: keine</p>
+  const n = total ?? items.length
   return (
     <details className="text-xs">
       <summary className="cursor-pointer">
-        {title}: {items.length}
+        {title}: {n.toLocaleString('de-DE')}
+        {n > items.length && <span className="text-muted-foreground"> (die ersten {items.length} gezeigt)</span>}
       </summary>
       <ul className="mt-1 max-h-40 overflow-y-auto pl-4">
         {items.map((s) => (

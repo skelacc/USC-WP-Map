@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { LocateFixed, MapPinOff } from 'lucide-react'
+import { Loader2, LocateFixed, MapPinOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { addressSummary } from '@/lib/address'
 import { categoryOf } from '@/lib/categories'
-import type { SortMode, SortedStudio } from '@/lib/filter'
+import type { Scope, SortMode, SortedStudio } from '@/lib/filter'
 import { formatDistance } from '@/lib/geo'
 import { cn } from '@/lib/utils'
 import { CategorySwatch } from '../ProviderBadges'
@@ -19,9 +20,16 @@ interface Props {
   onLocate: () => void
   locating: boolean
   searching?: boolean
+  scope: Scope
+  onScopeChange: (s: Scope) => void
+  /** Treffer, die außerhalb des Ausschnitts liegen (nur bei Bereich „Ausschnitt“) */
+  outsideCount: number
+  onShowOutside: () => void
+  loadingMore?: boolean
 }
 
-export function StudioList({ items, selectedId, onPick, sort, onSortChange, hasUserLocation, onLocate, locating, searching }: Props) {
+export function StudioList(p: Props) {
+  const { items, selectedId, onPick, sort, onSortChange, hasUserLocation, onLocate, locating, searching, scope, onScopeChange, outsideCount, onShowOutside, loadingMore } = p
   // Bei neuen Ergebnissen wieder mit der ersten Seite beginnen
   const [paging, setPaging] = useState({ items, limit: PAGE })
   const limit = paging.items === items ? paging.limit : PAGE
@@ -39,8 +47,19 @@ export function StudioList({ items, selectedId, onPick, sort, onSortChange, hasU
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col">
-      <div className="flex items-center gap-2 border-b px-3 py-2 text-xs">
+      <div className="flex items-center gap-2 border-b px-3 py-1.5 text-xs">
         <span className="font-medium tabular-nums">{items.length.toLocaleString('de-DE')} Studios</span>
+        {loadingMore && <Loader2 className="size-3.5 animate-spin text-muted-foreground" aria-label="Lädt weitere Studios" />}
+        <div className="ml-auto flex items-center gap-1" role="group" aria-label="Bereich für Liste, Suche und Zähler">
+          <Button size="xs" className="h-8 md:h-6" variant={scope === 'viewport' ? 'secondary' : 'ghost'} onClick={() => onScopeChange('viewport')} aria-pressed={scope === 'viewport'} title="Nur Studios im sichtbaren Kartenausschnitt">
+            Ausschnitt
+          </Button>
+          <Button size="xs" className="h-8 md:h-6" variant={scope === 'all' ? 'secondary' : 'ghost'} onClick={() => onScopeChange('all')} aria-pressed={scope === 'all'} title="Alle Studios in Deutschland (lädt alle Wellpass-Daten)">
+            Alle
+          </Button>
+        </div>
+      </div>
+      <div className="flex items-center gap-2 border-b px-3 py-1.5 text-xs">
         <div className="ml-auto flex items-center gap-1" role="group" aria-label="Sortierung">
           <span className="text-muted-foreground">Sortieren:</span>
           <Button size="xs" className="h-8 md:h-6" variant={sort === 'name' ? 'secondary' : 'ghost'} onClick={() => onSortChange('name')} aria-pressed={sort === 'name'}>
@@ -54,6 +73,17 @@ export function StudioList({ items, selectedId, onPick, sort, onSortChange, hasU
           </Button>
         </div>
       </div>
+      {scope === 'viewport' && searching && outsideCount > 0 && (
+        <p className="flex flex-wrap items-center gap-x-2 border-b bg-muted/50 px-3 py-1.5 text-xs">
+          <span>{outsideCount.toLocaleString('de-DE')} weitere Treffer außerhalb des Ausschnitts.</span>
+          <button type="button" className="text-primary underline" onClick={onShowOutside}>
+            Hinzoomen
+          </button>
+          <button type="button" className="text-primary underline" onClick={() => onScopeChange('all')}>
+            Alle zeigen
+          </button>
+        </p>
+      )}
       {sort === 'distance' && (
         <p className="border-b px-3 py-1 text-[11px] text-muted-foreground">
           Entfernung {hasUserLocation ? 'von deinem Standort' : 'von der Kartenmitte'}
@@ -76,7 +106,7 @@ export function StudioList({ items, selectedId, onPick, sort, onSortChange, hasU
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium">{s.name}</span>
                 <span className="block truncate text-xs text-muted-foreground">
-                  {[s.address.street, s.address.district].filter(Boolean).join(' · ') || 'Adresse unbekannt'}
+                  {addressSummary(s.address)}
                 </span>
               </span>
               <span className="shrink-0 pt-0.5 text-right text-xs text-muted-foreground tabular-nums">
@@ -89,7 +119,11 @@ export function StudioList({ items, selectedId, onPick, sort, onSortChange, hasU
             </button>
           </li>
         ))}
-        {items.length === 0 && <li className="p-6 text-center text-sm text-muted-foreground">Keine Studios für diese Filter/Suche.</li>}
+        {items.length === 0 && (
+          <li className="p-6 text-center text-sm text-muted-foreground">
+            {scope === 'viewport' ? 'Keine Studios im Kartenausschnitt für diese Filter/Suche.' : 'Keine Studios für diese Filter/Suche.'}
+          </li>
+        )}
         {limit < items.length && <div ref={sentinel} className="h-8" />}
       </ul>
     </div>

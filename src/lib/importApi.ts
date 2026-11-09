@@ -31,7 +31,7 @@ export interface ImportReport {
   startedAt: string
   finishedAt?: string
   requested?: string[]
-  sources: Record<string, { status: string; count?: number; error?: string; keptPrevious?: number; errors?: string[]; skipped?: number }>
+  sources: Record<string, { status: string; count?: number; error?: string; keptPrevious?: number; errors?: string[]; skipped?: number; note?: string }>
   errors: string[]
   warnings?: string[]
   matchCandidates?: number
@@ -41,6 +41,8 @@ export interface ImportReport {
     added: StudioSummary[]
     removed: StudioSummary[]
     providersChanged: (StudioSummary & { before: StudioSummary['providers'] })[]
+    /** Gesamtzahlen (die Listen sind auf 300 Einträge gekürzt) */
+    totals?: { added: number; removed: number; providersChanged: number }
   }
 }
 

@@ -6,7 +6,7 @@ import 'leaflet/dist/leaflet.css'
 import './map.css'
 import { categoryOf } from '@/lib/categories'
 import { BERLIN_CENTER, BERLIN_ZOOM, type LatLng } from '@/lib/geo'
-import type { Category, Studio } from '@/types/studio'
+import type { Bounds, Category, Studio } from '@/types/studio'
 import { clusterIcon, selectedIcon, studioIcon, userIcon } from './markerIcons'
 
 export interface FocusRequest {
@@ -16,6 +16,14 @@ export interface FocusRequest {
 
 export interface FitRequest {
   nonce: number
+  /** auf alle angezeigten Studios statt auf fitStudios zoomen */
+  all?: boolean
+}
+
+export interface MapView {
+  center: LatLng
+  bounds: Bounds
+  zoom: number
 }
 
 export interface FlyRequest {
@@ -27,13 +35,15 @@ export interface FlyRequest {
 
 interface Props {
   studios: Studio[]
+  /** Studios, auf die „fit“ zoomt (z. B. Suchtreffer im gewählten Bereich); Standard: studios */
+  fitStudios?: Studio[]
   active: Studio | null
   onMarkerClick: (id: string) => void
   onMapClick: () => void
   focus: FocusRequest | null
   fit: FitRequest | null
   userLocation: LatLng | null
-  onCenterChange: (c: LatLng) => void
+  onViewChange: (v: MapView) => void
   flyTo?: FlyRequest | null
   /** Höhe (px), die unten von Karte/Sheet verdeckt wird. */
   bottomInset?: number
@@ -52,7 +62,7 @@ const canHover = typeof window !== 'undefined' && window.matchMedia?.('(hover: h
  *  – Tipp auf Pin: Pin wird aktiv, unten erscheint die Vorschaukarte.
  *  – Tipp auf die freie Karte: Auswahl aufheben.
  */
-function ClusterLayer({ studios, onMarkerClick, focus, fit, bottomInset = 0 }: Pick<Props, 'studios' | 'onMarkerClick' | 'focus' | 'fit' | 'bottomInset'>) {
+function ClusterLayer({ studios, fitStudios, onMarkerClick, focus, fit, bottomInset = 0 }: Pick<Props, 'studios' | 'fitStudios' | 'onMarkerClick' | 'focus' | 'fit' | 'bottomInset'>) {
   const map = useMap()
   const groupRef = useRef<L.MarkerClusterGroup | null>(null)
   const markersRef = useRef(new Map<string, L.Marker>())
@@ -85,16 +95,30 @@ function ClusterLayer({ studios, onMarkerClick, focus, fit, bottomInset = 0 }: P
     }
   }, [map])
 
+  // Marker nur für Änderungen anpassen: Bei ~19.000 Studios wäre ein kompletter
+  // Neuaufbau (z. B. beim Nachladen einer Kachel oder bei jedem Tastendruck) spürbar langsam.
+  const signatureRef = useRef(new Map<string, string>())
   useEffect(() => {
     const group = groupRef.current
     if (!group) return
+    const prev = markersRef.current
+    const prevSig = signatureRef.current
     const markers = new Map<string, L.Marker>()
-    const list: L.Marker[] = []
+    const sigs = new Map<string, string>()
+    const toAdd: L.Marker[] = []
     for (const s of studios) {
       if (!s.coordinates) continue
       const category = categoryOf(s)
+      const approx = s.coordinates.precision === 'geocoded'
+      const sig = `${category}|${approx}|${s.coordinates.latitude}|${s.coordinates.longitude}|${s.name}`
+      const old = prev.get(s.id)
+      if (old && prevSig.get(s.id) === sig) {
+        markers.set(s.id, old)
+        sigs.set(s.id, sig)
+        continue
+      }
       const m = L.marker([s.coordinates.latitude, s.coordinates.longitude], {
-        icon: studioIcon(category, s.coordinates.precision === 'geocoded'),
+        icon: studioIcon(category, approx),
         keyboard: true,
         category,
       } as L.MarkerOptions)
@@ -104,11 +128,20 @@ function ClusterLayer({ studios, onMarkerClick, focus, fit, bottomInset = 0 }: P
         onClickRef.current(s.id)
       })
       markers.set(s.id, m)
-      list.push(m)
+      sigs.set(s.id, sig)
+      toAdd.push(m)
     }
-    group.clearLayers()
-    group.addLayers(list)
+    const toRemove: L.Marker[] = []
+    for (const [id, m] of prev) if (markers.get(id) !== m) toRemove.push(m)
+    if (toRemove.length > prev.size / 2) {
+      group.clearLayers()
+      group.addLayers([...markers.values()])
+    } else {
+      if (toRemove.length) group.removeLayers(toRemove)
+      if (toAdd.length) group.addLayers(toAdd)
+    }
     markersRef.current = markers
+    signatureRef.current = sigs
   }, [studios])
 
   // Zu einem Studio springen (aus Liste, Suche, Vorschaukarte)
@@ -124,10 +157,10 @@ function ClusterLayer({ studios, onMarkerClick, focus, fit, bottomInset = 0 }: P
     })
   }, [focus, map])
 
-  const studiosRef = useRef(studios)
+  const studiosRef = useRef(fitStudios ?? studios)
   useEffect(() => {
-    studiosRef.current = studios
-  }, [studios])
+    studiosRef.current = fitStudios ?? studios
+  }, [studios, fitStudios])
   useEffect(() => {
     if (!fit) return
     const pts = studiosRef.current.filter((s) => s.coordinates).map((s) => [s.coordinates!.latitude, s.coordinates!.longitude] as [number, number])
@@ -162,24 +195,30 @@ function FlyTo({ flyTo }: Pick<Props, 'flyTo'>) {
   return null
 }
 
-function MapEvents({ onMapClick, onCenterChange }: Pick<Props, 'onMapClick' | 'onCenterChange'>) {
+function MapEvents({ onMapClick, onViewChange }: Pick<Props, 'onMapClick' | 'onViewChange'>) {
+  const report = (m: L.Map) => {
+    const c = m.getCenter()
+    const b = m.getBounds()
+    onViewChange({ center: { lat: c.lat, lng: c.lng }, bounds: { south: b.getSouth(), west: b.getWest(), north: b.getNorth(), east: b.getEast() }, zoom: m.getZoom() })
+  }
   const map = useMapEvents({
     click: () => onMapClick(),
-    moveend: () => {
-      const c = map.getCenter()
-      onCenterChange({ lat: c.lat, lng: c.lng })
-    },
+    moveend: () => report(map),
   })
+  // Anfangsausschnitt melden
+  useEffect(() => {
+    map.whenReady(() => report(map))
+  }, [map]) // eslint-disable-line react-hooks/exhaustive-deps
   return null
 }
 
 export function StudioMap(props: Props) {
-  const { studios, active, onMarkerClick, onMapClick, focus, fit, userLocation, onCenterChange, flyTo, bottomInset = 0, showZoomControl = true } = props
+  const { studios, fitStudios, active, onMarkerClick, onMapClick, focus, fit, userLocation, onViewChange, flyTo, bottomInset = 0, showZoomControl = true } = props
   return (
     <MapContainer
       center={[BERLIN_CENTER.lat, BERLIN_CENTER.lng]}
       zoom={BERLIN_ZOOM}
-      minZoom={9}
+      minZoom={5}
       maxZoom={19}
       zoomControl={false}
       className="h-full w-full"
@@ -190,10 +229,10 @@ export function StudioMap(props: Props) {
         maxZoom={19}
       />
       {showZoomControl && <ZoomControl position="topright" />}
-      <ClusterLayer studios={studios} onMarkerClick={onMarkerClick} focus={focus} fit={fit} bottomInset={bottomInset} />
+      <ClusterLayer studios={studios} fitStudios={fitStudios} onMarkerClick={onMarkerClick} focus={focus} fit={fit} bottomInset={bottomInset} />
       <KeepVisible active={active} bottomInset={bottomInset} />
       <FlyTo flyTo={flyTo} />
-      <MapEvents onMapClick={onMapClick} onCenterChange={onCenterChange} />
+      <MapEvents onMapClick={onMapClick} onViewChange={onViewChange} />
       {active?.coordinates && (
         <Marker position={[active.coordinates.latitude, active.coordinates.longitude]} icon={selectedIcon} interactive={false} zIndexOffset={1000} />
       )}

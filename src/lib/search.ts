@@ -3,7 +3,7 @@ import type { Studio } from '@/types/studio'
 /**
  * Fehlertolerante Suche.
  *
- * Jeder Suchbegriff muss irgendwo in Name, Straße, PLZ oder Bezirk passen,
+ * Jeder Suchbegriff muss irgendwo in Name, Straße, PLZ, Bezirk, Ort oder Bundesland passen,
  * und zwar auf eine dieser Arten (absteigende Bewertung):
  *  1. als Teilstring (z. B. "fitn" in "fitness first")
  *  2. ohne Leerzeichen/Bindestriche/Punkte ("fitnessfirst", "ride bln" → "ride.bln")
@@ -40,7 +40,7 @@ function entryOf(s: Studio): Entry {
   if (!e) {
     const names = [s.name, ...Object.values(s.providerDetails).map((d) => d?.name ?? '')]
     const a = s.address
-    const raw = [...new Set(names), a.street, a.postalCode, a.district].filter(Boolean).join(' ')
+    const raw = [...new Set(names), a.street, a.postalCode, a.district, a.city, a.region].filter(Boolean).join(' ')
     const text = `${foldText(raw)} ${foldText(raw, true)}`
     const words = [...new Set(text.split(' ').filter(Boolean))]
     e = { text, compact: text.replace(/ /g, ''), words }

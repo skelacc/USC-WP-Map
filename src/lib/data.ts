@@ -33,5 +33,7 @@ export async function loadDataset(signal?: AbortSignal): Promise<Dataset> {
     matchCandidates: d.matchCandidates ?? [],
     rejectedPairs: d.rejectedPairs ?? [],
     sources: d.sources ?? [],
+    keyAliases: d.keyAliases ?? {},
+    tiles: d.tiles,
   }
 }

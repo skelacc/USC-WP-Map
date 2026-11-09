@@ -5,6 +5,10 @@ import { searchScore } from './search'
 
 export type CategoryFilter = Record<Category, boolean>
 export type SortMode = 'name' | 'distance'
+/** Bereich für Liste, Suche und Zähler */
+export type Scope = 'viewport' | 'all'
+/** Wellpass-Kacheln: nur im Ausschnitt nachladen oder alle */
+export type LoadMode = 'viewport' | 'all'
 
 /** Standard: nur Studios, die beide Anbieter akzeptieren */
 export const DEFAULT_FILTER: CategoryFilter = { both: true, usc: false, wellpass: false }

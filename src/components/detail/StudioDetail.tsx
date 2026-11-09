@@ -20,7 +20,10 @@ function formatDate(iso: string | null | undefined) {
 
 function addressLines(a?: Address | null) {
   if (!a) return ['Adresse unbekannt', '']
-  return [a.street ?? 'Straße unbekannt', [[a.postalCode, a.city].filter(Boolean).join(' '), a.district].filter(Boolean).join(' · ')]
+  const place = [[a.postalCode, a.city].filter(Boolean).join(' '), a.district, a.region].filter(Boolean).join(' · ')
+  // Der Wellpass-Gym-Finder liefert keine Straße – dann den Ort als Hauptzeile
+  if (!a.street) return place ? [place, 'Straße unbekannt (siehe Gym-Finder bzw. Route)'] : ['Adresse unbekannt', '']
+  return [a.approximate ? `ca. ${a.street}` : a.street, a.approximate ? [place, 'Adresse aus der Kartenposition ermittelt'].filter(Boolean).join(' · ') : place]
 }
 
 interface Props {
@@ -303,6 +306,11 @@ function ProviderSection({
           {PROVIDER_NAME[provider]}
         </span>
         {d.plus && <span className="rounded border px-1.5 py-0.5 text-[11px] font-semibold">Plus</span>}
+        {provider === 'wellpass' && d.plus1 !== undefined && (
+          <span className="rounded border px-1.5 py-0.5 text-[11px]" title="Auch mit Plus1-Mitgliedschaft (Angehörige) nutzbar">
+            Plus1: {d.plus1 ? 'ja' : 'nein'}
+          </span>
+        )}
         {d.rating ? (
           <span className="inline-flex items-center gap-0.5 text-xs text-muted-foreground">
             <Star className="size-3 fill-amber-400 text-amber-400" />

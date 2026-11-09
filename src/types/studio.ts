@@ -14,6 +14,10 @@ export interface Address {
   postalCode: string | null
   city: string | null
   district: string | null
+  /** Bundesland (außerhalb Berlins), z. B. „Bayern“ */
+  region?: string | null
+  /** Adresse nur ungefähr: per Rückwärtssuche aus der Position ermittelt (OpenStreetMap) */
+  approximate?: boolean
 }
 
 export interface Coordinates {
@@ -52,6 +56,8 @@ export interface ProviderDetail {
   planIncluded?: Partial<Record<PlanSize, boolean>>
   /** USC: als „Plus“ gekennzeichnet (Plus-Check-in nötig) */
   plus?: boolean | null
+  /** Wellpass: auch mit Plus1-Mitgliedschaft (Angehörige) nutzbar */
+  plus1?: boolean
   rating?: number | null
   ratingCount?: number | null
   /** USC: Besuche pro Monat je Stufe (-1 unbegrenzt, 0 nicht enthalten) */
@@ -141,4 +147,48 @@ export interface Dataset {
   matchCandidates: MatchCandidate[]
   rejectedPairs: string[]
   sources: SourceMeta[]
+  /** veraltete Eintragsschlüssel → aktuelle (z. B. Fair for Fitness → offizieller Gym-Finder) */
+  keyAliases?: Record<string, string>
+  /** Wellpass außerhalb Berlins liegt in Kacheln (public/data/tiles) */
+  tiles?: { index: string; total: number }
+}
+
+/** Kartenausschnitt in Grad */
+export interface Bounds {
+  south: number
+  west: number
+  north: number
+  east: number
+}
+
+/** public/data/tiles/index.json (erzeugt von scripts/studiomap/publish.py) */
+export interface TileIndex {
+  schemaVersion: number
+  generatedAt: string
+  fetchedAt: string | null
+  cellDeg: number
+  coreBounds: [number, number, number, number]
+  urlBase: string
+  activities: string[]
+  types: string[]
+  regions: Record<string, string>
+  total: number
+  cells: Record<string, number>
+}
+
+/** Kurzform eines Wellpass-Studios in einer Kachel */
+export interface TileRecord {
+  i: string
+  n: string
+  c: [number, number]
+  s: string
+  o?: string
+  r?: string
+  t?: number
+  a?: number[]
+  p?: 1
+  st?: string
+  z?: string
+  d?: string
+  x?: 1
 }

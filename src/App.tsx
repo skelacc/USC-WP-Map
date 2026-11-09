@@ -11,13 +11,14 @@ import { ProviderFilter } from '@/components/filters/ProviderFilter'
 import { SearchBox } from '@/components/filters/SearchBox'
 import { StudioList } from '@/components/list/StudioList'
 import { PreviewCarousel } from '@/components/map/PreviewCarousel'
-import { StudioMap, type FitRequest, type FlyRequest, type FocusRequest } from '@/components/map/StudioMap'
+import { StudioMap, type FitRequest, type FlyRequest, type FocusRequest, type MapView } from '@/components/map/StudioMap'
 import { useDataset } from '@/hooks/useDataset'
 import { useElementHeight } from '@/hooks/useElementHeight'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { usePersistentState } from '@/hooks/usePersistentState'
-import { DEFAULT_FILTER, countByCategory, filterStudios, searchStudios, sortStudios, type CategoryFilter, type SortMode } from '@/lib/filter'
+import { DEFAULT_FILTER, countByCategory, filterStudios, searchStudios, sortStudios, type CategoryFilter, type LoadMode, type Scope, type SortMode } from '@/lib/filter'
 import { BERLIN_CENTER, distanceM, type LatLng } from '@/lib/geo'
+import { boundsIntersect, cellsInBounds, coreBounds, inBounds } from '@/lib/tiles'
 import { decideMatch, getStatus, type ApiStatus } from '@/lib/importApi'
 import { applyDecisions, decisionFor, loadDecisions, memberKey, membersOf, saveDecisions, upsertDecision, type Decision } from '@/lib/merges'
 import { DEFAULT_USC_PLAN, activityCounts, applyView, planLabel, type UscPlan, type ViewStudio } from '@/lib/plans'
@@ -28,7 +29,7 @@ import type { FieldChoices, Studio } from '@/types/studio'
 const NEARBY = 12
 
 export default function App() {
-  const { dataset: rawDataset, error, loading, reload } = useDataset()
+  const { dataset: rawDataset, error, loading, reload, tiles, ensureCells, loadAll } = useDataset()
   const isDesktop = useMediaQuery('(min-width: 768px)')
 
   const [filter, setFilter] = usePersistentState<CategoryFilter>('filter-v2', DEFAULT_FILTER)
@@ -36,6 +37,10 @@ export default function App() {
   const [showPlus, setShowPlus] = usePersistentState<boolean>('showPlus', false)
   const [activities, setActivities] = usePersistentState<string[]>('activities', [])
   const [sort, setSort] = usePersistentState<SortMode>('sort', 'name')
+  // Liste, Suche und Zähler: nur Kartenausschnitt oder alle Einrichtungen
+  const [scope, setScope] = usePersistentState<Scope>('scope', 'viewport')
+  // Wellpass außerhalb Berlins: nur Kacheln im Ausschnitt laden oder gleich alle
+  const [loadMode, setLoadMode] = usePersistentState<LoadMode>('loadMode', 'viewport')
   const [decisions, setDecisions] = useState<Decision[]>(loadDecisions)
   const [syncConfig, setSyncConfig] = useState<SyncConfig>(loadSyncConfig)
   const [syncStatus, setSyncStatus] = useState<{ state: 'idle' | 'busy' | 'ok' | 'error'; message?: string; at?: string; url?: string }>({ state: 'idle' })
@@ -54,7 +59,8 @@ export default function App() {
   const [focus, setFocus] = useState<FocusRequest | null>(null)
   const [fit, setFit] = useState<FitRequest | null>(null)
   const [flyTo, setFlyTo] = useState<FlyRequest | null>(null)
-  const [mapCenter, setMapCenter] = useState<LatLng>(BERLIN_CENTER)
+  const [view, setView] = useState<MapView | null>(null)
+  const mapCenter = view?.center ?? BERLIN_CENTER
   const [userLocation, setUserLocation] = useState<LatLng | null>(null)
   const [locating, setLocating] = useState(false)
   const [listOpen, setListOpen] = useState(false)
@@ -74,13 +80,28 @@ export default function App() {
   // Stufe, Plus und Aktivität anwenden
   const studios = useMemo(() => applyView(allStudios, { plan, showPlus, activities }), [allStudios, plan, showPlus, activities])
   const byId = useMemo(() => new Map<string, ViewStudio>(studios.map((s) => [s.id, s])), [studios])
-  const actCounts = useMemo(() => activityCounts(allStudios, plan, showPlus), [allStudios, plan, showPlus])
+  const actBase = useMemo(() => (scope === 'viewport' && view ? allStudios.filter((s) => inBounds(s, view.bounds)) : allStudios), [allStudios, scope, view])
+  const actCounts = useMemo(() => activityCounts(actBase, plan, showPlus), [actBase, plan, showPlus])
 
+  // Kacheln nachladen: alle (Einstellung bzw. Bereich „Alle“) oder die im Ausschnitt
+  const wantAll = loadMode === 'all' || scope === 'all'
+  useEffect(() => {
+    if (!tiles.index) return
+    if (wantAll) loadAll()
+    else if (view) ensureCells(cellsInBounds(tiles.index, view.bounds))
+  }, [tiles.index, wantAll, view, loadAll, ensureCells])
+
+  // Suche über alles Geladene; die Karte zeigt alle Treffer, Liste und Zähler nur den gewählten Bereich
+  const bounds = scope === 'viewport' ? (view?.bounds ?? null) : null
   const search = useMemo(() => searchStudios(studios, deferredQuery), [studios, deferredQuery])
-  const counts = useMemo(() => countByCategory(search.matches), [search])
-  const visible = useMemo(() => filterStudios(search.matches, filter, ''), [search, filter])
+  const scopedMatches = useMemo(() => (bounds ? search.matches.filter((s) => inBounds(s, bounds)) : search.matches), [search, bounds])
+  const counts = useMemo(() => countByCategory(scopedMatches), [scopedMatches])
+  const mapStudios = useMemo(() => filterStudios(search.matches, filter, ''), [search, filter])
+  const visible = useMemo(() => (bounds ? mapStudios.filter((s) => inBounds(s, bounds)) : mapStudios), [mapStudios, bounds])
+  const outsideCount = useMemo(() => (bounds ? mapStudios.reduce((n, s) => n + (s.coordinates && !inBounds(s, bounds) ? 1 : 0), 0) : 0), [mapStudios, bounds])
   const origin = userLocation ?? mapCenter
   const sorted = useMemo(() => sortStudios(visible, sort, sort === 'distance' ? origin : null, search.scores), [visible, sort, origin, search])
+  const outsideBerlin = !!view && !boundsIntersect(view.bounds, coreBounds(tiles.index))
 
   const active = activeId ? (byId.get(activeId) ?? null) : null
   const activeFull = activeId ? (allById.get(activeId) ?? null) : null
@@ -90,7 +111,7 @@ export default function App() {
     const anchor = (anchorId && byId.get(anchorId)) || active
     if (!anchor?.coordinates) return active ? [active] : []
     const a = { lat: anchor.coordinates.latitude, lng: anchor.coordinates.longitude }
-    const list = visible
+    const list = mapStudios
       .filter((s) => s.coordinates)
       .map((s) => ({ s, d: distanceM(a, { lat: s.coordinates!.latitude, lng: s.coordinates!.longitude }) }))
       .sort((x, y) => x.d - y.d)
@@ -98,16 +119,18 @@ export default function App() {
       .map((x) => x.s)
     if (active && !list.some((s) => s.id === active.id)) list.unshift(active)
     return list
-  }, [anchorId, active, byId, visible])
+  }, [anchorId, active, byId, mapStudios])
 
   // Auswahl schließen, wenn das Studio durch Filter verschwindet
   useEffect(() => {
     if (activeId && !byId.has(activeId) && !detailOpen) setActiveId(null)
   }, [activeId, byId, detailOpen])
 
+  // Bereich „Alle“: beim Tippen auf die Treffer zoomen. Im Ausschnitt nicht – sonst
+  // würde der Ausschnitt (und damit die Trefferliste) mit jedem Tastendruck kleiner.
   useEffect(() => {
-    if (deferredQuery.trim().length >= 2) setFit({ nonce: Date.now() })
-  }, [deferredQuery])
+    if (scope === 'all' && deferredQuery.trim().length >= 2) setFit({ nonce: Date.now() })
+  }, [deferredQuery, scope])
 
   // Neue Suche: zurück zur Karte
   const onQueryChange = useCallback((q: string) => {
@@ -271,6 +294,14 @@ export default function App() {
       onLocate={() => locate(false)}
       locating={locating}
       searching={!!deferredQuery.trim()}
+      scope={scope}
+      onScopeChange={setScope}
+      outsideCount={outsideCount}
+      onShowOutside={() => {
+        setListOpen(false)
+        setFit({ nonce: Date.now(), all: true })
+      }}
+      loadingMore={tiles.loading}
     />
   )
 
@@ -302,7 +333,7 @@ export default function App() {
             <Dumbbell className="size-4" aria-hidden />
             <span className="hidden sm:inline">Studio Map Berlin</span>
           </h1>
-          <div className="min-w-0 flex-1 md:max-w-sm">
+          <div className="min-w-0 flex-1 md:max-w-sm md:min-w-52">
             <SearchBox value={query} onChange={onQueryChange} onSubmit={() => setFit({ nonce: Date.now() })} />
           </div>
           <div className="md:order-last md:ml-auto">
@@ -320,6 +351,9 @@ export default function App() {
               onSyncConfigChange={setSyncConfig}
               onSync={runSync}
               syncStatus={syncStatus}
+              loadMode={loadMode}
+              onLoadModeChange={setLoadMode}
+              tiles={tiles}
               open={settingsOpen}
               onOpenChange={setSettingsOpen}
               onMergeCandidate={(c) => {
@@ -346,7 +380,8 @@ export default function App() {
 
         <div className="relative isolate min-w-0 flex-1">
           <StudioMap
-            studios={visible}
+            studios={mapStudios}
+            fitStudios={fit?.all ? mapStudios : visible}
             active={active}
             onMarkerClick={onMarkerClick}
             onMapClick={closeAll}
@@ -354,7 +389,7 @@ export default function App() {
             fit={fit}
             flyTo={flyTo}
             userLocation={userLocation}
-            onCenterChange={setMapCenter}
+            onViewChange={setView}
             bottomInset={showPreview ? bottomHeight : 0}
             showZoomControl={isDesktop}
           />
@@ -362,6 +397,27 @@ export default function App() {
           {loading && !dataset && (
             <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-background/60">
               <Loader2 className="size-6 animate-spin" aria-label="Lädt" />
+            </div>
+          )}
+
+          {(tiles.loading || (outsideBerlin && !filter.wellpass)) && !error && !message && (
+            <div className="pointer-events-none absolute top-2 left-1/2 z-[1050] flex w-[min(92%,30rem)] -translate-x-1/2 flex-col items-center gap-1.5">
+              {tiles.loading && (
+                <span className="flex items-center gap-1.5 rounded-full border bg-background/95 px-3 py-1 text-xs shadow">
+                  <Loader2 className="size-3.5 animate-spin" /> Lade Wellpass-Studios …
+                </span>
+              )}
+              {outsideBerlin && !filter.wellpass && (
+                <div className="pointer-events-auto flex items-start gap-2 rounded-lg border bg-background p-2.5 text-sm shadow-lg">
+                  <span className="flex-1">
+                    Außerhalb Berlins gibt es nur Wellpass-Daten (Urban Sports Club wird nur für Berlin geladen). Diese Studios sind „Nur Wellpass“ –
+                    der Filter blendet sie gerade aus.
+                  </span>
+                  <Button size="xs" onClick={() => setFilter({ ...filter, wellpass: true })}>
+                    Einblenden
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 

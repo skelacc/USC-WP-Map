@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { ChevronRight, Star, X, ZoomIn } from 'lucide-react'
+import { addressSummary } from '@/lib/address'
 import { categoryOf, CATEGORY_META } from '@/lib/categories'
 import { distanceM, formatDistance, type LatLng } from '@/lib/geo'
 import type { ViewStudio } from '@/lib/plans'
@@ -124,7 +125,7 @@ export function PreviewCarousel({ items, activeId, onActiveChange, onOpen, onZoo
                 {dist !== null && <span>{formatDistance(dist)}</span>}
               </span>
               <span className="truncate text-xs text-muted-foreground">
-                {[s.address.street, s.address.district].filter(Boolean).join(' · ')}
+                {addressSummary(s.address)}
               </span>
               {shown.length > 0 && (
                 <span className="truncate text-xs">

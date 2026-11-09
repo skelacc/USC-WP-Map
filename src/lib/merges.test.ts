@@ -75,6 +75,16 @@ describe('Zusammenführen beliebig vieler Einträge', () => {
     expect(r.studios.find((s) => s.id === 'usc-1')!.providerDetails.wellpass!.sourceId).toBe('b')
     expect(r.studios.some((s) => s.providerDetails.wellpass?.sourceId === 'a' && !s.providers.urbanSportsClub)).toBe(true)
   })
+  it('übersetzt veraltete Schlüssel (Fair for Fitness → offizieller Gym-Finder)', () => {
+    const old = 'wellpass:fair-for-fitness:region-berlin:motions-10963'
+    const withAlias = { ...ds(), keyAliases: { [old]: w1.key! } }
+    const d = { pair: `${u1.key}~${old}`, decision: 'confirm' as const, fields: { name: old, address: 'urbanSportsClub' }, decidedAt: '' }
+    const r = applyDecisions(withAlias, [d])
+    const m = r.studios.find((s) => s.id === 'usc-1')!
+    expect(m.providers).toEqual({ urbanSportsClub: true, wellpass: true })
+    expect(m.name).toBe('Motions Gleisdreieck') // Feldwahl folgt dem Alias
+    expect(applyDecisions(ds(), [d]).studios).toHaveLength(5) // ohne Alias wirkungslos
+  })
   it('ignoriert Entscheidungen zu nicht vorhandenen Einträgen', () => {
     expect(applyDecisions(ds(), [decisionFor(['x', 'y'], 'confirm')]).studios).toHaveLength(5)
   })
