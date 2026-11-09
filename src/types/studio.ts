@@ -125,7 +125,7 @@ export interface MatchCandidate {
   addressMatch: 'exact' | 'different' | 'unknown'
   reasons: string[]
   urbanSportsClub: { key: string; name: string; street: string | null; district: string | null; studioId: string | null }
-  wellpass: { key: string; name: string; street: string | null; postalCode: string | null; studioId: string | null }
+  wellpass: { key: string; name: string; street: string | null; postalCode: string | null; studioId: string | null; approximate?: boolean }
 }
 
 export interface SourceMeta {

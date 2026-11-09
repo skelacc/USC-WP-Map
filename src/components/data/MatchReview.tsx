@@ -39,7 +39,7 @@ export function MatchReview({ candidates, decisions, onMerge, onReject, onShow }
                   <button type="button" className="text-left hover:underline" onClick={() => c.wellpass.studioId && onShow(c.wellpass.studioId)}>
                     <span className="block font-semibold text-orange-700">Wellpass</span>
                     {c.wellpass.name}
-                    <span className="block text-muted-foreground">{[c.wellpass.street, c.wellpass.postalCode].filter(Boolean).join(', ') || '–'}</span>
+                    <span className="block text-muted-foreground">{[c.wellpass.street && c.wellpass.approximate ? `ca. ${c.wellpass.street}` : c.wellpass.street, c.wellpass.postalCode].filter(Boolean).join(', ') || '–'}</span>
                   </button>
                 </div>
                 <p className="mt-1.5 text-[11px] text-muted-foreground">{c.reasons.join(' · ')}</p>

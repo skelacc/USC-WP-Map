@@ -45,8 +45,8 @@ export function InfoPanel({ dataset, tiles }: { dataset: Dataset | null; tiles?:
         {!wpThirdParty && (
           <Note title={`Wellpass: ${wpCount.toLocaleString('de-DE')} Studios in ganz Deutschland`}>
             Aus dem offiziellen Gym-Finder (Stand {fmt(wp?.fetchedAt)}). Position, Aktivitäten und Plus1 stammen direkt von Wellpass, Adressen liefert der
-            Gym-Finder aber nicht. Sie kommen von Urban Sports Club oder Fair for Fitness. In Berlin wurden die übrigen aus der Kartenposition ermittelt
-            (OpenStreetMap) und sind mit „ca.“ gekennzeichnet.
+            Gym-Finder aber nicht. Sie kommen von Urban Sports Club oder Fair for Fitness. Im Großraum Berlin wurden fehlende Angaben aus der Kartenposition
+            ermittelt (OpenStreetMap). So ergänzte Straßen sind mit „ca.“ gekennzeichnet.
           </Note>
         )}
         <Note warn title="Außerhalb Berlins nur Wellpass">
