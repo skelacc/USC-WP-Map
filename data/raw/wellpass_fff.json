@@ -1,0 +1,5746 @@
+{
+ "meta": {
+  "fetchedAt": "2026-11-03T10:26:07Z",
+  "count": 239,
+  "status": "ok",
+  "skipped": 0
+ },
+ "records": [
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:fitnessclub-vitalis-berlin",
+   "name": "Fitnessclub Vitalis",
+   "street": "Zerpenschleuser Ring 37",
+   "postalCode": "13439",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.6048775,
+   "longitude": 13.3673041,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessclub-vitalis.de/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-fitnessclub-vitalis-berlin",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "+49 30 415 38 80",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitomat:berlin-friedenauer-hoehe-lauterplatz",
+   "name": "FITOMAT Berlin Friedenauer Höhe (Lauterplatz)",
+   "street": "Friedenauer Höhe 24",
+   "postalCode": "12159",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4774913,
+   "longitude": 13.3355389,
+   "coordinatePrecision": "source",
+   "website": "https://fitomat.com/de/fitnessstudios/fitomat-berlin-friedenauer-hoehe-lauterplatz",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitomat-berlin-friedenauer-hoehe-lauterplatz",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitomat"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:fitness-galerie-karow-way-303606476",
+   "name": "Fitness Galerie Karow",
+   "street": "",
+   "postalCode": "",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.6181769,
+   "longitude": 13.4738345,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitness-galerie-karow.com/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-fitness-galerie-karow-way-303606476",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "+49 30 9413149",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitomat:adlershof",
+   "name": "FITOMAT Adlershof",
+   "street": "Dörpfeldstraße 27-29",
+   "postalCode": "12489",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4372392,
+   "longitude": 13.5467924,
+   "coordinatePrecision": "source",
+   "website": "https://fitomat.com/de/fitnessstudios/fitomat-adlershof",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitomat-adlershof",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitomat"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:powerhouse-gym-berlin-bezirk-spandau",
+   "name": "Powerhouse Gym",
+   "street": "Siemensdamm 44",
+   "postalCode": "13629",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5364746,
+   "longitude": 13.2752754,
+   "coordinatePrecision": "source",
+   "website": "http://www.powerhouse-berlin.de/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-powerhouse-gym-berlin-bezirk-spandau",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 34095594",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitomat:berlin-koepenick",
+   "name": "FITOMAT Berlin Köpenick",
+   "street": "Mahlsdorfer Straße 97D",
+   "postalCode": "12555",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4623901,
+   "longitude": 13.5822604,
+   "coordinatePrecision": "source",
+   "website": "https://fitomat.com/de/fitnessstudios/fitomat-berlin-koepenick",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitomat-berlin-koepenick",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "0160-92484611",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitomat"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitx:berlin-moabit",
+   "name": "FitX Fitnessstudio Berlin-Moabit",
+   "street": "Stromstraße 11-17",
+   "postalCode": "10551",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5271907,
+   "longitude": 13.3438487,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitx.de/fitnessstudios/berlin-moabit",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitx-berlin-moabit",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 39876442",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "FitX"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "cleverfit:berlin-pankow",
+   "name": "clever fit Berlin-Pankow",
+   "street": "Rosenthaler Weg 24b",
+   "postalCode": "13127",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.605942,
+   "longitude": 13.420047,
+   "coordinatePrecision": "source",
+   "website": "https://www.clever-fit.com/de/fitnessstudio/berlin-pankow/",
+   "providerUrl": "https://fair-for-fitness.de/studio/cleverfit-berlin-pankow",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "+4930 55621552",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "clever fit"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "cleverfit:berlin-marzahn",
+   "name": "clever fit Berlin-Marzahn",
+   "street": "Helene-Weigel-Platz 5",
+   "postalCode": "12681",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.52812040000001,
+   "longitude": 13.5392654,
+   "coordinatePrecision": "source",
+   "website": "https://www.clever-fit.com/de/fitnessstudio/berlin-marzahn/",
+   "providerUrl": "https://fair-for-fitness.de/studio/cleverfit-berlin-marzahn",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030/21453303",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "clever fit"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:fitnessclub-247-gruenau-berlin",
+   "name": "Fitnessclub 247 Grünau",
+   "street": "Regattastraße 116",
+   "postalCode": "12527",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4182184,
+   "longitude": 13.5795563,
+   "coordinatePrecision": "source",
+   "website": "https://fitnessclub247.de/studios/fitnessclub-247-gruenau/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-fitnessclub-247-gruenau-berlin",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "0178 6563751",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitnessclub 247"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitomat:grossziehten",
+   "name": "FITOMAT Großziethen",
+   "street": "Karl-Marx-Straße  17",
+   "postalCode": "12529",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.41170779999999,
+   "longitude": 13.4389599,
+   "coordinatePrecision": "source",
+   "website": "https://fitomat.com/de/fitnessstudios/fitomat-grossziehten",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitomat-grossziehten",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitomat"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "cleverfit:berlin-buch",
+   "name": "clever fit Berlin-Buch",
+   "street": "Walter-Friedrich-Str. 1",
+   "postalCode": "13125",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.6341692,
+   "longitude": 13.4967273,
+   "coordinatePrecision": "source",
+   "website": "https://www.clever-fit.com/de/fitnessstudio/berlin-buch/",
+   "providerUrl": "https://fair-for-fitness.de/studio/cleverfit-berlin-buch",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 94399727",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "clever fit"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:sport-club-siemensstadt-berlin-e-v-sport-centrum-siemensstadt-berlin-bezirk-spandau",
+   "name": "Sport Club Siemensstadt Berlin e.V., Sport Centrum Siemensstadt",
+   "street": "Buolstraße 14",
+   "postalCode": "13629",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.545127,
+   "longitude": 13.258577,
+   "coordinatePrecision": "source",
+   "website": "https://www.scs-berlin.de/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-sport-club-siemensstadt-berlin-e-v-sport-centrum-siemensstadt-berlin-bezirk-spandau",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 3800240",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-brandenburg:lovfit-sports-clubs-westend-berlin-bezirk-charlottenburg-wilmersdorf",
+   "name": "LOVFIT Sports Clubs Westend",
+   "street": "Theodor-Heuss-Platz 5",
+   "postalCode": "14052",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5084701,
+   "longitude": 13.272728,
+   "coordinatePrecision": "source",
+   "website": "http://www.lovfit.de/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-brandenburg-lovfit-sports-clubs-westend-berlin-bezirk-charlottenburg-wilmersdorf",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 55593112",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:unlimited-fitness-node-13638926188",
+   "name": "Unlimited Fitness",
+   "street": "",
+   "postalCode": "",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5609248,
+   "longitude": 13.4224586,
+   "coordinatePrecision": "source",
+   "website": "https://www.activ-fitness-deutschland.de/berlin-pankow.html",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-unlimited-fitness-node-13638926188",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 74072670",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:sports-club-berlin-berlin",
+   "name": "Sports Club Berlin",
+   "street": "Leipziger Pl. 12",
+   "postalCode": "10117",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.510638799999995,
+   "longitude": 13.3828374,
+   "coordinatePrecision": "source",
+   "website": "https://www.sports-club.de/berlin",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-sports-club-berlin-berlin",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 94051670",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Sports Club"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:dynamic-fitness-world-way-50013591",
+   "name": "Dynamic Fitness World",
+   "street": "",
+   "postalCode": "",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4014932,
+   "longitude": 13.4133349,
+   "coordinatePrecision": "source",
+   "website": "http://dynamic-fitness-world.de/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-dynamic-fitness-world-way-50013591",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "+49307456041",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:dokan-sportclub-dein-fitnessclub-in-berlin-weissensee-berlin-bezirk-pankow",
+   "name": "Dokan Sportclub – Dein Fitnessclub in Berlin Weißensee",
+   "street": "Berliner Allee 127",
+   "postalCode": "13088",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.551657899999995,
+   "longitude": 13.4618,
+   "coordinatePrecision": "source",
+   "website": "https://dokan.de/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-dokan-sportclub-dein-fitnessclub-in-berlin-weissensee-berlin-bezirk-pankow",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 92091119",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "cleverfit:berlin-charlottenburg",
+   "name": "clever fit Berlin-Charlottenburg",
+   "street": "Joachimsthalerstr. 19",
+   "postalCode": "10719",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5011301,
+   "longitude": 13.3306429,
+   "coordinatePrecision": "source",
+   "website": "https://www.clever-fit.com/de/fitnessstudio/berlin-charlottenburg/",
+   "providerUrl": "https://fair-for-fitness.de/studio/cleverfit-berlin-charlottenburg",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "03088917788",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "clever fit"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "cleverfit:berlin-marienfelde",
+   "name": "clever fit Berlin-Marienfelde",
+   "street": "Malteserstraße 135",
+   "postalCode": "12277",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4195939,
+   "longitude": 13.358684,
+   "coordinatePrecision": "source",
+   "website": "https://www.clever-fit.com/de/fitnessstudio/berlin-marienfelde/",
+   "providerUrl": "https://fair-for-fitness.de/studio/cleverfit-berlin-marienfelde",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "+49 40 524 75 89 1",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "clever fit"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "cleverfit:berlin-zehlendorf",
+   "name": "clever fit Berlin-Zehlendorf",
+   "street": "Martin-Buber-Straße 12",
+   "postalCode": "14163",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.43510320000001,
+   "longitude": 13.2582181,
+   "coordinatePrecision": "source",
+   "website": "https://www.clever-fit.com/de/fitnessstudio/berlin-zehlendorf/",
+   "providerUrl": "https://fair-for-fitness.de/studio/cleverfit-berlin-zehlendorf",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "+49 3080582180",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "clever fit"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-brandenburg:fitness-kladow-testzentrum-berlin",
+   "name": "Fitness Kladow / Testzentrum",
+   "street": "Eichelmatenweg 1",
+   "postalCode": "14089",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.455003399999995,
+   "longitude": 13.1433449,
+   "coordinatePrecision": "source",
+   "website": "http://www.fitness-kladow.de/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-brandenburg-fitness-kladow-testzentrum-berlin",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 33936640",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:ignite-fit-berlin-bezirk-pankow",
+   "name": "IGNITE FIT",
+   "street": "Husemannstraße 32",
+   "postalCode": "10435",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.539584299999994,
+   "longitude": 13.4181524,
+   "coordinatePrecision": "source",
+   "website": "http://ignite.fit/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-ignite-fit-berlin-bezirk-pankow",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitnessfirst:berlin-schoeneberg",
+   "name": "Fitness First Berlin - Schöneberg",
+   "street": "Bautzener Straße 56",
+   "postalCode": "10829",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.492274544383,
+   "longitude": 13.371115728124,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessfirst.de/clubs/berlin-schoeneberg",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitnessfirst-berlin-schoeneberg",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "03033878387",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitness First"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitnessfirst:berlin-hohenschoenhausen",
+   "name": "Fitness First Berlin - Hohenschönhausen",
+   "street": "Hansastraße 236",
+   "postalCode": "13051",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.560852458129,
+   "longitude": 13.498645728697,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessfirst.de/clubs/berlin-hohenschoenhausen",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitnessfirst-berlin-hohenschoenhausen",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "03092404400",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitness First"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitnessfirst:berlin-wedding",
+   "name": "Fitness First Berlin - Wedding",
+   "street": "Müllerstraße 35",
+   "postalCode": "13353",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.54901579385,
+   "longitude": 13.355046498316,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessfirst.de/clubs/berlin-wedding",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitnessfirst-berlin-wedding",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "03045028220",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitness First"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:rueckenwind-gmbh-berlin-bezirk-pankow",
+   "name": "Rückenwind GmbH",
+   "street": "Schönhauser Allee 118",
+   "postalCode": "10437",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5492362,
+   "longitude": 13.4129247,
+   "coordinatePrecision": "source",
+   "website": "http://www.rueckenwind-berlin.de/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-rueckenwind-gmbh-berlin-bezirk-pankow",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 47375912",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:apollo-fitness-world-node-12285966732",
+   "name": "Apollo Fitness World",
+   "street": "",
+   "postalCode": "",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5460194,
+   "longitude": 13.4524314,
+   "coordinatePrecision": "source",
+   "website": "https://www.apollo-fitness-world.de/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-apollo-fitness-world-node-12285966732",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 9274231",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "evofitness:berlin-rosenthaler-platz",
+   "name": "EVO Fitness Berlin Rosenthaler Platz",
+   "street": "Torstraße 125",
+   "postalCode": "10119",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5298592,
+   "longitude": 13.4004233,
+   "coordinatePrecision": "source",
+   "website": "https://evofitness.de/clubs/berlin-rosenthaler-platz",
+   "providerUrl": "https://fair-for-fitness.de/studio/evofitness-berlin-rosenthaler-platz",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "EVO Fitness"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "evofitness:berlin-alexanderplatz",
+   "name": "EVO Fitness Berlin Alexanderplatz",
+   "street": "Rosa-Luxemburg-Straße 14",
+   "postalCode": "10178",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5245352,
+   "longitude": 13.4102247,
+   "coordinatePrecision": "source",
+   "website": "https://evofitness.de/clubs/berlin-europacity",
+   "providerUrl": "https://fair-for-fitness.de/studio/evofitness-berlin-alexanderplatz",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "EVO Fitness"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:bunker-berlin-berlin",
+   "name": "Bunker Berlin",
+   "street": "Grünberger Straße 54",
+   "postalCode": "10245",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.511239,
+   "longitude": 13.4558403,
+   "coordinatePrecision": "source",
+   "website": "https://bunker-berlin.com",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-bunker-berlin-berlin",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "0179 1757415",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitnessfirst:berlin-wilmersdorf",
+   "name": "Fitness First Berlin - Wilmersdorf",
+   "street": "Wilmersdorfer Straße 108-111",
+   "postalCode": "10627",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5062905,
+   "longitude": 13.3071002,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessfirst.de/clubs/berlin-wilmersdorf",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitnessfirst-berlin-wilmersdorf",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "0303199110",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitness First"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitnessfirst:berlin-women-friedrichshain",
+   "name": "Fitness First Berlin - Friedrichshain - Ladies",
+   "street": "Frankfurter Allee 57-59",
+   "postalCode": "10247",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.514817843942,
+   "longitude": 13.465885436162,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessfirst.de/clubs/berlin-women-friedrichshain",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitnessfirst-berlin-women-friedrichshain",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "0304530510",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitness First"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitnessfirst:berlin-women-pankow",
+   "name": "Fitness First Berlin - Pankow - Ladies",
+   "street": "Breite Straße 33-34",
+   "postalCode": "13187",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.569839993941,
+   "longitude": 13.406764185056,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessfirst.de/clubs/berlin-women-pankow",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitnessfirst-berlin-women-pankow",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "03025096410",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitness First"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitnessfirst:berlin-prenzlauer-berg",
+   "name": "Fitness First Berlin - Prenzlauer Berg",
+   "street": "Schönhauser Allee 80",
+   "postalCode": "10439",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5494879,
+   "longitude": 13.4154182,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessfirst.de/clubs/berlin-prenzlauer-berg",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitnessfirst-berlin-prenzlauer-berg",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "0304467370",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitness First"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:deen-berlin",
+   "name": "deen",
+   "street": "Rheinstraße 45-46",
+   "postalCode": "12161",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4665189,
+   "longitude": 13.3305268,
+   "coordinatePrecision": "source",
+   "website": "https://www.deen.de/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-deen-berlin",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "+49 30 851 22 11",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:power-factory-gmbh-berlin",
+   "name": "Power Factory GmbH",
+   "street": "Tangermünder Straße 129",
+   "postalCode": "12627",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5377691,
+   "longitude": 13.609346,
+   "coordinatePrecision": "source",
+   "website": "https://www.powerfactory-berlin.de/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-power-factory-gmbh-berlin",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 86317976",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitbox:berlin-bahnhof-koepenick",
+   "name": "fitbox Berlin Bahnhof Köpenick",
+   "street": "Bahnhofstraße 2",
+   "postalCode": "12487",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4531868,
+   "longitude": 13.5750833,
+   "coordinatePrecision": "source",
+   "website": "https://fitbox.de/de/ems-studios/fitbox-berlin-bahnhof-koepenick",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitbox-berlin-bahnhof-koepenick",
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "015757804341",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "fitbox"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "holmesplace:region-berlin-holmes-place-berlin",
+   "name": "Holmes Place",
+   "street": "Wilmersdorfer Straße 38",
+   "postalCode": "10585",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5119376,
+   "longitude": 13.3049113,
+   "coordinatePrecision": "source",
+   "website": "https://www.holmesplace.com/de/de/clubs/bismarckstrasse",
+   "providerUrl": "https://fair-for-fitness.de/studio/holmesplace-region-berlin-holmes-place-berlin",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:lokahi-loft-fitness-wellness-und-spa-berlin-bezirk-charlottenburg-wilmersdorf",
+   "name": "Lokahi Loft Fitness Wellness und Spa",
+   "street": "Joachim-Friedrich-Straße 37/38",
+   "postalCode": "10711",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4999001,
+   "longitude": 13.2959166,
+   "coordinatePrecision": "source",
+   "website": "http://www.lokahiloft.de/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-lokahi-loft-fitness-wellness-und-spa-berlin-bezirk-charlottenburg-wilmersdorf",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 8922080",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:strom-linien-berlin",
+   "name": "Strom-Linien",
+   "street": "Prinzregentenstraße 42",
+   "postalCode": "10715",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4792746,
+   "longitude": 13.3325115,
+   "coordinatePrecision": "source",
+   "website": "https://www.ems-studio-berlin.de/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-strom-linien-berlin",
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "030 85072526",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:speed-fit-berlin-mitte-berlin",
+   "name": "SPEED.FIT Berlin Mitte",
+   "street": "Albrechtstraße 12",
+   "postalCode": "10117",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.521156,
+   "longitude": 13.385039,
+   "coordinatePrecision": "source",
+   "website": "http://www.speed-fit.de/speed-fit-studio-berlin-mitte/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-speed-fit-berlin-mitte-berlin",
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "030 28044770",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-brandenburg:ems-fitnessstudio-fitbox-berlin-clayallee-berlin-bezirk-steglitz-zehlendorf",
+   "name": "EMS Fitnessstudio fitbox Berlin Clayallee",
+   "street": "Clayallee 347C",
+   "postalCode": "14169",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.436031799999995,
+   "longitude": 13.2602706,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitbox.de/de/studios/fitbox-berlin-clayallee",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-brandenburg-ems-fitnessstudio-fitbox-berlin-clayallee-berlin-bezirk-steglitz-zehlendorf",
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "030 26077262",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:noir-sport-berlin",
+   "name": "Noir Sport",
+   "street": "Eisenzahnstraße 14",
+   "postalCode": "10709",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4953563,
+   "longitude": 13.3047562,
+   "coordinatePrecision": "source",
+   "website": "https://urbantribeclub.de/",
+   "providerUrl": "https://fair-for-fitness.de/studio/region-berlin-noir-sport-berlin",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "0176 63435610",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitbox:berlin-gleimkiez",
+   "name": "fitbox Berlin Gleimkiez",
+   "street": "Schönhauser Allee 125",
+   "postalCode": "10437",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5472954,
+   "longitude": 13.4128372,
+   "coordinatePrecision": "source",
+   "website": "https://fitbox.de/de/ems-studios/fitbox-berlin-gleimkiez",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitbox-berlin-gleimkiez",
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "+49 30 80932789",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "fitbox"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitbox:berlin-motzstrasse",
+   "name": "fitbox Berlin Motzstraße",
+   "street": "Motzstraße 9",
+   "postalCode": "10777",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4985438,
+   "longitude": 13.3510883,
+   "coordinatePrecision": "source",
+   "website": "https://fitbox.de/de/ems-studios/fitbox-berlin-motzstrasse",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitbox-berlin-motzstrasse",
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "+4930 91431850",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "fitbox"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitnessfirst:berlin-gendarmenmarkt",
+   "name": "Fitness First Berlin - Gendarmenmarkt",
+   "street": "Jägerstraße 27",
+   "postalCode": "10117",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5139491,
+   "longitude": 13.3955845,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessfirst.de/clubs/berlin-gendarmenmarkt",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitnessfirst-berlin-gendarmenmarkt",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "03047398260",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitness First"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitnessfirst:berlin-prager-platz",
+   "name": "Fitness First Berlin - Prager Platz",
+   "street": "Prager Platz 1-3",
+   "postalCode": "10779",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.49475581629,
+   "longitude": 13.332503859934,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessfirst.de/clubs/berlin-prager-platz",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitnessfirst-berlin-prager-platz",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "0308540680",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitness First"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitnessfirst:berlin-steglitz-ssc",
+   "name": "Fitness First Berlin - Steglitz SSC",
+   "street": "Walther-Schreiber-Platz 1",
+   "postalCode": "12161",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.464918720826,
+   "longitude": 13.327887909075,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessfirst.de/clubs/berlin-steglitz-ssc",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitnessfirst-berlin-steglitz-ssc",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030814560272",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitness First"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitnessfirst:berlin-steglitz",
+   "name": "Fitness First Berlin - Steglitz",
+   "street": "Schloßstraße 110",
+   "postalCode": "12163",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4610669,
+   "longitude": 13.3251054,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessfirst.de/clubs/berlin-steglitz",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitnessfirst-berlin-steglitz",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "0307978770",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitness First"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitnessfirst:berlin-women-steglitz-im-schloss",
+   "name": "Fitness First Berlin - Steglitz - Im Schloss - Ladies",
+   "street": "Schloßstr. 33-36",
+   "postalCode": "12163",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.45782396195,
+   "longitude": 13.321188348345,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessfirst.de/clubs/berlin-women-steglitz-im-schloss",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitnessfirst-berlin-women-steglitz-im-schloss",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "03079742850",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitness First"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitnessfirst:berlin-lichterfelde",
+   "name": "Fitness First Berlin - Lichterfelde",
+   "street": "Lankwitzer Str. 19-24",
+   "postalCode": "12209",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.429598815073,
+   "longitude": 13.3297911,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessfirst.de/clubs/berlin-lichterfelde",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitnessfirst-berlin-lichterfelde",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "03027490270",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitness First"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitnessfirst:berlin-hellersdorf",
+   "name": "Fitness First Berlin - Hellersdorf",
+   "street": "Heidenauer Straße 26",
+   "postalCode": "12627",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.535299462588,
+   "longitude": 13.607197742329,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessfirst.de/clubs/berlin-hellersdorf",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitnessfirst-berlin-hellersdorf",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "069408016555",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitness First"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitnessfirst:berlin-zehlendorfer-welle",
+   "name": "Fitness First Berlin - Zehlendorfer Welle",
+   "street": "Clayallee 328-334",
+   "postalCode": "14169",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.437794079034,
+   "longitude": 13.263995312154,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitnessfirst.de/clubs/berlin-zehlendorfer-welle",
+   "providerUrl": "https://fair-for-fitness.de/studio/fitnessfirst-berlin-zehlendorfer-welle",
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "0308100930",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Fitness First"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:turnhalle-hightech-sports-berlin",
+   "name": "Turnhalle hightech sports",
+   "street": "Reinhardtstraße 27a",
+   "postalCode": "10117",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5230214,
+   "longitude": 13.3828939,
+   "coordinatePrecision": "source",
+   "website": "http://www.turnhalle-berlin.de/",
+   "providerUrl": null,
+   "categories": [
+    "gesundheit"
+   ],
+   "plans": [],
+   "phone": "030 20054055",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "holmesplace:berlin-gendarmenmarkt",
+   "name": "Holmes Place Berlin Gendarmenmarkt",
+   "street": "Friedrichstr. 68 – Eingang Anton-Wilhelm-Amo Straße",
+   "postalCode": "10117",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5126117,
+   "longitude": 13.3883238,
+   "coordinatePrecision": "source",
+   "website": "https://www.holmesplace.de/clubs/berlin-gendarmenmarkt",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:pink-frauen-fitness-berlin",
+   "name": "Pink Frauen Fitness",
+   "street": "Friedrichstraße 100",
+   "postalCode": "10117",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5204782,
+   "longitude": 13.3890615,
+   "coordinatePrecision": "source",
+   "website": "http://pinkfrauenfitness.de/",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "030 20607431",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:ft-lounge-by-aprosports-personal-training-berlin-mitte-berlin",
+   "name": "FT-Lounge by AproSports - Personal Training Berlin Mitte",
+   "street": "Anton-Wilhelm-Amo-Straße 17",
+   "postalCode": "10117",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5119743,
+   "longitude": 13.389979,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 20629630",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:original-bootcamp-outdoor-fitness-tiergarten-haus-der-kulturen-berlin",
+   "name": "Original Bootcamp - Outdoor Fitness | Tiergarten / Haus der Kulturen",
+   "street": "Bettina-von-Arnim-Ufer 6",
+   "postalCode": "10557",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5189564,
+   "longitude": 13.3640578,
+   "coordinatePrecision": "source",
+   "website": "http://www.original-bootcamp.com/berlin",
+   "providerUrl": null,
+   "categories": [
+    "oeffentlich"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Original Bootcamp"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:aurum-training-node-12752614827",
+   "name": "AURUM Training",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5235568,
+   "longitude": 13.3864509,
+   "coordinatePrecision": "source",
+   "website": "https://aurumberlin.com/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "0179 2043742",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:sky-spa-node-13192187878",
+   "name": "Sky & Spa",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5234091,
+   "longitude": 13.367996,
+   "coordinatePrecision": "source",
+   "website": "https://www.sky-spa-fitnesslounge.de/",
+   "providerUrl": null,
+   "categories": [
+    "gesundheit"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:beat81-node-13650705167",
+   "name": "Beat81",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5251163,
+   "longitude": 13.3883154,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "crossfit"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "holmesplace:berlin-potsdamer-platz",
+   "name": "Holmes Place Berlin Potsdamer Platz",
+   "street": "Gabriele-Tergit-Promenade 17 A-D",
+   "postalCode": "10963",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5056934,
+   "longitude": 13.3732609,
+   "coordinatePrecision": "source",
+   "website": "https://www.holmesplace.de/clubs/berlin-potsdamer-platz",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:holi-collective-gmbh-berlin",
+   "name": "Holi Collective GmbH",
+   "street": "Charlottenstraße 18",
+   "postalCode": "10117",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5085013,
+   "longitude": 13.3923909,
+   "coordinatePrecision": "source",
+   "website": "http://www.goholi.life/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:bodystreet-node-4604863055",
+   "name": "Bodystreet",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5079287,
+   "longitude": 13.3917379,
+   "coordinatePrecision": "source",
+   "website": "https://www.bodystreet.com/de/studio/bodystreet-berlin-checkpoint-charlie",
+   "providerUrl": null,
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "+49 30 33846280",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Bodystreet"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:forde-fitness-berlin",
+   "name": "Forde Fitness",
+   "street": "Stresemannstraße 65",
+   "postalCode": "10963",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5025396,
+   "longitude": 13.3844025,
+   "coordinatePrecision": "source",
+   "website": "https://www.forde-fitness.com/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:kaju-gym-official-hyrox-training-club-berlin",
+   "name": "KAJU Gym - official HYROX TRAINING CLUB",
+   "street": "Stresemannstraße 65",
+   "postalCode": "10963",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.502514600000005,
+   "longitude": 13.3844532,
+   "coordinatePrecision": "source",
+   "website": "http://www.kaju-coaching.de/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:urban-gladiators-10963",
+   "name": "Urban Gladiators",
+   "street": "Wilhelmstraße 14",
+   "postalCode": "10963",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5021909,
+   "longitude": 13.3884688,
+   "coordinatePrecision": "source",
+   "website": "https://www.urbangladiators.de",
+   "providerUrl": null,
+   "categories": [
+    "crossfit"
+   ],
+   "plans": [],
+   "phone": "0176 41733893",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:motions-gleisdreieck-10963",
+   "name": "Motions Gleisdreieck",
+   "street": "36",
+   "postalCode": "10963",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5006633,
+   "longitude": 13.3750353,
+   "coordinatePrecision": "source",
+   "website": "https://www.motionsberlin.de/",
+   "providerUrl": null,
+   "categories": [
+    "tanz"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:yoga-rebellion-berlin",
+   "name": "Yoga Rebellion",
+   "street": "Gartenstraße 6",
+   "postalCode": "10115",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5297496,
+   "longitude": 13.3925007,
+   "coordinatePrecision": "source",
+   "website": "https://www.yogarebellion.com/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "+49 157 759 852 30",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:beat81-berlin",
+   "name": "Beat81",
+   "street": "Dircksenstraße 47",
+   "postalCode": "10178",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5235553,
+   "longitude": 13.4047829,
+   "coordinatePrecision": "source",
+   "website": "https://www.beat81.com/",
+   "providerUrl": null,
+   "categories": [
+    "crossfit"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:momax-reformer-pilates-node-13931442173",
+   "name": "momax Reformer Pilates",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5266034,
+   "longitude": 13.402035,
+   "coordinatePrecision": "source",
+   "website": "https://www.momax-pilates.net/",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": "0176 84764785",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:original-bootcamp-outdoor-fitness-beachmitte-nordbahnhof-berlin",
+   "name": "Original Bootcamp - Outdoor Fitness | Beachmitte - Nordbahnhof",
+   "street": "Caroline-Michaelis-Straße",
+   "postalCode": "10115",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5340001,
+   "longitude": 13.3857421,
+   "coordinatePrecision": "source",
+   "website": "https://www.original-bootcamp.com/berlin?utm_source=googlemaps&utm_medium=locations&utm_campaign=beachmitte-nordbahnhof",
+   "providerUrl": null,
+   "categories": [
+    "oeffentlich"
+   ],
+   "plans": [],
+   "phone": "0221 48530112",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Original Bootcamp"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:hit-bln-moabit-personal-training-gym-berlin-berlin",
+   "name": "HIT BLN Moabit - Personal Training Gym Berlin",
+   "street": "Helgoländer Ufer 7B",
+   "postalCode": "10557",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5222519,
+   "longitude": 13.3488782,
+   "coordinatePrecision": "source",
+   "website": "http://hit-bln.de/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 40535800",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:hit-bln-node-11014339720",
+   "name": "HIT BLN",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5310799,
+   "longitude": 13.396507,
+   "coordinatePrecision": "source",
+   "website": "https://www.hit-bln.de/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 37469660",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:you-glow-yoga-womanhood-mitte-berlin",
+   "name": "YOU GLOW Yoga & Womanhood Mitte",
+   "street": "Ackerstraße 23",
+   "postalCode": "10115",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5321231,
+   "longitude": 13.3963886,
+   "coordinatePrecision": "source",
+   "website": "http://www.youglowyoga.berlin/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:beyond-node-12160358671",
+   "name": "Beyond",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5328448,
+   "longitude": 13.3985301,
+   "coordinatePrecision": "source",
+   "website": "https://beyondbln.de",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": "+49 30 28035570",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:open-mitte-berlin",
+   "name": "OPEN – Mitte",
+   "street": "Brunnenstraße 24",
+   "postalCode": "10119",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5335937,
+   "longitude": 13.3992039,
+   "coordinatePrecision": "source",
+   "website": "https://openstudiosberlin.com/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:yogafuerdich-berlin-mitte-yoga-pilates-mediation-berlin",
+   "name": "yogafürdich Berlin Mitte - Yoga, Pilates & Mediation",
+   "street": "Zehdenicker Str. 21",
+   "postalCode": "10119",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5305166,
+   "longitude": 13.4053652,
+   "coordinatePrecision": "source",
+   "website": "https://www.yfdberlin.com/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "0178 1822882",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:three-boons-yoga-berlin",
+   "name": "Three Boons Yoga",
+   "street": "Brunnenstraße 29",
+   "postalCode": "10119",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5345204,
+   "longitude": 13.398546,
+   "coordinatePrecision": "source",
+   "website": "https://www.threeboonsyoga.de/mitte",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "+49 30 48491948",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:koerperformen-berlin",
+   "name": "Körperformen",
+   "street": "Anklamer Straße 17",
+   "postalCode": "10115",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5349746,
+   "longitude": 13.3990861,
+   "coordinatePrecision": "source",
+   "website": "http://www.körperformen.com/standorte/ems-training-berlin-mitte/",
+   "providerUrl": null,
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "030 51733933",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Körperformen"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:rocycle-berlin-mitte-berlin",
+   "name": "Rocycle Berlin Mitte",
+   "street": "Linienstraße 41",
+   "postalCode": "10119",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.528312,
+   "longitude": 13.4095226,
+   "coordinatePrecision": "source",
+   "website": "https://www.rocyclestudios.com/en/",
+   "providerUrl": null,
+   "categories": [
+    "tanz"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:motion-s-moritzplatz-berlin",
+   "name": "motion*s Moritzplatz",
+   "street": "Prinzenstrasse",
+   "postalCode": "10969",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5035008,
+   "longitude": 13.4089613,
+   "coordinatePrecision": "source",
+   "website": "https://www.motionsberlin.de/",
+   "providerUrl": null,
+   "categories": [
+    "tanz"
+   ],
+   "plans": [],
+   "phone": "030 69004201",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:balance-soul-studio-berlin-berlin",
+   "name": "Balance Soul Studio Berlin",
+   "street": "Schicklerstraße 5",
+   "postalCode": "10179",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5161607,
+   "longitude": 13.4157793,
+   "coordinatePrecision": "source",
+   "website": "https://balance-group.de/studio-berlin/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "069 95908800",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:aur-pilates-kudamm-berlin",
+   "name": "Aurè Pilates Kudamm",
+   "street": "Kleiststraße 9-12",
+   "postalCode": "10787",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5009264,
+   "longitude": 13.3486001,
+   "coordinatePrecision": "source",
+   "website": "https://aure.de/",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:wemoa-by-coach-noah-berlin",
+   "name": "WeMoa by Coach Noah",
+   "street": "Havelberger Str. 28",
+   "postalCode": "10559",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5315696,
+   "longitude": 13.3468493,
+   "coordinatePrecision": "source",
+   "website": "https://www.wemoa.de/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "01573 3900874",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:aura-berlin-studio-node-12367443606",
+   "name": "Aura Berlin Studio",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5050261,
+   "longitude": 13.3423099,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:sha-la-studios-prenzlauer-berg-berlin",
+   "name": "SHA-LA Studios Prenzlauer Berg",
+   "street": "Kastanienallee 63",
+   "postalCode": "10119",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5344524,
+   "longitude": 13.4057805,
+   "coordinatePrecision": "source",
+   "website": "https://www.shalastudios.com/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "0179 8382135",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:ladyline-loft-yoga-more-berlin",
+   "name": "Ladyline Loft | Yoga & More",
+   "street": "Stromstraße 39",
+   "postalCode": "10551",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.530919999999995,
+   "longitude": 13.34259,
+   "coordinatePrecision": "source",
+   "website": "https://www.ladyline-loft.de/",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "030 77906990",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:green-yoga-kreuzberg-berlin",
+   "name": "Green Yoga Kreuzberg",
+   "street": "Oranienstraße 163 Backyard",
+   "postalCode": "10969",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5025213,
+   "longitude": 13.4141055,
+   "coordinatePrecision": "source",
+   "website": "http://greenyoga.co/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:the-frame-reformer-pilates-berlin-berlin",
+   "name": "The Frame | Reformer Pilates | Berlin",
+   "street": "Waldemarstraße 17",
+   "postalCode": "10179",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5045126,
+   "longitude": 13.4166764,
+   "coordinatePrecision": "source",
+   "website": "https://www.theframe-studio.de/",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:o-yoga-node-12630500002",
+   "name": "O-Yoga",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4934119,
+   "longitude": 13.3553739,
+   "coordinatePrecision": "source",
+   "website": "https://www.o-yoga.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:original-bootcamp-outdoor-fitness-kreuzberg-boecklerpark-berlin",
+   "name": "Original Bootcamp - Outdoor Fitness | Kreuzberg - Böcklerpark",
+   "street": "Prinzenstraße 1",
+   "postalCode": "10969",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4968265,
+   "longitude": 13.4074488,
+   "coordinatePrecision": "source",
+   "website": "https://www.original-bootcamp.com/berlin?utm_source=googlemaps&utm_medium=locations&utm_campaign=Kreuzberg+-+B%C3%B6cklerpark",
+   "providerUrl": null,
+   "categories": [
+    "oeffentlich"
+   ],
+   "plans": [],
+   "phone": "0221 95673376",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Original Bootcamp"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:adidas-urban-gym-kreuzberg-berlin-bezirk-friedrichshain-kreuzberg",
+   "name": "adidas Urban Gym - Kreuzberg",
+   "street": "Prinzenstraße 1",
+   "postalCode": "10969",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4966085,
+   "longitude": 13.4084682,
+   "coordinatePrecision": "source",
+   "website": "https://jogging-portal.com/adidas-playground/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:unfold-studio-berlin",
+   "name": "Unfold Studio",
+   "street": "Leuschnerdamm 13/Aufgang 2 Etage 2",
+   "postalCode": "10999",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5045514,
+   "longitude": 13.4190879,
+   "coordinatePrecision": "source",
+   "website": "https://www.unfoldstudioberlin.com/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:achter-prenzlauer-berg-berlin",
+   "name": "ACHTER - Prenzlauer Berg",
+   "street": "Schwedter Str. 36A",
+   "postalCode": "10435",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.537914699999995,
+   "longitude": 13.4067229,
+   "coordinatePrecision": "source",
+   "website": "https://achter.club/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "0176 74039101",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:three-boons-yoga-berlin-kreuzberg-jivamukti-berlin-gmbh-berlin",
+   "name": "Three Boons Yoga Berlin-Kreuzberg (Jivamukti Berlin GmbH)",
+   "street": "Dresdener Str. 11",
+   "postalCode": "10999",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5006984,
+   "longitude": 13.4177965,
+   "coordinatePrecision": "source",
+   "website": "http://www.threeboonsyoga.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "030 48491948",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:original-bootcamp-outdoor-fitness-i-brunnenviertel-berlin",
+   "name": "Original Bootcamp - Outdoor Fitness I Brunnenviertel",
+   "street": "Putbusser Str. 12",
+   "postalCode": "13355",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5443349,
+   "longitude": 13.3947865,
+   "coordinatePrecision": "source",
+   "website": "https://www.original-bootcamp.com/locations/mitte-brunnenviertel?utm_source=googlemaps&utm_medium=location&utm_campaign=berlin-mitte_brunnenviertel",
+   "providerUrl": null,
+   "categories": [
+    "oeffentlich"
+   ],
+   "plans": [],
+   "phone": "0221 95673376",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Original Bootcamp"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:pole-sport-studio-berlin-berlin",
+   "name": "Pole Sport Studio Berlin",
+   "street": "Wiclefstraße 18",
+   "postalCode": "10551",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5307116,
+   "longitude": 13.3343979,
+   "coordinatePrecision": "source",
+   "website": "https://polesportberlin.de/",
+   "providerUrl": null,
+   "categories": [
+    "tanz"
+   ],
+   "plans": [],
+   "phone": "+49 30 12095667",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:lady-company-fitness-fuer-frauen-prenzlauer-berg-berlin",
+   "name": "Lady Company - Fitness für Frauen - Prenzlauer Berg",
+   "street": "Schönhauser Allee 36-37",
+   "postalCode": "10435",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.539052,
+   "longitude": 13.4130648,
+   "coordinatePrecision": "source",
+   "website": "http://www.ladycompany.de/",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "030 44012377",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:tanzschule-berlin-center-of-dance-berlin",
+   "name": "Tanzschule Berlin - CENTER OF DANCE",
+   "street": "Schönhauser Allee 36",
+   "postalCode": "10435",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.538812799999995,
+   "longitude": 13.4139341,
+   "coordinatePrecision": "source",
+   "website": "http://centerofdance.net/",
+   "providerUrl": null,
+   "categories": [
+    "tanz"
+   ],
+   "plans": [],
+   "phone": "030 23134238",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:soul-yoga-berlin-berlin",
+   "name": "Soul Yoga Berlin",
+   "street": "Herbertstraße 11",
+   "postalCode": "10827",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4861692,
+   "longitude": 13.3587153,
+   "coordinatePrecision": "source",
+   "website": "https://soulyoga-berlin.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:fitness-unlimited-berlin",
+   "name": "Fitness Unlimited",
+   "street": "Uhlandstraße 194",
+   "postalCode": "10623",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5069366,
+   "longitude": 13.326358,
+   "coordinatePrecision": "source",
+   "website": "https://www.activ-fitness-deutschland.de/fitness-unlimited/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 30831088",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:yoga-at-lobe-block-berlin",
+   "name": "YOGA at Lobe Block",
+   "street": "Böttgerstraße 16",
+   "postalCode": "13357",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5489177,
+   "longitude": 13.3810065,
+   "coordinatePrecision": "source",
+   "website": "https://www.yogaatlobeblock.de/stundenplan",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:yoga-on-the-move-the-shala-berlin",
+   "name": "Yoga On The Move - The Shala",
+   "street": "Akazienstraße 27 Hinterhof rechts",
+   "postalCode": "10823",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.486703600000006,
+   "longitude": 13.3545666,
+   "coordinatePrecision": "source",
+   "website": "http://www.yogaonthemove.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:flowsol-berlin",
+   "name": "Flowsol",
+   "street": "Apostel-Paulus-Straße 30",
+   "postalCode": "10823",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.488156,
+   "longitude": 13.3491473,
+   "coordinatePrecision": "source",
+   "website": "https://www.flowsolstudio.com/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:good-moves-studio-berlin",
+   "name": "Good Moves Studio",
+   "street": "Immanuelkirchstraße 24",
+   "postalCode": "10405",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5321796,
+   "longitude": 13.4256695,
+   "coordinatePrecision": "source",
+   "website": "http://www.goodmovesstudio.com/",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:pilates-leveka-berlin",
+   "name": "Pilates Leveka",
+   "street": "Bundesallee 215A",
+   "postalCode": "10719",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4976637,
+   "longitude": 13.3316994,
+   "coordinatePrecision": "source",
+   "website": "https://www.yogaleveka.de/",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:beyond-node-13261388258",
+   "name": "Beyond",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4970918,
+   "longitude": 13.4232898,
+   "coordinatePrecision": "source",
+   "website": "http://www.beyondbln.de/",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": "030 91431200",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:spirit-joga-berlin",
+   "name": "Spirit Joga",
+   "street": "Goethestraße 2-3",
+   "postalCode": "10623",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5089222,
+   "longitude": 13.3236498,
+   "coordinatePrecision": "source",
+   "website": "https://www.spirityoga.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "+49 30 27908505",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:ride-bln-node-8622816454",
+   "name": "ride.bln",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5399323,
+   "longitude": 13.4177211,
+   "coordinatePrecision": "source",
+   "website": "https://ride-berlin.com",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "+49 30 98440980",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:b23-space-berlin",
+   "name": "B23 Space",
+   "street": "Greifswalder Straße 23",
+   "postalCode": "10405",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.531302,
+   "longitude": 13.4278041,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:ycba-yogacircle-berlin-akademie-lychener-strasse-berlin",
+   "name": "YCBA YogaCircle Berlin Akademie - Lychener Straße",
+   "street": "Gartenhaus",
+   "postalCode": "10437",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5417291,
+   "longitude": 13.4152031,
+   "coordinatePrecision": "source",
+   "website": "https://yogacircle-berlin.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "01515 3433392",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:open-charlottenburg-berlin",
+   "name": "OPEN – Charlottenburg",
+   "street": "Kurfürstendamm 210",
+   "postalCode": "10719",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5020053,
+   "longitude": 13.3243536,
+   "coordinatePrecision": "source",
+   "website": "https://openstudiosberlin.com/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:life-artists-creators-hub-berlin-bezirk-pankow",
+   "name": "Life Artists Creators Hub",
+   "street": "Milastraße 4",
+   "postalCode": "10437",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.545521699999995,
+   "longitude": 13.4108101,
+   "coordinatePrecision": "source",
+   "website": "http://www.creatorshub.berlin/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:my-esports-ems-training-by-sp-spektrum-praxis-ug-haftungsbeschraenkt-berlin",
+   "name": "my-eSports EMS Training by SP Spektrum Praxis UG(haftungsbeschränkt)",
+   "street": "Danziger Str. 69",
+   "postalCode": "10435",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.539618,
+   "longitude": 13.423449,
+   "coordinatePrecision": "source",
+   "website": "http://www.my-esports.de/",
+   "providerUrl": null,
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "030 58739525",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:my-sports-berlin",
+   "name": "My Sports",
+   "street": "Danziger Straße 69",
+   "postalCode": "10435",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5395343,
+   "longitude": 13.4235503,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:bodystreet-kudamm-ems-training-berlin-bezirk-charlottenburg-wilmersdorf",
+   "name": "BODYSTREET | Kudamm | EMS Training",
+   "street": "Lietzenburger Str. 77",
+   "postalCode": "10719",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.499787000000005,
+   "longitude": 13.3241791,
+   "coordinatePrecision": "source",
+   "website": "https://www.bodystreet.com/de/studio/bodystreet-berlin-am-kudamm",
+   "providerUrl": null,
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "030 61290280",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Bodystreet"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:a-ma-health-club-berlin",
+   "name": "aōma health club",
+   "street": "Uhlandstraße 39",
+   "postalCode": "10719",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4994722,
+   "longitude": 13.3244638,
+   "coordinatePrecision": "source",
+   "website": "https://aomahealthclub.de/",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "mrssporty:berlin-prenzlauerberg-winsstrasse",
+   "name": "Mrs.Sporty Club Berlin-Prenzlauerberg-Winsstraße",
+   "street": "Winsstraße 42",
+   "postalCode": "10405",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.53686,
+   "longitude": 13.42771,
+   "coordinatePrecision": "source",
+   "website": "https://www.mrssporty.de/club/berlin-prenzlauerberg-winsstrasse",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "030 300 266",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Mrs.Sporty"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:peace-yoga-berlin-berlin",
+   "name": "Peace Yoga Berlin",
+   "street": "Eisenbahnstraße 5",
+   "postalCode": "10997",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5016941,
+   "longitude": 13.432989,
+   "coordinatePrecision": "source",
+   "website": "https://www.peaceyoga.de",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "030 82409588",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:yoga-ist-studio-berlin",
+   "name": "YOGA IST... STUDIO",
+   "street": "Zeughofstraße 20",
+   "postalCode": "10997",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5002583,
+   "longitude": 13.4331629,
+   "coordinatePrecision": "source",
+   "website": "https://www.yoga-ist-berlin.de/studio",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitbox:berlin-bundesallee",
+   "name": "fitbox Berlin Bundesallee",
+   "street": "Bundesallee 192",
+   "postalCode": "10717",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4912362,
+   "longitude": 13.3312613,
+   "coordinatePrecision": "source",
+   "website": "https://fitbox.de/de/ems-studios/fitbox-berlin-bundesallee",
+   "providerUrl": null,
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "+49 30 35054470",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "fitbox"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:yogacircle-berlin",
+   "name": "YogaCircle",
+   "street": "Schliemannstraße 22",
+   "postalCode": "10437",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5445551,
+   "longitude": 13.4207853,
+   "coordinatePrecision": "source",
+   "website": "https://yogacircle-berlin.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "+49 30 44718418",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:open-kreuzberg-berlin",
+   "name": "OPEN — Kreuzberg",
+   "street": "Reichenberger Str. 125",
+   "postalCode": "10999",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.495518,
+   "longitude": 13.4312817,
+   "coordinatePrecision": "source",
+   "website": "https://www.openstudioberlin.com/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:formwandler-berlin",
+   "name": "Formwandler",
+   "street": "Dunckerstraße 21",
+   "postalCode": "10437",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5439907,
+   "longitude": 13.4223608,
+   "coordinatePrecision": "source",
+   "website": "https://www.formwandler.de/",
+   "providerUrl": null,
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "+49 30 43200911",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:brooklyn-fitboxing-charlottenburg-berlin",
+   "name": "Brooklyn Fitboxing Charlottenburg",
+   "street": "Kantstraße 38",
+   "postalCode": "10625",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5064381,
+   "longitude": 13.3142089,
+   "coordinatePrecision": "source",
+   "website": "https://www.brooklynfitboxing.com/public/de/de-de/club/CHARLOTTENBURG",
+   "providerUrl": null,
+   "categories": [
+    "kampfsport"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:american-fitness-berlin",
+   "name": "American Fitness",
+   "street": "Hermannplatz 10",
+   "postalCode": "10967",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4880071,
+   "longitude": 13.4241071,
+   "coordinatePrecision": "source",
+   "website": "http://american-fitness.org/berlin",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "+49 30 69807090",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "holmesplace:neue-welt",
+   "name": "Holmes Place Neue Welt",
+   "street": "Hasenheide 109",
+   "postalCode": "10967",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.485298,
+   "longitude": 13.4195821,
+   "coordinatePrecision": "source",
+   "website": "https://www.holmesplace.de/clubs/neue-welt",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "mrssporty:berlin-karl-august-platz",
+   "name": "Mrs.Sporty Club Berlin-Karl-August-Platz",
+   "street": "Weimarer Straße 32",
+   "postalCode": "10625",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.50862,
+   "longitude": 13.31257,
+   "coordinatePrecision": "source",
+   "website": "https://www.mrssporty.de/club/berlin-karl-august-platz",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "030 351 250 42",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Mrs.Sporty"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:kreuzberg-yoga-berlin",
+   "name": "Kreuzberg Yoga",
+   "street": "Lübbener Straße 9",
+   "postalCode": "10997",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4989674,
+   "longitude": 13.437719,
+   "coordinatePrecision": "source",
+   "website": "https://www.kreuzbergyoga.de/kontakt/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:storm-bootcamp-berlin-neue-welt-berlin",
+   "name": "STORM Bootcamp Berlin Neue Welt",
+   "street": "Hasenheide 109 Located in Holmes Place Neue Welt",
+   "postalCode": "10967",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4853111,
+   "longitude": 13.4217709,
+   "coordinatePrecision": "source",
+   "website": "http://www.wearethestorm.de/",
+   "providerUrl": null,
+   "categories": [
+    "crossfit"
+   ],
+   "plans": [],
+   "phone": "030 62725800",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:original-bootcamp-outdoor-fitness-volkspark-friedrichshain-berlin",
+   "name": "Original Bootcamp - Outdoor Fitness | Volkspark Friedrichshain",
+   "street": "Margarete-Sommer-Straße",
+   "postalCode": "10407",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5290426,
+   "longitude": 13.4424507,
+   "coordinatePrecision": "source",
+   "website": "https://www.original-bootcamp.com/berlin?utm_source=googlemaps&utm_medium=locations&utm_campaign=friedrichshain-volkspark",
+   "providerUrl": null,
+   "categories": [
+    "oeffentlich"
+   ],
+   "plans": [],
+   "phone": "0221 95673376",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Original Bootcamp"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "mrssporty:berlin-prenzlauerberg-rodenbergstrasse",
+   "name": "Mrs.Sporty Club Berlin-Prenzlauerberg-Rodenbergstraße",
+   "street": "Rodenbergstraße 35",
+   "postalCode": "10439",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.550478,
+   "longitude": 13.418688,
+   "coordinatePrecision": "source",
+   "website": "https://www.mrssporty.de/club/berlin-prenzlauerberg-rodenbergstrasse",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "Mobil und WhatsApp: +49 (0)176 434 995 61",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Mrs.Sporty"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:sunyoga-berlin",
+   "name": "SunYoga",
+   "street": "Torellstraße 7",
+   "postalCode": "10243",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5110587,
+   "longitude": 13.4488022,
+   "coordinatePrecision": "source",
+   "website": "http://sunyoga.de",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "+49 30 740 78 026",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:classical-pilates-berlin-berlin-bezirk-friedrichshain-kreuzberg",
+   "name": "Classical Pilates Berlin",
+   "street": "Cuvrystraße 35",
+   "postalCode": "10997",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4968331,
+   "longitude": 13.443426,
+   "coordinatePrecision": "source",
+   "website": "http://classicalpilatesberlin.com/",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": "0179 3239159",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:viva-studio-berlin",
+   "name": "Viva Studio",
+   "street": "Wilmersdorfer Straße 98",
+   "postalCode": "10629",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5021593,
+   "longitude": 13.3080794,
+   "coordinatePrecision": "source",
+   "website": "https://vivastudioberlin.com/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "0162 6102254",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:kineo-studio-berlin",
+   "name": "Kineo Studio",
+   "street": "Friedenauer Höhe 6",
+   "postalCode": "12159",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4777092,
+   "longitude": 13.3405201,
+   "coordinatePrecision": "source",
+   "website": "https://www.kineostudio.de/",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": "0176 88105323",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:sarasvati-yoga-berlin-berlin",
+   "name": "Sarasvati Yoga Berlin",
+   "street": "Bundesallee 53",
+   "postalCode": "10715",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4822505,
+   "longitude": 13.329427,
+   "coordinatePrecision": "source",
+   "website": "https://www.yoga-oase-berlin.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "0176 20211187",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:house-of-om-berlin-berlin",
+   "name": "House of Om Berlin",
+   "street": "Bundesallee 53",
+   "postalCode": "10715",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.482195999999995,
+   "longitude": 13.3294883,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:made-to-move-holistic-health-club-berlin",
+   "name": "Made to Move. | Holistic Health Club",
+   "street": "Stuttgarter Pl. 5",
+   "postalCode": "10627",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5057491,
+   "longitude": 13.3051244,
+   "coordinatePrecision": "source",
+   "website": "https://madetomove.berlin/",
+   "providerUrl": null,
+   "categories": [
+    "gesundheit"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitbox:berlin-schlesische-strasse",
+   "name": "fitbox Berlin Schlesische Straße",
+   "street": "Schlesische Straße 30",
+   "postalCode": "10997",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4986921,
+   "longitude": 13.4467841,
+   "coordinatePrecision": "source",
+   "website": "https://fitbox.de/de/ems-studios/fitbox-berlin-schlesische-strasse",
+   "providerUrl": null,
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "+49 30 92366470",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "fitbox"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:studio-b-barre-pilates-berlin",
+   "name": "Studio B - Barre & Pilates",
+   "street": "Gierkezeile 15",
+   "postalCode": "10585",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.514342199999994,
+   "longitude": 13.3027751,
+   "coordinatePrecision": "source",
+   "website": "https://www.eversports.de/s/studio-b?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGnWFHsaVCNXZVW3iPVlLyxF85GJz2cs839-7WMumZikKFRjUoBlm4YPBZJMcI_aem_v5QIm35RiECF4oTmiq7QzA",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:rocycle-berlin",
+   "name": "Rocycle",
+   "street": "Warschauer Straße 6",
+   "postalCode": "10243",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5146761,
+   "longitude": 13.4529451,
+   "coordinatePrecision": "source",
+   "website": "https://rocyclestudios.com/de/studios/berlin/berlin-fhain",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:yogicescape-yoga-wellness-studio-berlin",
+   "name": "Yogicescape - Yoga & Wellness Studio",
+   "street": "Naugarder Str. 14",
+   "postalCode": "10409",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.544142099999995,
+   "longitude": 13.4380236,
+   "coordinatePrecision": "source",
+   "website": "https://www.yogicescape.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "01514 5845051",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:yoga-hub-berlin-friedrichshain-berlin-bezirk-friedrichshain-kreuzberg",
+   "name": "Yoga Hub Berlin - Friedrichshain",
+   "street": "Thaerstraße 40",
+   "postalCode": "10249",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.52056,
+   "longitude": 13.454210000000002,
+   "coordinatePrecision": "source",
+   "website": "https://www.yogahubberlin.com/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "01575 8734608",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:pilates-studio-node-11613447903",
+   "name": "Pilates Studio",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4773912,
+   "longitude": 13.4213217,
+   "coordinatePrecision": "source",
+   "website": "https://pilatesengel.de/",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": "+49 176 78529751",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:beat-81-friedrichshain-berlin-bezirk-friedrichshain-kreuzberg",
+   "name": "Beat 81 Friedrichshain",
+   "street": "Grünberger Str. 54",
+   "postalCode": "10245",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5100349,
+   "longitude": 13.4548642,
+   "coordinatePrecision": "source",
+   "website": "https://www.beat81.com/de/",
+   "providerUrl": null,
+   "categories": [
+    "crossfit"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:authentic-body-control-node-440337320",
+   "name": "authentic body control",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4810205,
+   "longitude": 13.4336999,
+   "coordinatePrecision": "source",
+   "website": "http://pilatesberlin.com/",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:sapta-yoga-berlin",
+   "name": "SAPTA Yoga",
+   "street": "Schönstedtstraße 7",
+   "postalCode": "12043",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4824103,
+   "longitude": 13.4367699,
+   "coordinatePrecision": "source",
+   "website": "https://www.sapta.yoga/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:beyond-a-becycle-studio-berlin",
+   "name": "BEYOND: a BECYCLE studio",
+   "street": "Pestalozzistraße 56",
+   "postalCode": "10627",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.507894699999994,
+   "longitude": 13.2975731,
+   "coordinatePrecision": "source",
+   "website": "https://www.beyondbln.de/",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": "030 28035575",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:kim-x-you-berlin",
+   "name": "KIM x YOU",
+   "street": "Schandauer Str. 1A",
+   "postalCode": "12045",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.484626299999995,
+   "longitude": 13.4409199,
+   "coordinatePrecision": "source",
+   "website": "https://www.i-am.kim/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "01517 0091377",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:open-sonnenallee-berlin",
+   "name": "OPEN – Sonnenallee",
+   "street": "Sonnenallee 90",
+   "postalCode": "12045",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4825453,
+   "longitude": 13.4378128,
+   "coordinatePrecision": "source",
+   "website": "https://openstudiosberlin.com/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:argo-athletics-berlin",
+   "name": "Argo Athletics",
+   "street": "Mühlenstraße 62;63;64;65",
+   "postalCode": "13187",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5642337,
+   "longitude": 13.4095229,
+   "coordinatePrecision": "source",
+   "website": "https://www.argo-athletics.de/",
+   "providerUrl": null,
+   "categories": [
+    "crossfit"
+   ],
+   "plans": [],
+   "phone": "030 64442342",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:ems-training-berlin-node-7544210933",
+   "name": "EMS Training Berlin",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.475808,
+   "longitude": 13.3246233,
+   "coordinatePrecision": "source",
+   "website": "http://www.ems-training-berlin.de/",
+   "providerUrl": null,
+   "categories": [
+    "gesundheit"
+   ],
+   "plans": [],
+   "phone": "030 30648097",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:argo-athletics-way-68808849",
+   "name": "Argo Athletics",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5646845,
+   "longitude": 13.4098556,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:flow-fitness-berlin",
+   "name": "Flow Fitness",
+   "street": "Fregestraße 11",
+   "postalCode": "12159",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4702542,
+   "longitude": 13.3370775,
+   "coordinatePrecision": "source",
+   "website": "https://www.flowfitness.info/",
+   "providerUrl": null,
+   "categories": [
+    "gesundheit"
+   ],
+   "plans": [],
+   "phone": "+49 30 24329828",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:every-damn-day-yoga-node-11649758184",
+   "name": "Every Damn Day Yoga",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5055523,
+   "longitude": 13.4620033,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:circle-personal-training-club-berlin",
+   "name": "CIRCLE - Personal Training Club",
+   "street": "Joachim-Friedrich-Straße 37-38",
+   "postalCode": "10711",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4995827,
+   "longitude": 13.2956735,
+   "coordinatePrecision": "source",
+   "website": "https://www.thecircle-gym.de/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "0176 82039541",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:grazioes-berlin-pankow-berlin-bezirk-pankow",
+   "name": "GRAZIÖS Berlin-Pankow",
+   "street": "Elsa-Brändström-Straße 93",
+   "postalCode": "13189",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.56066,
+   "longitude": 13.426525,
+   "coordinatePrecision": "source",
+   "website": "https://www.grazioes-sport.de/",
+   "providerUrl": null,
+   "categories": [
+    "gesundheit"
+   ],
+   "plans": [],
+   "phone": "030 52131369",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:graceful-movement-sweat-body-berlin",
+   "name": "Graceful Movement - Sweat Body",
+   "street": "Elsenstraße 87",
+   "postalCode": "12435",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4871989,
+   "longitude": 13.4518768,
+   "coordinatePrecision": "source",
+   "website": "https://www.gracefarmer.de/",
+   "providerUrl": null,
+   "categories": [
+    "tanz"
+   ],
+   "plans": [],
+   "phone": "0162 8818522",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:sivananda-yoga-berlin",
+   "name": "Sivananda Yoga",
+   "street": "Schmiljanstraße 24",
+   "postalCode": "12161",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.470673,
+   "longitude": 13.3310663,
+   "coordinatePrecision": "source",
+   "website": "https://berlin.sivananda.yoga/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "+49 30 85999798",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:ycba-yogacircle-berlin-akademie-boernestrasse-berlin",
+   "name": "YCBA YogaCircle Berlin Akademie - Börnestraße",
+   "street": "Börnestraße 16",
+   "postalCode": "13086",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.548916899999995,
+   "longitude": 13.448034,
+   "coordinatePrecision": "source",
+   "website": "https://yogacircle-berlin.de/yogalehrer-ausbildung-berlin/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "01515 3433392",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:saccinanda-yoga-node-12054497889",
+   "name": "Saccinanda Yoga",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5118274,
+   "longitude": 13.4660189,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:ems-bodystreet-berlin-antonplatz-personal-training-weissensee-berlin-bezirk-pankow",
+   "name": "EMS | Bodystreet Berlin Antonplatz | Personal -Training Weißensee",
+   "street": "Berliner Allee 25",
+   "postalCode": "13088",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5482155,
+   "longitude": 13.4502887,
+   "coordinatePrecision": "source",
+   "website": "https://www.bodystreet.de/studio/bodystreet-berlin-antonplatz",
+   "providerUrl": null,
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "030 34353414",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Bodystreet"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "mrssporty:berlin-weissensee",
+   "name": "Mrs.Sporty Club Berlin-Weißensee",
+   "street": "Max-Steinke-Straße 6",
+   "postalCode": "13086",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.549464,
+   "longitude": 13.450799,
+   "coordinatePrecision": "source",
+   "website": "https://www.mrssporty.de/club/berlin-weissensee",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "030/ 98 606 187",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Mrs.Sporty"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:open-friedrichshain-berlin",
+   "name": "OPEN – Friedrichshain",
+   "street": "Boxhagener Str. 77",
+   "postalCode": "10245",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5075801,
+   "longitude": 13.4690504,
+   "coordinatePrecision": "source",
+   "website": "http://openstudiosberlin.com/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:berlin-hot-yoga-node-5659022957",
+   "name": "Berlin Hot Yoga",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5079023,
+   "longitude": 13.4695348,
+   "coordinatePrecision": "source",
+   "website": "http://mahalaya-yoga.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "030 29363646",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:green-studio-pilates-berlin",
+   "name": "Green Studio Pilates",
+   "street": "Jessnerstraße 58",
+   "postalCode": "10247",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.50955,
+   "longitude": 13.4698898,
+   "coordinatePrecision": "source",
+   "website": "https://pilatesfriedrichshain.de/",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:pilates-on-the-go-berlin",
+   "name": "Pilates On The Go",
+   "street": "Wiesbadener Straße 79",
+   "postalCode": "12161",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4714277,
+   "longitude": 13.320908,
+   "coordinatePrecision": "source",
+   "website": "http://pilates-on-the-go.com",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:bodystreet-berlin",
+   "name": "Bodystreet",
+   "street": "Berliner Straße 2",
+   "postalCode": "13187",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5702216,
+   "longitude": 13.4103995,
+   "coordinatePrecision": "source",
+   "website": "https://www.bodystreet.com/de/studio/bodystreet-berlin-pankow-kirche",
+   "providerUrl": null,
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Bodystreet"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:sonne-mond-sterne-berlin",
+   "name": "Sonne Mond & Sterne",
+   "street": "Meyerbeerstraße 59",
+   "postalCode": "13088",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5476997,
+   "longitude": 13.4572285,
+   "coordinatePrecision": "source",
+   "website": "https://sonnemondundsterne-weissensee.jimdofree.com/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:feldenkrais-berlin-neukoelln-berlin",
+   "name": "Feldenkrais Berlin Neukölln",
+   "street": "Altenbraker Str. 26",
+   "postalCode": "12051",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.469139899999995,
+   "longitude": 13.4324841,
+   "coordinatePrecision": "source",
+   "website": "http://feldenkrais-berlin-neukoelln.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "0162 5477752",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "holmesplace:berlin-ostkreuz",
+   "name": "Holmes Place Berlin Ostkreuz",
+   "street": "Hirschberger Straße 3",
+   "postalCode": "10317",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5044924,
+   "longitude": 13.4715891,
+   "coordinatePrecision": "source",
+   "website": "https://www.holmesplace.de/clubs/berlin-ostkreuz",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:oma-om-yoga-berlin",
+   "name": "Oma Om Yoga",
+   "street": "Richardstraße 43",
+   "postalCode": "12055",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4734928,
+   "longitude": 13.4452931,
+   "coordinatePrecision": "source",
+   "website": "https://www.omaom.com/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:bh-dhara-yoga-berlin",
+   "name": "Bhūdhara Yoga",
+   "street": "Hackerstraße 4",
+   "postalCode": "12161",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4664211,
+   "longitude": 13.3246264,
+   "coordinatePrecision": "source",
+   "website": "https://bhudhara-yoga.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:original-bootcamp-outdoor-fitness-lichtenberg-stadtpark-berlin",
+   "name": "Original Bootcamp - Outdoor Fitness | Lichtenberg - Stadtpark",
+   "street": "Am Stadtpark",
+   "postalCode": "10367",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.517213899999994,
+   "longitude": 13.4783193,
+   "coordinatePrecision": "source",
+   "website": "https://www.original-bootcamp.com/berlin?utm_source=googlemaps&utm_campaign=Lichtenberg+-+Stadtpark",
+   "providerUrl": null,
+   "categories": [
+    "oeffentlich"
+   ],
+   "plans": [],
+   "phone": "015888 491659",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Original Bootcamp"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "holmesplace:berlin-schlossstrasse",
+   "name": "Holmes Place Berlin Schlossstrasse",
+   "street": "Schildhornstr. 1",
+   "postalCode": "12163",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4620797,
+   "longitude": 13.3244353,
+   "coordinatePrecision": "source",
+   "website": "https://www.holmesplace.de/clubs/berlin-schlossstrasse",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:bln-athletics-node-11046023605",
+   "name": "BLN Athletics",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5142111,
+   "longitude": 13.4816451,
+   "coordinatePrecision": "source",
+   "website": "https://blnathletics.com/",
+   "providerUrl": null,
+   "categories": [
+    "crossfit"
+   ],
+   "plans": [],
+   "phone": "030 123",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:bln-athletics-berlin",
+   "name": "BLN.Athletics",
+   "street": "Rathausstr. 12a",
+   "postalCode": "10367",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5141054,
+   "longitude": 13.4816218,
+   "coordinatePrecision": "source",
+   "website": "https://www.blnathletics.com/de",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:fitwomen-boutique-gym-berlin-berlin",
+   "name": "FitWomen Boutique Gym Berlin",
+   "street": "Mariendorfer Damm 16",
+   "postalCode": "12109",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4516356,
+   "longitude": 13.3843943,
+   "coordinatePrecision": "source",
+   "website": "https://www.fitwomen.berlin/",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "030 22193593",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:omni-yoga-berlin",
+   "name": "OMNI Yoga",
+   "street": "Bergstraße 92",
+   "postalCode": "12169",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4583235,
+   "longitude": 13.3277669,
+   "coordinatePrecision": "source",
+   "website": "https://www.omniyogastudio.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "mrssporty:berlin-schmargendorf",
+   "name": "Mrs.Sporty Club Berlin-Schmargendorf",
+   "street": "Reichenhaller Straße 2-3",
+   "postalCode": "14199",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.477205,
+   "longitude": 13.289358,
+   "coordinatePrecision": "source",
+   "website": "https://www.mrssporty.de/club/berlin-schmargendorf",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "Club: +493083223400",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Mrs.Sporty"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "mrssporty:berlin-westend",
+   "name": "Mrs.Sporty Club Berlin-Westend",
+   "street": "Reichsstraße 93",
+   "postalCode": "14052",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.513429,
+   "longitude": 13.265193,
+   "coordinatePrecision": "source",
+   "website": "https://www.mrssporty.de/club/berlin-westend",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "030/805 807 30",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Mrs.Sporty"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:pilateysa-pilates-mit-janna-berlin",
+   "name": "Pilateysa - Pilates mit Janna",
+   "street": "Grunewaldstraße 10",
+   "postalCode": "12165",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4586872,
+   "longitude": 13.3164768,
+   "coordinatePrecision": "source",
+   "website": "https://sb535q.webmepage.com/pilateysade",
+   "providerUrl": null,
+   "categories": [
+    "pilates"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:fitness-reha-zentrum-britz-berlin-bezirk-neukoelln",
+   "name": "Fitness & Reha-Zentrum Britz",
+   "street": "Tempelhofer Weg 44",
+   "postalCode": "12347",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4550539,
+   "longitude": 13.4289951,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "gesundheit"
+   ],
+   "plans": [],
+   "phone": "030 6079551",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:venice-sporting-club-berlin",
+   "name": "Venice Sporting Club",
+   "street": "Tempelhofer Weg 44",
+   "postalCode": "12347",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4550011,
+   "longitude": 13.4290189,
+   "coordinatePrecision": "source",
+   "website": "https://www.venice-sportingclub.de/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:win-club-crossfit-berlin",
+   "name": "Win Club CrossFit",
+   "street": "Mittelstrasse 34 (bei Nippon)",
+   "postalCode": "12167",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4543428,
+   "longitude": 13.3263116,
+   "coordinatePrecision": "source",
+   "website": "https://www.winclubcrossfit.com/",
+   "providerUrl": null,
+   "categories": [
+    "crossfit"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:win-club-crossfit-node-12040833981",
+   "name": "Win Club CrossFit",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4542309,
+   "longitude": 13.3261574,
+   "coordinatePrecision": "source",
+   "website": "https://www.winclubcrossfit.com/",
+   "providerUrl": null,
+   "categories": [
+    "crossfit"
+   ],
+   "plans": [],
+   "phone": "+49 176 56865295",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:kraft-kultur-coaching-berlin-berlin-bezirk-steglitz-zehlendorf",
+   "name": "KRAFT.KULTUR Coaching Berlin",
+   "street": "Mittelstraße 34",
+   "postalCode": "12167",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4542915,
+   "longitude": 13.326224,
+   "coordinatePrecision": "source",
+   "website": "https://www.kraftpersonaltrainer.com/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "01577 1485728",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:fitnesscenter-vital-inn-berlin-bezirk-lichtenberg",
+   "name": "Fitnesscenter Vital Inn",
+   "street": "Küstriner Str. 46",
+   "postalCode": "13055",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.538440699999995,
+   "longitude": 13.4877309,
+   "coordinatePrecision": "source",
+   "website": "http://www.fitnesscenter-vitalinn-berlin.de/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 9704164",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:vital-lichtenberg-fitness-und-gesundheitsclub-berlin-bezirk-lichtenberg",
+   "name": "Vital Lichtenberg Fitness- und Gesundheitsclub",
+   "street": "Wönnichstraße 68-70",
+   "postalCode": "10317",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5047382,
+   "longitude": 13.4964219,
+   "coordinatePrecision": "source",
+   "website": "http://www.vital-lichtenberg.de/",
+   "providerUrl": null,
+   "categories": [
+    "gesundheit"
+   ],
+   "plans": [],
+   "phone": "030 51099535",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:think-outside-crossfit-berlin",
+   "name": "Think Outside CrossFit",
+   "street": "Eichborndamm 167/Gebäude 39",
+   "postalCode": "13403",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5829927,
+   "longitude": 13.3161439,
+   "coordinatePrecision": "source",
+   "website": "http://www.think-outside.berlin/",
+   "providerUrl": null,
+   "categories": [
+    "crossfit"
+   ],
+   "plans": [],
+   "phone": "0162 3248792",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:fourty-fit-healthclub-berlin",
+   "name": "fourty fit healthclub",
+   "street": "Gardeschützenweg 57",
+   "postalCode": "12203",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4470269,
+   "longitude": 13.3083434,
+   "coordinatePrecision": "source",
+   "website": "http://dassportstudio.de/",
+   "providerUrl": null,
+   "categories": [
+    "gesundheit"
+   ],
+   "plans": [],
+   "phone": "030 24537733",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:iryna-mozes-personal-fitness-trainerin-berlin-berlin",
+   "name": "Iryna Mozes Personal Fitness Trainerin Berlin",
+   "street": "Gardeschützenweg 57",
+   "postalCode": "12203",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4470501,
+   "longitude": 13.3083454,
+   "coordinatePrecision": "source",
+   "website": "https://www.train-with-mozes.de/",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "0179 1292990",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:injoy-berlin",
+   "name": "INJOY",
+   "street": "Kamenzer Damm 30",
+   "postalCode": "12249",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4332479,
+   "longitude": 13.3558657,
+   "coordinatePrecision": "source",
+   "website": "https://injoy-berlin-steglitz.de/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 7717052",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "mrssporty:berlin-lichtenberg-friedrichsfelde",
+   "name": "Mrs.Sporty Club Berlin-Lichtenberg-Friedrichsfelde",
+   "street": "Alfred-Kowalke-Str. 2-4",
+   "postalCode": "10315",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.50517,
+   "longitude": 13.51479,
+   "coordinatePrecision": "source",
+   "website": "https://www.mrssporty.de/club/berlin-lichtenberg-friedrichsfelde",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "+493035127250",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Mrs.Sporty"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:pyramide-fitness-world-berlin",
+   "name": "Pyramide Fitness World",
+   "street": "Alte Rhinstraße 16",
+   "postalCode": "12681",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5332187,
+   "longitude": 13.5195225,
+   "coordinatePrecision": "source",
+   "website": "https://www.pyramide-fitness-world.de/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "+49 30 54986401",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:yoga-flow-slow-berlin",
+   "name": "Yoga Flow Slow",
+   "street": "Dachgeschoss Altbau │ hohes Gebäude",
+   "postalCode": "10318",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4825612,
+   "longitude": 13.5144082,
+   "coordinatePrecision": "source",
+   "website": "https://www.yoga-flow-slow.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "01573 4101555",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:bodystreet-berlin-borsighallen-berlin-bezirk-reinickendorf",
+   "name": "Bodystreet Berlin Borsighallen",
+   "street": "Brunowstraße 58",
+   "postalCode": "13507",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5877207,
+   "longitude": 13.287435,
+   "coordinatePrecision": "source",
+   "website": "https://www.bodystreet.com/de/standorte/deutschland/berlin/bodystreet-berlin-tegel/",
+   "providerUrl": null,
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "030 50593933",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Bodystreet"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:original-bootcamp-outdoor-fitness-lichterfelde-berlin-bezirk-steglitz-zehlendorf",
+   "name": "Original Bootcamp - Outdoor Fitness | Lichterfelde",
+   "street": "Bäkestraße 15A",
+   "postalCode": "12207",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4335901,
+   "longitude": 13.3174601,
+   "coordinatePrecision": "source",
+   "website": "https://original-bootcamp.com/",
+   "providerUrl": null,
+   "categories": [
+    "oeffentlich"
+   ],
+   "plans": [],
+   "phone": "0221 48530112",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Original Bootcamp"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:active-ladies-13051",
+   "name": "Active Ladies",
+   "street": "Zingster Straße 4",
+   "postalCode": "13051",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5648847,
+   "longitude": 13.5039111,
+   "coordinatePrecision": "source",
+   "website": "http://www.active-ladies.de",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "+49 30 36 74 50 60",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "fitbox:berlin-hohenschoenhausen",
+   "name": "fitbox Berlin Hohenschönhausen",
+   "street": "Rotkamp 6",
+   "postalCode": "13053",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5614415,
+   "longitude": 13.5093529,
+   "coordinatePrecision": "source",
+   "website": "https://fitbox.de/de/ems-studios/fitbox-berlin-hohenschoenhausen",
+   "providerUrl": null,
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "+49 17682169680",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "fitbox"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "mrssporty:berlin-karlshorst",
+   "name": "Mrs.Sporty Club Berlin-Karlshorst",
+   "street": "Marksburgstr. 41",
+   "postalCode": "10318",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.48703,
+   "longitude": 13.52449,
+   "coordinatePrecision": "source",
+   "website": "https://www.mrssporty.de/club/berlin-karlshorst",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "030 600 53 610",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Mrs.Sporty"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:sporteve-berlin-mariendorf-frauenfitness-berlin-bezirk-tempelhof-schoeneberg",
+   "name": "Sporteve Berlin Mariendorf Frauenfitness",
+   "street": "Mariendorfer Damm 349",
+   "postalCode": "12107",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4225445,
+   "longitude": 13.3970283,
+   "coordinatePrecision": "source",
+   "website": "https://www.sporteve.de/clubs/berlin-mariendorf/",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "030 70763710",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Sporteve"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:sky-plate-berlin-berlin-bezirk-pankow",
+   "name": "Sky.Plate Berlin",
+   "street": "Hauptstraße 13A",
+   "postalCode": "13127",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.605061899999995,
+   "longitude": 13.4319941,
+   "coordinatePrecision": "source",
+   "website": "https://www.skyplate.de/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "030 51058219",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:bodystreet-kranoldplatz-ems-training-berlin-bezirk-steglitz-zehlendorf",
+   "name": "BODYSTREET | Kranoldplatz | EMS Training",
+   "street": "Oberhofer Weg 15",
+   "postalCode": "12209",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4266128,
+   "longitude": 13.3275419,
+   "coordinatePrecision": "source",
+   "website": "https://www.bodystreet.com/de/standorte/deutschland/berlin/bodystreet-berlin-kranoldplatz/",
+   "providerUrl": null,
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "030 34626376",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Bodystreet"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:yoga-labor-berlin-yoga-kurse-ausbildung-retreats-berlin",
+   "name": "Yoga Labor Berlin | Yoga Kurse, Ausbildung & Retreats",
+   "street": "Wilhelminenhofstraße 92",
+   "postalCode": "12459",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4623568,
+   "longitude": 13.5086504,
+   "coordinatePrecision": "source",
+   "website": "https://www.yogalaborberlin.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "01573 0242715",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:original-bootcamp-outdoor-fitness-karlshorst-berlin-berlin",
+   "name": "Original Bootcamp - Outdoor Fitness | Karlshorst - Berlin",
+   "street": "Am Carlsgarten 16",
+   "postalCode": "10318",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4788942,
+   "longitude": 13.5288706,
+   "coordinatePrecision": "source",
+   "website": "https://www.original-bootcamp.com/s-bhf-karlshorst%20?utm_source=googlemaps&utm_medium=locations&utm_campaign=+Berlin+-+S-Bhf.+Karlshorst+",
+   "providerUrl": null,
+   "categories": [
+    "oeffentlich"
+   ],
+   "plans": [],
+   "phone": "0221 95673376",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Original Bootcamp"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:easy-fit-21-ems-fitnesslounge-berlin",
+   "name": "EASY Fit 21 - EMS Fitnesslounge",
+   "street": "Mariendorfer Damm 419 a",
+   "postalCode": "12107",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4177754,
+   "longitude": 13.399694,
+   "coordinatePrecision": "source",
+   "website": "https://www.easyfit21.de/",
+   "providerUrl": null,
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "030 54810520",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:vacufitems-berlin",
+   "name": "VacuFitEMS",
+   "street": "Wilhelminenhofstraße 18",
+   "postalCode": "12459",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4624349,
+   "longitude": 13.515048600000002,
+   "coordinatePrecision": "source",
+   "website": "https://vacufitems.de/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "0176 16371698",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:yoga-baer-studio-node-12261125503",
+   "name": "Yoga Bär Studio",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4559706,
+   "longitude": 13.5122716,
+   "coordinatePrecision": "source",
+   "website": "https://yogabaerstudio.de",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "+49 17689479881",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "schwimmbad:sommerbad-node-11879105315",
+   "name": "Schwimmbad Sommerbad",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4275486,
+   "longitude": 13.4701628,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "schwimmbad"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Schwimmbad"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:orange-fit-gesundheitszentrum-golightly-energy-gmbh-berlin",
+   "name": "ORANGE FIT Gesundheitszentrum Golightly Energy GmbH",
+   "street": "Orange Fit Gesundheitszentrum",
+   "postalCode": "12459",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4589249,
+   "longitude": 13.5239586,
+   "coordinatePrecision": "source",
+   "website": "https://www.orange-fit.de/",
+   "providerUrl": null,
+   "categories": [
+    "gesundheit"
+   ],
+   "plans": [],
+   "phone": "030 53015121",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:aktifit-berlin-bezirk-reinickendorf",
+   "name": "aktiFit",
+   "street": "Schramberger Str. 21",
+   "postalCode": "13467",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.6160697,
+   "longitude": 13.3027436,
+   "coordinatePrecision": "source",
+   "website": "http://www.aktifit-berlin.de/Kontakt/body_kontakt_0.html",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "0179 5321648",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:sportstudio-node-10909471605",
+   "name": "Sportstudio",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5305105,
+   "longitude": 13.5585447,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:eee-fitness-pole-dance-und-personal-training-berlin",
+   "name": "EEE Fitness, Pole Dance und Personal Training",
+   "street": "Oberfeldstraße 105",
+   "postalCode": "12683",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5304814,
+   "longitude": 13.5585963,
+   "coordinatePrecision": "source",
+   "website": "http://www.eee-gesundheit.de/",
+   "providerUrl": null,
+   "categories": [
+    "tanz"
+   ],
+   "plans": [],
+   "phone": "0160 6230772",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-brandenburg:spirit-yoga-zehlendorf-berlin",
+   "name": "Spirit Yoga Zehlendorf",
+   "street": "Martin-Buber-Straße 23",
+   "postalCode": "14163",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4315544,
+   "longitude": 13.2568542,
+   "coordinatePrecision": "source",
+   "website": "http://www.spirityoga.de/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "030 27908503",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "schwimmbad:kleine-schwimmhalle-wuhlheide-way-482062998",
+   "name": "Schwimmbad Kleine Schwimmhalle Wuhlheide",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4600371,
+   "longitude": 13.5396083,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "schwimmbad"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Schwimmbad"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:calisthenics-am-waldsee-berlin",
+   "name": "Calisthenics am Waldsee",
+   "street": "Parkstraße 8",
+   "postalCode": "13467",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.6250216,
+   "longitude": 13.3176031,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:noex-berlin-berlin-bezirk-spandau",
+   "name": "NOEX-Berlin",
+   "street": "Altonaer Str. 84",
+   "postalCode": "13581",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5329182,
+   "longitude": 13.1837607,
+   "coordinatePrecision": "source",
+   "website": "http://noex-berlin.de/",
+   "providerUrl": null,
+   "categories": [
+    "crossfit"
+   ],
+   "plans": [],
+   "phone": "030 52109389",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:kiez-fit-women-berlin-bezirk-marzahn-hellersdorf",
+   "name": "KIEZ FIT Women",
+   "street": "Mehrower Allee 34",
+   "postalCode": "12687",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5558537,
+   "longitude": 13.5631375,
+   "coordinatePrecision": "source",
+   "website": "https://www.kiez.fitness/",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "030 9311502",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:bodystreet-berlin-adlershof-berlin",
+   "name": "Bodystreet Berlin Adlershof",
+   "street": "Hermann-Dorner-Allee 13",
+   "postalCode": "12489",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.436010499999995,
+   "longitude": 13.5243346,
+   "coordinatePrecision": "source",
+   "website": "https://www.bodystreet.de/studio/bodystreet-berlin-adlershof",
+   "providerUrl": null,
+   "categories": [
+    "ems"
+   ],
+   "plans": [],
+   "phone": "030 49081206",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Bodystreet"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:move-trainingszirkel-berlin-simonshof-iii",
+   "name": "Move! Trainingszirkel",
+   "street": "Schönwalder Allee 26/19a",
+   "postalCode": "13587",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5707392,
+   "longitude": 13.1998262,
+   "coordinatePrecision": "source",
+   "website": "http://physio-johannesstift.de/move.html",
+   "providerUrl": null,
+   "categories": [
+    "gesundheit"
+   ],
+   "plans": [],
+   "phone": "030 30648605",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:die-bewegungsebene-berlin",
+   "name": "Die Bewegungsebene",
+   "street": "Alt-Kaulsdorf 18",
+   "postalCode": "12621",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5046976,
+   "longitude": 13.5821677,
+   "coordinatePrecision": "source",
+   "website": "https://die-bewegungsebene.de/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "+49 30 48638959",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "schwimmbad:schwimmbad-kaulsdorf-way-47281555",
+   "name": "Schwimmbad Kaulsdorf",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5209679,
+   "longitude": 13.5854977,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "schwimmbad"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Schwimmbad"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-brandenburg:gesuvita-health-club-berlin-bezirk-steglitz-zehlendorf",
+   "name": "GesuVita Health Club",
+   "street": "Kleinmachnower Weg 9-11",
+   "postalCode": "14165",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.408659199999995,
+   "longitude": 13.2651805,
+   "coordinatePrecision": "source",
+   "website": "http://www.gesuvita.de/",
+   "providerUrl": null,
+   "categories": [
+    "gesundheit"
+   ],
+   "plans": [],
+   "phone": "030 47370560",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:yoga-glueck-berlin",
+   "name": "Yoga Glück",
+   "street": "Hackenbergstraße 7",
+   "postalCode": "12489",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4395292,
+   "longitude": 13.5479174,
+   "coordinatePrecision": "source",
+   "website": "https://www.yoga-glueck-berlin.de",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:akupunktur-massage-lisa-hartl-berlin",
+   "name": "Akupunktur & Massage - Lisa Hartl",
+   "street": "Hackenbergstraße 7",
+   "postalCode": "12489",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4395124,
+   "longitude": 13.5480226,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "0163 1432619",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "mrssporty:berlin-kaulsdorf",
+   "name": "Mrs.Sporty Club Berlin-Kaulsdorf",
+   "street": "Cecilienplatz 8",
+   "postalCode": "12619",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.52077,
+   "longitude": 13.59099,
+   "coordinatePrecision": "source",
+   "website": "https://www.mrssporty.de/club/berlin-kaulsdorf",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "+493057799830",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Mrs.Sporty"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "schwimmbad:freibad-heiligensee-way-51832083",
+   "name": "Schwimmbad Freibad Heiligensee",
+   "street": null,
+   "postalCode": null,
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.6003164,
+   "longitude": 13.2133202,
+   "coordinatePrecision": "source",
+   "website": null,
+   "providerUrl": null,
+   "categories": [
+    "schwimmbad"
+   ],
+   "plans": [],
+   "phone": null,
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Schwimmbad"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-brandenburg:physiotherapie-fitness-ifarus-gmbh-berlin-bezirk-steglitz-zehlendorf",
+   "name": "Physiotherapie & Fitness IFARUS GmbH",
+   "street": "Am Bogenhaus",
+   "postalCode": "14129",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4272533,
+   "longitude": 13.2165558,
+   "coordinatePrecision": "source",
+   "website": "https://ifarus.de/",
+   "providerUrl": null,
+   "categories": [
+    "gesundheit"
+   ],
+   "plans": [],
+   "phone": "030 80487110",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:citi-frauen-fitness-12629",
+   "name": "CITI-Frauen-Fitness",
+   "street": "Alte Hellersdorfer Straße 119",
+   "postalCode": "12629",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.5452832,
+   "longitude": 13.5911324,
+   "coordinatePrecision": "source",
+   "website": "http://www.citi-sport.de/",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "030 99400446",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:b-touched-yoga-by-bianca-berlin",
+   "name": "B-touched Yoga by Bianca",
+   "street": "Königsbacher Zeile 23",
+   "postalCode": "13465",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.6402199,
+   "longitude": 13.295109,
+   "coordinatePrecision": "source",
+   "website": "https://b-touched-yoga.com/",
+   "providerUrl": null,
+   "categories": [
+    "yoga"
+   ],
+   "plans": [],
+   "phone": "+49 176 38747534",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:muk-yah-berlin",
+   "name": "Muk-Yah",
+   "street": "Ruppiner Chaussee 331-335 1. Obergeschoss links",
+   "postalCode": "13503",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.6204176,
+   "longitude": 13.2367023,
+   "coordinatePrecision": "source",
+   "website": "https://www.muk-yah.de/",
+   "providerUrl": null,
+   "categories": [
+    "tanz"
+   ],
+   "plans": [],
+   "phone": "0160 4557256",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:just-you-fitness-berlin",
+   "name": "Just You Fitness",
+   "street": "Köpenicker Str. 11",
+   "postalCode": "12524",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4227291,
+   "longitude": 13.5397485,
+   "coordinatePrecision": "source",
+   "website": "https://www.justyou-fitness.de/",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "030 67896623",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "mrssporty:berlin-rudow",
+   "name": "Mrs.Sporty Club Berlin-Rudow",
+   "street": "Lieselotte-Berger- Straße 25",
+   "postalCode": "12355",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.40317,
+   "longitude": 13.507214,
+   "coordinatePrecision": "source",
+   "website": "https://www.mrssporty.de/club/berlin-rudow",
+   "providerUrl": null,
+   "categories": [
+    "frauen"
+   ],
+   "plans": [],
+   "phone": "03074075316",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Mrs.Sporty"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "cleverfit:berlin-mahlsdorf",
+   "name": "clever fit Berlin-Mahlsdorf",
+   "street": "Hultschiner Damm 90",
+   "postalCode": "12623",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.4829438,
+   "longitude": 13.6021201,
+   "coordinatePrecision": "source",
+   "website": "https://www.clever-fit.com/de/fitnessstudio/berlin-mahlsdorf/",
+   "providerUrl": null,
+   "categories": [
+    "gym"
+   ],
+   "plans": [],
+   "phone": "03053018060",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "clever fit"
+   }
+  },
+  {
+   "provider": "wellpass",
+   "source": "fair-for-fitness",
+   "sourceId": "region-berlin:grazioes-berlin-mahlsdorf-berlin-bezirk-marzahn-hellersdorf",
+   "name": "GRAZIÖS Berlin-Mahlsdorf",
+   "street": "Hultschiner Damm 185",
+   "postalCode": "12623",
+   "city": "Berlin",
+   "district": null,
+   "latitude": 52.491459899999995,
+   "longitude": 13.6076136,
+   "coordinatePrecision": "source",
+   "website": "https://www.grazioes-sport.de/",
+   "providerUrl": null,
+   "categories": [
+    "gesundheit"
+   ],
+   "plans": [],
+   "phone": "030 98289038",
+   "fetchedAt": "2026-11-03T10:26:07Z",
+   "extra": {
+    "chain": "Unabhängig"
+   }
+  }
+ ]
+}
