@@ -14,17 +14,35 @@ Farbe **und** Form unterscheiden die Kategorien, damit sie auch bei Farbsehschw�
 
 ---
 
-## Funktionen (MVP)
+## Bedienung
 
-- **Karte** (Leaflet + OpenStreetMap). Startet mit Berlin im Ausschnitt, ist zoom- und verschiebbar und fasst nahe Standorte zu Clustern zusammen.
-- **USC-Mitgliedschaft** (Standard: **M / Classic**, wählbar S, M, L, XL oder alle). Studios, die bei USC erst in einer höheren Stufe enthalten sind, zählen nicht als USC-Studio. Ein solches Studio mit Wellpass erscheint dann als „Nur Wellpass“, eines ohne Wellpass wird ausgeblendet.
-- **Filter** für „Beide“, „Nur USC“ und „Nur Wellpass“, einzeln oder kombiniert. Ein Doppelklick zeigt nur diese Kategorie. Die Filter dienen zugleich als Legende mit Anzahl.
-- **Fehlertolerante Suche** nach Name, Straße, PLZ oder Bezirk. Jeder Suchbegriff passt als Teilstring, ohne Leerzeichen, Bindestriche und Punkte („speedfit“ findet „SPEED.FIT“) oder unscharf. Unscharf heißt: 1 Tippfehler ab 4 Buchstaben, 2 ab 8 Buchstaben (falscher, fehlender, zusätzlicher oder vertauschter Buchstabe; Damerau-Levenshtein-Abstand). Auch Wortanfänge zählen, und Umlaute gehen in jeder Schreibweise. Beispiel: „homes plce“ findet „Holmes Place“. Die Treffer werden nach Relevanz sortiert, die Karte zoomt auf sie.
-- **Studioliste**: am Desktop als Seitenleiste, mobil als ausklappbare Liste. Sie lässt sich alphabetisch oder nach Entfernung sortieren (ab dem eigenen Standort oder ab der Kartenmitte). Ein Klick auf einen Eintrag springt zum Marker. Filter und Suche gelten auch hier.
-- **Detailansicht**: am Desktop als Karte über der Landkarte, mobil als Bottom-Sheet. Sie zeigt Name, Adresse, Anbieter, Website und Telefon (soweit vorhanden), die Sportarten und die USC-Stufen laut USC. Pro Anbieter stehen Datenquelle und Prüfdatum dabei. Bei zusammengeführten Studios werden die Gründe der Zuordnung angezeigt.
-- **Datenbereich** („Daten“): Datenbestand und Quellen, „Daten aktualisieren“ mit Live-Status und Abbruch, Prüfbericht (neu, entfernt, geändert, Fehlerprotokoll) vor dem Übernehmen, Prüfung der Zuordnungsvorschläge sowie der Import eigener CSV- oder JSON-Dateien.
-- Filter und Sortierung werden im **LocalStorage** gespeichert.
-- **Für das Smartphone optimiert:** einzeilige, wischbare Filterleiste, Bottom-Sheet für Details und Liste, Knopf „Zu meinem Standort“, große Tippflächen. Die Seite lässt sich als App auf den Startbildschirm legen (Chrome/Firefox → Menü → „Zum Startbildschirm hinzufügen“).
+**Karte (Verhalten wie in der Urban-Sports-Club-App):**
+- **Cluster antippen:** Die Karte zoomt auf die Studios im Cluster. Liegen mehrere Angebote an derselben Adresse, fächern sie sich auf.
+- **Pin antippen:** Der Pin wird markiert, unten erscheint eine **Vorschaukarte** mit Name, Anbietern, Bewertung, Entfernung, Adresse und den ersten Aktivitäten (gewählte Aktivitäten fett). **Seitlich wischen** wechselt zu den nächstgelegenen Studios, die Karte folgt.
+- **Vorschaukarte antippen:** Die **Details** öffnen sich (mobil als großes Sheet, am Desktop links).
+- **Freie Karte antippen:** Die Auswahl schließt sich.
+- Am Desktop zeigt das Überfahren eines Pins den Namen.
+
+**Filterleiste** (mobil seitlich wischbar, Einstellungen werden gespeichert):
+- **USC-Stufe** (Standard **M / Classic**): Studios und Aktivitäten, die bei USC erst in höheren Stufen enthalten sind, zählen nicht als USC.
+- **Aktivität** (z. B. Massage, Mehrfachauswahl): Zeigt nur Studios, in denen die Aktivität **mit deiner Stufe buchbar** ist. Grundlage sind die Kategorie-Limits je Stufe von der USC-Studioseite. Beispiel: Massage in einem Yoga-Studio, das M-Mitglieder nutzen dürfen, ist oft erst ab L buchbar. Bei Wellpass zählt, ob die Aktivität angeboten wird.
+- **Plus** (Standard **aus**): USC-Plus-Angebote (nur mit Plus-Check-in) sind ausgeblendet. Eingeschaltet erscheinen sie wieder.
+- **Beide / Nur USC / Nur Wellpass**: Auswahl der Anbieter-Kategorien (Doppelklick: nur diese).
+
+**Details:** Bei zusammengeführten Studios gibt es Tabs **Übersicht | USC | Wellpass** mit allen Angaben je Anbieter: Name dort, Adresse, Website, Telefon, Bewertung, Plus-Kennzeichen, **Besuche pro Monat je Stufe (S/M/L/XL)** und **Aktivitäten mit Verfügbarkeit in deiner Stufe** (z. B. „M: 4× / Monat“, „erst ab L“).
+
+**Zusammenführen:**
+- **„Ähnlich wie …“-Hinweis:** In den Details direkt „Zusammenführen…“ oder „Verschieden“ wählen.
+- **Beliebiges Studio:** „Mit einem Wellpass-/USC-Studio zusammenführen…“ zeigt die Studios des anderen Anbieters in der Nähe (mit Suche).
+- **Angaben wählen:** Im Dialog legst du fest, welcher **Name** (USC, Wellpass oder eigener), welche **Adresse**, welche **Position** und welche **Website** gelten.
+- **Ändern und trennen:** Zusammengeführte Studios lassen sich über „Angaben ändern“ anpassen oder über „Trennen“ wieder aufteilen. Das geht auch bei automatischen Zuordnungen.
+- **Speicherort:** Entscheidungen werden **im Browser** gespeichert und funktionieren daher auch auf GitHub Pages. Unter `npm run dev` landen sie zusätzlich in `data/manual/match_decisions.json`. Unter „Daten“ → „Zuordnungen“ kannst du sie exportieren und importieren (z. B. vom Handy ins Repository).
+
+**Weitere Funktionen:**
+- Fehlertolerante Suche (Tippfehler, fehlende Leerzeichen und Bindestriche, Umlaute).
+- Liste sortiert nach Name, Entfernung oder Relevanz.
+- Knopf „Zu meinem Standort“.
+- Lässt sich als App auf den Startbildschirm legen.
 
 ## Voraussetzungen
 
@@ -63,6 +81,7 @@ Hinweise:
 |---|---|---|---|
 | **Urban Sports Club**<br>urbansportsclub.com/de/venues | Keine dokumentierte API, kein Export | Die öffentliche Standortsuche lädt ihre Daten ohne Login selbst nach: `/de/studios-map?city_id=1&plan_type=N` (JSON mit Name, Koordinaten, Slug) und `/de/venues?…&page=N` (HTML-Liste mit Straße, Bezirk, Sportarten). Diese Abfragen stellt der Import auf die gleiche Weise. | Name, Koordinaten, Straße (ohne PLZ), Bezirk, Sportarten, Link zur Studioseite, **USC-Stufen** (pro Stufe abgefragt) |
 | **EGYM Wellpass**<br>de.egym-wellpass.com/de-de/gym-finder | Keine dokumentierte API, kein Export | Der Gym-Finder bettet `locations.egym.com` ein. **Deren robots.txt sperrt alle automatisierten Zugriffe (`Disallow: /`)**, daher gibt es keinen direkten Abruf. Stattdessen wird die **dokumentierte öffentliche API von Fair for Fitness** verwendet (siehe nächste Zeile). | – |
+| **USC-Studioseiten**<br>urbansportsclub.com/de/venues/&lt;studio&gt; | Nein; die Seite lädt ihre Daten in einem eigenen Format (Next.js) | `enrich-usc`: eine Anfrage je Studio (Header `RSC: 1`, ~100 KB), 1 Anfrage/s, Zwischenspeicher `data/raw/usc_details.json` | **Plus**-Kennzeichen, **Besuchslimits je Stufe**, **Kategorie-Limits je Stufe** (z. B. Massage: M 0, L 1, XL 2 pro Monat), PLZ, Telefon, Bewertung |
 | **EGYM Wellpass – offiziell** (optional) | Nicht dokumentiert: `gymfinder.int.api.egym.com/v1/gym/overview` (vom Gym-Finder genutzt) | Nur mit `--wellpass-official`, gedacht für einen **einmaligen** privaten Abgleich, weil die robots.txt automatisierte Zugriffe untersagt. Eine Anfrage für Berlin, 30 km Radius. | Name, Adresse mit PLZ, Koordinaten, Website, Telefon, Sportarten. Vollständiger als Fair for Fitness. |
 | **Fair for Fitness**<br>fair-for-fitness.de | **Ja**: OpenAPI unter `/openapi.json`; robots.txt erlaubt `/api/search` ausdrücklich. Lizenz: „Daten ohne Gewähr; Nutzung mit Attribution + Link erlaubt“ | `GET /api/search?lat=…&lng=…&radius=30&networks=wellpass`, gefiltert auf Berliner PLZ | Name, Koordinaten, Adresse (meist mit PLZ), teils Website und Telefon. Die Wellpass-Zuordnung stammt von Fair for Fitness (**Drittquelle**) und ist überall so gekennzeichnet. |
 | **Eigene Dateien** | – | CSV/JSON in `data/manual/import/` oder Upload über die App | was man selbst einträgt (z. B. aus dem offiziellen Wellpass-Gym-Finder abgeschrieben) |
@@ -93,6 +112,9 @@ npm run data:fetch -- --sources manual --geocode   # fehlende Koordinaten per No
 npm run data:apply                         # geprüften Stand veröffentlichen
 npm run data:discard                       # vorbereiteten Stand verwerfen
 npm run data:rebuild                       # offline neu zusammenführen (z. B. nach Änderungen am Algorithmus)
+npm run data:enrich-usc                    # USC-Studioseiten laden: Plus, Limits je Stufe/Aktivität, PLZ, Bewertung
+                                           # (~2.200 Seiten, ca. 1 Std.; Zwischenspeicher, setzt nach Abbruch fort,
+                                           #  holt danach nur Einträge älter als 30 Tage) – anschließend data:rebuild
 npm run data:validate -- datei.csv         # Importdatei prüfen
 ```
 

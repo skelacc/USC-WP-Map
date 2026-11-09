@@ -26,14 +26,17 @@ def read_json(path: Path, default: Any = None) -> Any:
         return json.load(f)
 
 
-def write_json_atomic(path: Path, data: Any) -> None:
+def write_json_atomic(path: Path, data: Any, compact: bool = False) -> None:
     """Schreibt erst in eine temporäre Datei und benennt dann um – ein
     abgebrochener Import hinterlässt so nie eine halbe Datei."""
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.", suffix=".tmp")
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=1)
+            if compact:
+                json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+            else:
+                json.dump(data, f, ensure_ascii=False, indent=1)
             f.write("\n")
         os.replace(tmp, path)
     except BaseException:

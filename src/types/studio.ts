@@ -24,15 +24,48 @@ export interface Coordinates {
   from: ProviderKey
 }
 
+export type PlanSize = 'S' | 'M' | 'L' | 'XL'
+
+/** Aktivität eines Anbieters. limits (nur USC): Check-ins pro Monat je Stufe,
+ *  -1 = unbegrenzt, 0 = in dieser Stufe nicht verfügbar; null = unbekannt. */
+export interface Activity {
+  name: string
+  limits: Record<PlanSize, number> | null
+}
+
 export interface ProviderDetail {
   sourceId: string
   source: SourceKind
+  /** provider:source:sourceId – Schlüssel für Zusammenführungen */
+  key?: string
   name: string
   url: string | null
+  address?: Address
+  coordinates?: Omit<Coordinates, 'from'> | null
+  website?: string | null
+  phone?: string | null
   /** USC-Mitgliedschaftsstufen, in denen der Standort laut USC nutzbar ist */
   plans: string[] | null
   categories: string[] | null
+  activities?: Activity[]
+  /** USC: Standort in Stufe enthalten */
+  planIncluded?: Partial<Record<PlanSize, boolean>>
+  /** USC: als „Plus“ gekennzeichnet (Plus-Check-in nötig) */
+  plus?: boolean | null
+  rating?: number | null
+  ratingCount?: number | null
+  /** USC: Besuche pro Monat je Stufe (-1 unbegrenzt, 0 nicht enthalten) */
+  visitLimits?: Partial<Record<PlanSize, number | null>> | null
   fetchedAt: string | null
+  detailsFetchedAt?: string | null
+}
+
+export type FieldChoice = ProviderKey | { custom: string }
+export interface FieldChoices {
+  name?: FieldChoice
+  address?: ProviderKey
+  coordinates?: ProviderKey
+  website?: FieldChoice
 }
 
 export interface MatchInfo {
@@ -41,6 +74,7 @@ export interface MatchInfo {
   reasons: string[]
   distanceM: number | null
   decidedAt?: string
+  fields?: FieldChoices
 }
 
 export interface Studio {
@@ -53,10 +87,14 @@ export interface Studio {
   website: string | null
   phone: string | null
   categories: string[]
+  /** einheitliche Aktivitätsnamen beider Anbieter */
+  activities?: string[]
   source: Record<ProviderKey, SourceKind | null>
   lastVerified: string | null
   matchConfidence: MatchConfidence
   match: MatchInfo | null
+  /** bei manueller Zusammenführung: gewählte Quelle je Feld */
+  fieldChoices?: FieldChoices
   // Erweiterungen (Phase 4) können hier optional ergänzt werden:
   // openingHours?, images?, amenities?, courses? …
 }

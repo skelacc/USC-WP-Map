@@ -27,37 +27,50 @@ export interface FlyRequest {
 
 interface Props {
   studios: Studio[]
-  selected: Studio | null
-  onSelect: (id: string | null) => void
+  active: Studio | null
+  onMarkerClick: (id: string) => void
+  onMapClick: () => void
   focus: FocusRequest | null
   fit: FitRequest | null
   userLocation: LatLng | null
   onCenterChange: (c: LatLng) => void
   flyTo?: FlyRequest | null
-  /** Höhe (px), die unten von einem Bottom-Sheet verdeckt wird (mobil). */
+  /** Höhe (px), die unten von Karte/Sheet verdeckt wird. */
   bottomInset?: number
   showZoomControl?: boolean
 }
 
 type CategoryMarker = L.Marker & { options: L.MarkerOptions & { category: Category } }
 
-function ClusterLayer({ studios, onSelect, focus, fit, bottomInset = 0 }: Pick<Props, 'studios' | 'onSelect' | 'focus' | 'fit' | 'bottomInset'>) {
+const canHover = typeof window !== 'undefined' && window.matchMedia?.('(hover: hover)').matches
+
+/**
+ * Verhalten wie bei Urban Sports Club:
+ *  – Cluster fassen Pins im ~60-px-Raster zusammen; ab Zoom 15/17 nur noch sehr nahe Pins.
+ *  – Tipp auf Cluster: auf dessen Ausdehnung zoomen. Liegen alle Pins an derselben
+ *    Adresse (mehrere Angebote in einem Haus), werden sie aufgefächert.
+ *  – Tipp auf Pin: Pin wird aktiv, unten erscheint die Vorschaukarte.
+ *  – Tipp auf die freie Karte: Auswahl aufheben.
+ */
+function ClusterLayer({ studios, onMarkerClick, focus, fit, bottomInset = 0 }: Pick<Props, 'studios' | 'onMarkerClick' | 'focus' | 'fit' | 'bottomInset'>) {
   const map = useMap()
   const groupRef = useRef<L.MarkerClusterGroup | null>(null)
   const markersRef = useRef(new Map<string, L.Marker>())
-  const onSelectRef = useRef(onSelect)
+  const onClickRef = useRef(onMarkerClick)
+  const insetRef = useRef(bottomInset)
   useEffect(() => {
-    onSelectRef.current = onSelect
-  }, [onSelect])
+    onClickRef.current = onMarkerClick
+    insetRef.current = bottomInset
+  }, [onMarkerClick, bottomInset])
 
-  // Clustergruppe einmalig anlegen
   useEffect(() => {
     const group = L.markerClusterGroup({
       chunkedLoading: true,
       showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
       spiderfyOnMaxZoom: true,
-      maxClusterRadius: (zoom) => (zoom >= 15 ? 30 : 50),
-      disableClusteringAtZoom: 18,
+      spiderfyDistanceMultiplier: 1.6,
+      maxClusterRadius: (zoom) => (zoom >= 17 ? 12 : zoom >= 15 ? 35 : 60),
       iconCreateFunction: (cluster) => {
         const counts: Record<Category, number> = { both: 0, usc: 0, wellpass: 0 }
         for (const m of cluster.getAllChildMarkers() as CategoryMarker[]) counts[m.options.category]++
@@ -72,7 +85,6 @@ function ClusterLayer({ studios, onSelect, focus, fit, bottomInset = 0 }: Pick<P
     }
   }, [map])
 
-  // Marker bei geänderter Auswahl (Filter/Suche) neu setzen
   useEffect(() => {
     const group = groupRef.current
     if (!group) return
@@ -83,11 +95,14 @@ function ClusterLayer({ studios, onSelect, focus, fit, bottomInset = 0 }: Pick<P
       const category = categoryOf(s)
       const m = L.marker([s.coordinates.latitude, s.coordinates.longitude], {
         icon: studioIcon(category, s.coordinates.precision === 'geocoded'),
-        title: s.name,
         keyboard: true,
         category,
       } as L.MarkerOptions)
-      m.on('click', () => onSelectRef.current(s.id))
+      if (canHover) m.bindTooltip(s.name, { direction: 'top', offset: [0, -10], opacity: 0.95 })
+      m.on('click', (e) => {
+        L.DomEvent.stopPropagation(e)
+        onClickRef.current(s.id)
+      })
       markers.set(s.id, m)
       list.push(m)
     }
@@ -96,7 +111,7 @@ function ClusterLayer({ studios, onSelect, focus, fit, bottomInset = 0 }: Pick<P
     markersRef.current = markers
   }, [studios])
 
-  // Zu einem Studio springen (z. B. aus der Liste)
+  // Zu einem Studio springen (aus Liste, Suche, Vorschaukarte)
   useEffect(() => {
     if (!focus) return
     const m = markersRef.current.get(focus.id)
@@ -104,14 +119,11 @@ function ClusterLayer({ studios, onSelect, focus, fit, bottomInset = 0 }: Pick<P
     if (!m || !group) return
     group.zoomToShowLayer(m, () => {
       const zoom = Math.max(map.getZoom(), 16)
-      // Marker oberhalb eines Bottom-Sheets zentrieren
-      const target = map.unproject(map.project(m.getLatLng(), zoom).add([0, bottomInset / 2]), zoom)
+      const target = map.unproject(map.project(m.getLatLng(), zoom).add([0, insetRef.current / 2]), zoom)
       map.setView(target, zoom, { animate: true })
     })
-    // bottomInset nur beim Fokussieren relevant
-  }, [focus, map]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [focus, map])
 
-  // Kartenausschnitt an Suchergebnisse anpassen – nur bei neuer Anforderung
   const studiosRef = useRef(studios)
   useEffect(() => {
     studiosRef.current = studios
@@ -121,21 +133,24 @@ function ClusterLayer({ studios, onSelect, focus, fit, bottomInset = 0 }: Pick<P
     const pts = studiosRef.current.filter((s) => s.coordinates).map((s) => [s.coordinates!.latitude, s.coordinates!.longitude] as [number, number])
     if (!pts.length) return
     if (pts.length === 1) map.setView(pts[0], 16)
-    else map.fitBounds(L.latLngBounds(pts), { paddingTopLeft: [30, 30], paddingBottomRight: [30, 30 + 60], maxZoom: 16 })
+    else map.fitBounds(L.latLngBounds(pts), { paddingTopLeft: [30, 30], paddingBottomRight: [30, 90], maxZoom: 16 })
   }, [fit, map])
 
   return null
 }
 
-/** Hält das ausgewählte Studio sichtbar, wenn unten ein Bottom-Sheet liegt. */
-function KeepVisible({ selected, bottomInset = 0 }: Pick<Props, 'selected' | 'bottomInset'>) {
+/** Hält den aktiven Pin sichtbar, wenn unten etwas die Karte verdeckt. */
+function KeepVisible({ active, bottomInset = 0 }: Pick<Props, 'active' | 'bottomInset'>) {
   const map = useMap()
   useEffect(() => {
-    if (!selected?.coordinates || !bottomInset) return
-    const p = map.latLngToContainerPoint([selected.coordinates.latitude, selected.coordinates.longitude])
-    const visibleHeight = map.getSize().y - bottomInset
-    if (p.y > visibleHeight - 30 || p.y < 30) map.panBy([0, p.y - visibleHeight / 2], { animate: true })
-  }, [selected, bottomInset, map])
+    if (!active?.coordinates) return
+    const p = map.latLngToContainerPoint([active.coordinates.latitude, active.coordinates.longitude])
+    const size = map.getSize()
+    const visibleHeight = size.y - bottomInset
+    if (p.y > visibleHeight - 40 || p.y < 40 || p.x < 20 || p.x > size.x - 20) {
+      map.panBy([p.x - size.x / 2, p.y - visibleHeight / 2], { animate: true })
+    }
+  }, [active, bottomInset, map])
   return null
 }
 
@@ -147,9 +162,9 @@ function FlyTo({ flyTo }: Pick<Props, 'flyTo'>) {
   return null
 }
 
-function MapEvents({ onSelect, onCenterChange }: Pick<Props, 'onSelect' | 'onCenterChange'>) {
+function MapEvents({ onMapClick, onCenterChange }: Pick<Props, 'onMapClick' | 'onCenterChange'>) {
   const map = useMapEvents({
-    click: () => onSelect(null),
+    click: () => onMapClick(),
     moveend: () => {
       const c = map.getCenter()
       onCenterChange({ lat: c.lat, lng: c.lng })
@@ -158,7 +173,8 @@ function MapEvents({ onSelect, onCenterChange }: Pick<Props, 'onSelect' | 'onCen
   return null
 }
 
-export function StudioMap({ studios, selected, onSelect, focus, fit, userLocation, onCenterChange, flyTo, bottomInset = 0, showZoomControl = true }: Props) {
+export function StudioMap(props: Props) {
+  const { studios, active, onMarkerClick, onMapClick, focus, fit, userLocation, onCenterChange, flyTo, bottomInset = 0, showZoomControl = true } = props
   return (
     <MapContainer
       center={[BERLIN_CENTER.lat, BERLIN_CENTER.lng]}
@@ -166,7 +182,6 @@ export function StudioMap({ studios, selected, onSelect, focus, fit, userLocatio
       minZoom={9}
       maxZoom={19}
       zoomControl={false}
-      preferCanvas={false}
       className="h-full w-full"
     >
       <TileLayer
@@ -175,17 +190,12 @@ export function StudioMap({ studios, selected, onSelect, focus, fit, userLocatio
         maxZoom={19}
       />
       {showZoomControl && <ZoomControl position="topright" />}
-      <ClusterLayer studios={studios} onSelect={onSelect} focus={focus} fit={fit} bottomInset={bottomInset} />
-      <KeepVisible selected={selected} bottomInset={bottomInset} />
+      <ClusterLayer studios={studios} onMarkerClick={onMarkerClick} focus={focus} fit={fit} bottomInset={bottomInset} />
+      <KeepVisible active={active} bottomInset={bottomInset} />
       <FlyTo flyTo={flyTo} />
-      <MapEvents onSelect={onSelect} onCenterChange={onCenterChange} />
-      {selected?.coordinates && (
-        <Marker
-          position={[selected.coordinates.latitude, selected.coordinates.longitude]}
-          icon={selectedIcon}
-          interactive={false}
-          zIndexOffset={1000}
-        />
+      <MapEvents onMapClick={onMapClick} onCenterChange={onCenterChange} />
+      {active?.coordinates && (
+        <Marker position={[active.coordinates.latitude, active.coordinates.longitude]} icon={selectedIcon} interactive={false} zIndexOffset={1000} />
       )}
       {userLocation && <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon} interactive={false} />}
     </MapContainer>

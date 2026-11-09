@@ -14,6 +14,7 @@ weiterverwendet und der Fehler im Bericht vermerkt.
 
 from __future__ import annotations
 
+import json
 import shutil
 import signal
 from datetime import datetime
@@ -27,9 +28,10 @@ from .http import FetchError, PoliteClient
 from .io import emit, now_iso, read_json, write_json_atomic
 from .merge import merge
 from .records import SourceRecord, validate_record
-from .sources import manual, usc, wellpass_egym, wellpass_fff
+from .sources import manual, usc, usc_details, wellpass_egym, wellpass_fff
 
 STAGING_RAW = paths.STAGING / "raw"
+USC_DETAILS = paths.RAW / "usc_details.json"
 
 SOURCES: dict[str, dict[str, Any]] = {
     "usc": {
@@ -116,6 +118,13 @@ def _published_dataset(records_by_source: dict[str, tuple[list[SourceRecord], di
     all_records: list[SourceRecord] = []
     for recs, _ in records_by_source.values():
         all_records.extend(recs)
+    # USC-Detailangaben (Plus, Limits je Stufe/Aktivität, PLZ …) anhängen
+    details = read_json(USC_DETAILS, {}) or {}
+    for r in all_records:
+        if r.provider == "urbanSportsClub" and r.providerUrl:
+            det = details.get(r.providerUrl.rsplit("/", 1)[1])
+            if det:
+                r.extra["details"] = det
     decisions = read_json(paths.DECISIONS, [])
     dataset = merge(all_records, decisions)
     dataset["sources"] = [
@@ -216,7 +225,7 @@ def cmd_apply(force: bool = False) -> int:
     backup = _backup_published()
     for f in STAGING_RAW.glob("*.json"):
         shutil.move(str(f), paths.RAW / f.name)
-    write_json_atomic(paths.PUBLISHED, dataset)
+    write_json_atomic(paths.PUBLISHED, dataset, compact=True)
     paths.STAGING_STUDIOS.unlink(missing_ok=True)
     paths.STAGING_REPORT.unlink(missing_ok=True)
     emit("done", f"Datenbestand übernommen ({len(dataset['studios'])} Studios)." + (f" Sicherung: {backup.relative_to(paths.ROOT)}" if backup else ""))
@@ -240,12 +249,12 @@ def cmd_rebuild() -> int:
         return 1
     dataset = _published_dataset(records_by_source)
     _backup_published()
-    write_json_atomic(paths.PUBLISHED, dataset)
+    write_json_atomic(paths.PUBLISHED, dataset, compact=True)
     emit("done", f"Datenbestand neu erzeugt: {len(dataset['studios'])} Studios, {len(dataset['matchCandidates'])} offene Zuordnungsvorschläge.")
     return 0
 
 
-def cmd_decide(pair: str, decision: str) -> int:
+def cmd_decide(pair: str, decision: str, fields: str | None = None) -> int:
     if decision not in ("confirm", "reject", "reset"):
         emit("error", f"Ungültige Entscheidung: {decision}")
         return 1
@@ -254,7 +263,16 @@ def cmd_decide(pair: str, decision: str) -> int:
         return 1
     decisions = [d for d in read_json(paths.DECISIONS, []) if d.get("pair") != pair]
     if decision != "reset":
-        decisions.append({"pair": pair, "decision": decision, "decidedAt": now_iso()})
+        entry: dict[str, Any] = {"pair": pair, "decision": decision, "decidedAt": now_iso()}
+        if fields:
+            try:
+                parsed = json.loads(fields)
+            except json.JSONDecodeError as e:
+                emit("error", f"--fields ist kein gültiges JSON: {e}")
+                return 1
+            if isinstance(parsed, dict):
+                entry["fields"] = parsed
+        decisions.append(entry)
     write_json_atomic(paths.DECISIONS, decisions)
     emit("progress", f"Entscheidung gespeichert: {decision}")
     return cmd_rebuild()
@@ -277,3 +295,29 @@ def cmd_validate(file: str) -> int:
          valid=len(records), errors=errors[:200], withoutCoordinates=without,
          providers={p: sum(1 for r in records if r.provider == p) for p in ("urbanSportsClub", "wellpass")})
     return 0 if records else 1
+
+
+
+def cmd_enrich_usc(max_age_days: int = 30, limit: int | None = None) -> int:
+    """Lädt Detailangaben (Plus, Limits je Stufe/Aktivität, PLZ, Bewertung) für
+    alle USC-Studios des veröffentlichten Stands. Zwischenspeicher:
+    data/raw/usc_details.json – abgebrochene Läufe setzen dort fort."""
+    _install_signal_handlers()
+    records, _ = _load_raw(paths.RAW / "usc.json")
+    slugs = sorted({r.providerUrl.rsplit("/", 1)[1] for r in records if r.providerUrl})
+    if limit:
+        slugs = slugs[:limit]
+    cache = read_json(USC_DETAILS, {}) or {}
+    client = PoliteClient(delay=1.0)
+    try:
+        cache, errors = usc_details.fetch_details(
+            slugs, cache, client, lambda m: emit("progress", m), should_stop,
+            lambda c: write_json_atomic(USC_DETAILS, c), max_age_days,
+        )
+    except InterruptedError:
+        emit("cancelled", "Abgebrochen – bisher geladene Details sind gespeichert.")
+        return 130
+    for e in errors[:50]:
+        emit("error", e)
+    emit("done", f"USC-Details: {len(cache)} Studios im Zwischenspeicher, {len(errors)} Fehler. Jetzt 'rebuild' ausführen.")
+    return 0 if not errors else 2

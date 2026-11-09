@@ -135,7 +135,9 @@ export function importApi(): Plugin {
             if (typeof body.pair !== 'string' || !['confirm', 'reject', 'reset'].includes(body.decision)) {
               return json(res, 400, { message: 'Ungültige Entscheidung.' })
             }
-            const r = await runCollect(['decide', body.pair, body.decision])
+            const args = ['decide', body.pair, body.decision]
+            if (body.fields && typeof body.fields === 'object') args.push('--fields', JSON.stringify(body.fields))
+            const r = await runCollect(args)
             return json(res, r.code === 0 ? 200 : 422, r)
           }
           if (req.method === 'POST' && url.pathname === '/api/upload') {

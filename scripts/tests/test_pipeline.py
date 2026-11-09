@@ -201,6 +201,49 @@ class WellpassOfficialTests(unittest.TestCase):
             wellpass_egym.parse_response({"foo": []}, "x")
 
 
+class ActivityAndOverrideTests(unittest.TestCase):
+    def test_usc_activities_from_limits(self):
+        from studiomap.activities import usc_activities, usc_plan_included
+        det = {"limits": [
+            {"size": "S", "included": False, "categories": []},
+            {"size": "M", "included": True, "categories": [{"name": "Massage", "perMonth": 0}, {"name": "Yoga", "perMonth": 4}]},
+            {"size": "L", "included": True, "categories": [{"name": "Massage", "perMonth": 1}, {"name": "Yoga", "perMonth": None}]},
+            {"size": "XL", "included": True, "categories": [{"name": "Massage", "perMonth": 2}, {"name": "Yoga", "perMonth": -1}]},
+        ]}
+        acts = {a["name"]: a["limits"] for a in usc_activities(["Massage", "Yoga"], det)}
+        self.assertEqual(acts["Massage"], {"S": 0, "M": 0, "L": 1, "XL": 2})
+        self.assertEqual(acts["Yoga"], {"S": 0, "M": 4, "L": -1, "XL": -1})
+        self.assertEqual(usc_plan_included(det, []), {"S": False, "M": True, "L": True, "XL": True})
+        self.assertEqual(usc_plan_included(None, ["Premium", "Max"]), {"S": False, "M": False, "L": True, "XL": True})
+
+    def test_confirm_with_field_overrides(self):
+        u = usc_rec("1", "Studio Eins", "Torstraße 1", 52.5, 13.4)
+        w = wp_rec("a", "Ganz anders GmbH", "Torstr. 1", 52.5001, 13.4001, postalCode="10119", website="https://wp.example")
+        fields = {"name": {"custom": "Mein Studio"}, "address": "wellpass", "website": "wellpass"}
+        out = merge([u, w], [{"pair": f"{u.key}~{w.key}", "decision": "confirm", "fields": fields}])
+        self.assertEqual(len(out["studios"]), 1)
+        s = out["studios"][0]
+        self.assertEqual(s["name"], "Mein Studio")
+        self.assertEqual(s["address"]["postalCode"], "10119")
+        self.assertEqual(s["website"], "https://wp.example")
+        self.assertEqual(s["providerDetails"]["wellpass"]["address"]["street"], "Torstr. 1")
+
+    def test_usc_details_parser(self):
+        from studiomap.sources.usc_details import parse_venue_page
+        page = ('<script type="application/ld+json">{"@context":"https://schema.org","@type":"SportsActivityLocation","name":"X",'
+                '"address":{"@type":"PostalAddress","postalCode":"12045","streetAddress":"Weichselstraße 53"},"telephone":"+49 1",'
+                '"aggregateRating":{"ratingValue":4.9,"reviewCount":81}}</script>'
+                '{\\"data-testid\\":\\"plus-badge\\"}'
+                '\\"venueLimits\\":{\\"b2c\\":[{\\"id\\":2,\\"name\\":\\"M\\",\\"planName\\":\\"Classic\\",\\"isProvidedByVenue\\":false,'
+                '\\"monthlyLimitVenue\\":null,\\"categoryLimits\\":[]}]}')
+        info = parse_venue_page(page.replace("\\\\", "\\"))
+        self.assertTrue(info["plus"])
+        self.assertEqual(info["postalCode"], "12045")
+        self.assertEqual(info["rating"], 4.9)
+        self.assertEqual(info["limits"][0]["size"], "M")
+        self.assertFalse(info["limits"][0]["included"])
+
+
 class DiffTests(unittest.TestCase):
     def test_diff_and_warning(self):
         old = merge([usc_rec(str(i), f"S{i}", None, 52.5, 13.4) for i in range(30)])

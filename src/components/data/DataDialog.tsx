@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getStatus, type ApiStatus } from '@/lib/importApi'
-import type { Dataset } from '@/types/studio'
+import type { Decision } from '@/lib/merges'
+import type { Dataset, MatchCandidate } from '@/types/studio'
 import { FileImport } from './FileImport'
 import { ImportPanel } from './ImportPanel'
 import { MatchReview } from './MatchReview'
@@ -13,7 +14,10 @@ interface Props {
   dataset: Dataset | null
   api: ApiStatus
   onDataChanged: () => void
-  onDecide: (pair: string, decision: 'confirm' | 'reject') => Promise<void>
+  decisions: Decision[]
+  onImportDecisions: (d: Decision[]) => void
+  onMergeCandidate: (c: MatchCandidate) => void
+  onRejectCandidate: (pair: string) => void
   onShowStudio: (id: string) => void
 }
 
@@ -23,7 +27,7 @@ function fmt(iso?: string) {
   return Number.isNaN(d.getTime()) ? iso : d.toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' })
 }
 
-export function DataDialog({ dataset, api, onDataChanged, onDecide, onShowStudio }: Props) {
+export function DataDialog({ dataset, api, onDataChanged, decisions, onImportDecisions, onMergeCandidate, onRejectCandidate, onShowStudio }: Props) {
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState<ApiStatus>(api)
   const pending = dataset?.matchCandidates.length ?? 0
@@ -96,8 +100,13 @@ export function DataDialog({ dataset, api, onDataChanged, onDecide, onShowStudio
             <TabsContent value="matches">
               <MatchReview
                 candidates={dataset?.matchCandidates ?? []}
-                canEdit={status.available}
-                onDecide={onDecide}
+                decisions={decisions}
+                onImportDecisions={onImportDecisions}
+                onMerge={(c) => {
+                  setOpen(false)
+                  onMergeCandidate(c)
+                }}
+                onReject={onRejectCandidate}
                 onShow={(id) => {
                   setOpen(false)
                   onShowStudio(id)

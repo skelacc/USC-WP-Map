@@ -123,15 +123,70 @@ def _studio_id(primary: SourceRecord) -> str:
 
 
 def _provider_detail(r: SourceRecord) -> dict[str, Any]:
-    return {
+    """Vollständige Angaben je Anbieter – das Frontend zeigt sie in eigenen
+    Tabs und kann Studios damit auch selbst zusammenführen/trennen."""
+    from .activities import usc_activities, usc_plan_included, wellpass_activity
+
+    det = r.extra.get("details") or {}
+    d: dict[str, Any] = {
         "sourceId": r.sourceId,
         "source": r.source,
+        "key": r.key,
         "name": r.name,
         "url": r.providerUrl,
+        "address": {"street": r.street, "postalCode": r.postalCode, "city": r.city or "Berlin", "district": r.district},
+        "coordinates": (
+            {"latitude": r.latitude, "longitude": r.longitude, "precision": r.coordinatePrecision or "source"}
+            if r.latitude is not None else None
+        ),
+        "website": r.website,
+        "phone": r.phone or det.get("phone"),
         "plans": r.plans or None,
         "categories": r.categories or None,
         "fetchedAt": r.fetchedAt,
     }
+    if r.provider == "urbanSportsClub":
+        d["activities"] = usc_activities(r.categories, det or None)
+        d["planIncluded"] = usc_plan_included(det or None, r.plans)
+        d["plus"] = bool(det.get("plus")) if det else None
+        d["rating"] = det.get("rating")
+        d["ratingCount"] = det.get("ratingCount")
+        d["visitLimits"] = {l["size"]: l["perMonth"] if l["included"] else 0 for l in det.get("limits") or [] if l.get("size")} or None
+        d["detailsFetchedAt"] = det.get("fetchedAt")
+    else:
+        d["activities"] = [{"name": n, "limits": None} for n in sorted({wellpass_activity(c) for c in r.categories})]
+    return d
+
+
+FIELD_PROVIDERS = ("urbanSportsClub", "wellpass")
+
+
+def _apply_overrides(studio: dict[str, Any], fields: dict[str, Any] | None) -> None:
+    """Manuell gewählte Angaben bei einer Zusammenführung: je Feld der Anbieter
+    ("urbanSportsClub"/"wellpass") oder ein eigener Text {"custom": "..."}."""
+    if not fields:
+        return
+    det = studio["providerDetails"]
+    for field, choice in fields.items():
+        if isinstance(choice, dict) and "custom" in choice:
+            value = choice["custom"]
+            if field == "name":
+                studio["name"] = value
+            elif field == "website":
+                studio["website"] = value
+            continue
+        if choice not in FIELD_PROVIDERS or choice not in det:
+            continue
+        src = det[choice]
+        if field == "name":
+            studio["name"] = src["name"]
+        elif field == "address":
+            studio["address"] = dict(src["address"])
+        elif field == "coordinates" and src.get("coordinates"):
+            studio["coordinates"] = {**src["coordinates"], "from": choice}
+        elif field == "website":
+            studio["website"] = src.get("website")
+    studio["fieldChoices"] = fields
 
 
 def _build_studio(records: list[SourceRecord], confidence: str, match: dict | None) -> dict[str, Any]:
@@ -156,12 +211,13 @@ def _build_studio(records: list[SourceRecord], confidence: str, match: dict | No
         details[r.provider] = _provider_detail(r)
     fetched = sorted(r.fetchedAt for r in records if r.fetchedAt)
     categories = sorted({c for r in records for c in r.categories})
+    activities = sorted({a["name"] for d in details.values() for a in d.get("activities") or []})
     return {
         "id": _studio_id(p),
         "name": p.name,
         "address": {
             "street": first("street"),
-            "postalCode": first("postalCode"),
+            "postalCode": first("postalCode") or next((r.extra.get("details", {}).get("postalCode") for r in ordered if r.extra.get("details", {}).get("postalCode")), None),
             "city": first("city") or "Berlin",
             "district": first("district"),
         },
@@ -180,6 +236,7 @@ def _build_studio(records: list[SourceRecord], confidence: str, match: dict | No
         "website": first("website"),
         "phone": first("phone"),
         "categories": categories,
+        "activities": activities,
         "source": source,
         "lastVerified": fetched[0][:10] if fetched else None,
         "matchConfidence": confidence,
@@ -245,6 +302,7 @@ def merge(records: list[SourceRecord], decisions: list[dict] | None = None) -> d
         merged_groups.append(([u, w], "verified", {
             "method": "manual", "score": res.score, "reasons": res.reasons,
             "decidedAt": d.get("decidedAt"), "distanceM": round(res.distance_m) if res.distance_m is not None else None,
+            "fields": d.get("fields"),
         }))
 
     # 2) Automatische Treffer, bestes Paar zuerst, jeweils 1:1
@@ -273,7 +331,11 @@ def merge(records: list[SourceRecord], decisions: list[dict] | None = None) -> d
                 "wellpass": {"key": w.key, "name": w.name, "street": w.street, "postalCode": w.postalCode},
             })
 
-    studios = [_build_studio(g, conf, m) for g, conf, m in merged_groups]
+    studios = []
+    for g, conf, m in merged_groups:
+        st = _build_studio(g, conf, m)
+        _apply_overrides(st, (m or {}).get("fields"))
+        studios.append(st)
     for r in records:
         if r.key not in used:
             studios.append(_build_studio([r], "single", None))
