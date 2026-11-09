@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+LIST_LIMIT = 300
+
 
 def _summary(s: dict) -> dict:
     return {"id": s["id"], "name": s["name"], "street": (s.get("address") or {}).get("street"), "providers": s["providers"]}
@@ -32,12 +34,14 @@ def diff(old: dict | None, new: dict) -> dict[str, Any]:
         if new_studios[i]["providers"] != old_studios[i]["providers"]:
             changed.append({**_summary(new_studios[i]), "before": old_studios[i]["providers"]})
     key = lambda s: (s["name"] or "").lower()  # noqa: E731
+    # Listen gekürzt (bei ganz Deutschland sonst > 10.000 Einträge); Gesamtzahlen separat
     return {
         "before": provider_counts(list(old_studios.values())) if old else None,
         "after": provider_counts(new["studios"]),
-        "added": sorted(added, key=key),
-        "removed": sorted(removed, key=key),
-        "providersChanged": sorted(changed, key=key),
+        "added": sorted(added, key=key)[:LIST_LIMIT],
+        "removed": sorted(removed, key=key)[:LIST_LIMIT],
+        "providersChanged": sorted(changed, key=key)[:LIST_LIMIT],
+        "totals": {"added": len(added), "removed": len(removed), "providersChanged": len(changed)},
     }
 
 

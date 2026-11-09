@@ -17,6 +17,8 @@ def main(argv: list[str] | None = None) -> int:
     f.add_argument("--sources", default="usc,wellpass,manual", help="Komma-Liste: usc,wellpass,manual")
     f.add_argument("--wellpass-official", action="store_true",
                    help="Wellpass einmalig direkt vom offiziellen Gym-Finder abrufen (statt Fair for Fitness)")
+    f.add_argument("--wellpass-file", default=None,
+                   help="Wellpass aus einem Browser-Export des Gym-Finders (HAR oder JSON) lesen; ohne Angabe: neueste Datei in data/WP-network")
     f.add_argument("--geocode", action="store_true", help="fehlende Koordinaten manueller Einträge per Nominatim ermitteln")
 
     a = sub.add_parser("apply", help="geprüften Import übernehmen")
@@ -35,12 +37,18 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--max-age-days", type=int, default=30)
     e.add_argument("--limit", type=int, default=None)
 
+    w = sub.add_parser("enrich-wellpass", help="Adressen für Wellpass-Studios ohne Adresse per OpenStreetMap ermitteln")
+    w.add_argument("--all", action="store_true", help="ganz Deutschland statt nur Großraum Berlin (~16.000 Anfragen, ca. 5 Std.)")
+    w.add_argument("--limit", type=int, default=None)
+
     v = sub.add_parser("validate", help="Importdatei (CSV/JSON) prüfen, ohne etwas zu ändern")
     v.add_argument("file")
 
     args = p.parse_args(argv)
     if args.cmd == "enrich-usc":
         return pipeline.cmd_enrich_usc(args.max_age_days, args.limit)
+    if args.cmd == "enrich-wellpass":
+        return pipeline.cmd_enrich_wellpass(args.all, args.limit)
     if args.cmd == "validate":
         return pipeline.cmd_validate(args.file)
     if args.cmd == "fetch":
@@ -48,7 +56,7 @@ def main(argv: list[str] | None = None) -> int:
         unknown = [n for n in names if n not in pipeline.SOURCES]
         if unknown:
             p.error(f"unbekannte Quelle(n): {', '.join(unknown)}")
-        return pipeline.cmd_fetch(names, geocode=args.geocode, wellpass_official=args.wellpass_official)
+        return pipeline.cmd_fetch(names, geocode=args.geocode, wellpass_official=args.wellpass_official, wellpass_file=args.wellpass_file)
     if args.cmd == "apply":
         return pipeline.cmd_apply(force=args.force)
     if args.cmd == "discard":

@@ -16,6 +16,8 @@ from studiomap.merge import compare, merge  # noqa: E402
 from studiomap.normalize import address_key, name_similarity  # noqa: E402
 from studiomap.records import SourceRecord  # noqa: E402
 from studiomap.sources import manual, usc, wellpass_egym, wellpass_fff  # noqa: E402
+from studiomap import addresses, publish  # noqa: E402
+from studiomap.supplement import link_fair_for_fitness  # noqa: E402
 
 
 def usc_rec(sid, name, street=None, lat=None, lng=None, **kw):
@@ -123,12 +125,12 @@ class ManualImportTests(unittest.TestCase):
         self.assertAlmostEqual(recs[1].latitude, 52.52)
 
     def test_invalid_rows_are_reported_and_skipped(self):
-        p = self.write("x.csv", "provider,name,latitude,longitude\nfoo,Studio,,\nwellpass,,,\nwellpass,X,abc,13\nwellpass,Y,48.1,11.5\nwellpass,Z,52.5,\nwellpass,OK,,\n")
+        p = self.write("x.csv", "provider,name,latitude,longitude\nfoo,Studio,,\nwellpass,,,\nwellpass,X,abc,13\nwellpass,Y,40.4,-3.7\nwellpass,Z,52.5,\nwellpass,OK,,\n")
         recs, errs = manual.parse_file(p)
         self.assertEqual([r.name for r in recs], ["OK"])
         self.assertEqual(len(errs), 5)
         self.assertTrue(any("Zeile 2" in e and "Anbieter" in e for e in errs))
-        self.assertTrue(any("außerhalb Berlins" in e for e in errs))
+        self.assertTrue(any("außerhalb Deutschlands" in e for e in errs))
 
     def test_broken_files(self):
         with self.assertRaises(manual.ImportFileError):
@@ -182,23 +184,139 @@ class SourceParserTests(unittest.TestCase):
 
 
 class WellpassOfficialTests(unittest.TestCase):
+    GYMS = {"gyms": [
+        {"egi": "1", "a": "Yoga Rebellion Berlin Neukölln", "lat": 52.48, "lng": 13.43, "slug": "berlin-yoga-rebellion",
+         "sp": "BE", "st": "YOGA_STUDIO", "ac": [{"a": "YOGA"}, {"a": "PILATES", "c": True}], "mt": ["UNLIMITED", "PLUS_1"],
+         "tz": "Europe/Berlin", "lc": "de_DE"},
+        {"egi": "2", "a": "Lorenz Hill Yoga Bad Tölz", "lat": 47.76, "lng": 11.56, "slug": "badtoelz-lorenz-hill", "sp": "BY",
+         "st": "GYM", "ac": [{"a": "FITNESS"}, {"a": "MUSCULATION"}, {"a": "BOULDERING_CLIMBING"}], "mt": ["UNLIMITED"]},
+        {"egi": "3", "a": "Fit Wien", "lat": 48.2, "lng": 16.37, "slug": "wien-fit", "sp": "Wien", "st": "GYM", "ac": [], "mt": []},
+        {"egi": "4", "a": "Ohne Land Hamburg", "lat": 53.55, "lng": 9.99, "slug": "hamburg-ohne-land", "st": "GYM", "ac": [], "mt": [],
+         "tz": "Europe/Berlin", "lc": "de_DE"},
+        {"egi": "5", "a": "Ohne Land Salzburg", "lat": 47.8, "lng": 13.04, "slug": "salzburg-x", "st": "GYM", "ac": [], "mt": [],
+         "tz": "Europe/Vienna"},
+    ]}
+
     def test_parse(self):
-        data = {"gyms": [
-            {"gymId": 1, "alias": "Gym A", "qualitrainGym": True, "website": "https://a.de",
-             "address": {"street": "Torstraße", "streetNumber": "1", "zipCode": "10119", "city": "Berlin", "coordinates": [13.40, 52.53]},
-             "options": {"activities": [{"activity": "YOGA_STUDIO"}]}},
-            {"gymId": 2, "alias": "Potsdam", "qualitrainGym": True, "address": {"zipCode": "14467", "city": "Potsdam", "coordinates": [13.06, 52.40]}},
-            {"gymId": 3, "alias": "Nur Frankreich", "qualitrainGym": False, "address": {"zipCode": "10115", "city": "Berlin"}},
-            {"gymId": 4, "alias": "Ohne Koordinaten", "address": {"street": "Weg", "streetNumber": "2", "zipCode": "10115", "city": "Berlin"}},
-        ]}
-        recs = wellpass_egym.parse_response(data, "2026-11-03T00:00:00Z")
-        self.assertEqual(sorted(r.name for r in recs), ["Gym A", "Ohne Koordinaten"])
-        a = next(r for r in recs if r.name == "Gym A")
-        self.assertEqual((a.street, a.postalCode, a.latitude, a.longitude), ("Torstraße 1", "10119", 52.53, 13.40))
-        self.assertEqual(a.source, "official")
-        self.assertEqual(a.categories, ["Yoga Studio"])
+        recs = {r.sourceId: r for r in wellpass_egym.parse_response(self.GYMS, "2026-11-09T00:00:00Z")}
+        self.assertEqual(sorted(recs), ["1", "2", "4"])  # Österreich ausgeschlossen
+        a = recs["1"]
+        self.assertEqual((a.source, a.city, a.region, a.latitude), ("official", "Berlin", "BE", 52.48))
+        self.assertEqual(a.categories, ["Yogastudio"])
+        self.assertEqual(a.extra["activities"], ["Pilates", "Yoga"])
+        self.assertTrue(a.extra["plus1"])
+        self.assertEqual(a.providerUrl, "https://de.egym-wellpass.com/de-de/gym-finder/berlin-yoga-rebellion")
+        b = recs["2"]
+        self.assertEqual((b.city, b.region), ("Bad Tölz", "BY"))
+        self.assertEqual(b.extra["activities"], ["Bouldern", "Fitness", "Klettern"])
+        self.assertFalse(b.extra["plus1"])
+        self.assertEqual(recs["4"].city, "Hamburg")
         with self.assertRaises(Exception):
             wellpass_egym.parse_response({"foo": []}, "x")
+
+    def test_city_from_slug(self):
+        f = wellpass_egym.city_from_slug
+        self.assertEqual(f("kiel-kieler-naturheilpraxis", "Kieler Naturheilpraxis Kiel"), "Kiel")
+        self.assertEqual(f("steinbach-hallenberg-fit", "fit+ Steinbach-Hallenberg"), "Steinbach-Hallenberg")
+        self.assertEqual(f("muenchen-pasing-osho", "OSHO Leela München Pasing"), "München")
+        self.assertIsNone(f("muenchen-munichpoledance", "Munich Poledance"))
+
+    def test_load_har_and_concatenated_json(self):
+        body = json.dumps(self.GYMS)
+        har = {"log": {"entries": [
+            {"request": {"url": "https://gymfinder.int.api.egym.com/v1/search-filter/wellpass"}, "response": {"content": {"text": "[]"}}},
+            {"request": {"url": "https://gymfinder.int.api.egym.com/v1/gym/overview?searchFilter=wellpass&limit=20000"},
+             "response": {"content": {"text": body}}, "startedDateTime": "2026-11-09T19:38:53.123Z"},
+        ]}}
+        with tempfile.TemporaryDirectory() as d:
+            h = Path(d) / "x.har"
+            h.write_text(json.dumps(har), encoding="utf-8")
+            data, stamp = wellpass_egym.load_file(h)
+            self.assertEqual(len(data["gyms"]), 5)
+            self.assertEqual(stamp, "2026-11-09T19:38:53Z")
+            j = Path(d) / "x.json"
+            j.write_text(body + body, encoding="utf-8")  # doppelt eingefügt
+            self.assertEqual(len(wellpass_egym.load_file(j)[0]["gyms"]), 5)
+            empty = Path(d) / "leer.har"
+            empty.write_text(json.dumps({"log": {"entries": []}}), encoding="utf-8")
+            with self.assertRaises(wellpass_egym.ExportFileError):
+                wellpass_egym.load_file(empty)
+
+
+class OfficialWellpassMergeTests(unittest.TestCase):
+    def off(self, sid, name, lat, lng, region="BE", city="Berlin"):
+        return SourceRecord("wellpass", "official", sid, name, city=city, region=region, latitude=lat, longitude=lng,
+                            coordinatePrecision="source", providerUrl=f"{publish.GYM_FINDER_BASE}{sid}-slug",
+                            fetchedAt="2026-11-09T00:00:00Z", extra={"activities": ["Yoga"], "plus1": True})
+
+    def test_link_fair_for_fitness_and_aliases(self):
+        o = [self.off("1", "Holmes Place Berlin Schloßstraße", 52.4560, 13.3200), self.off("2", "Move & Meet Berlin Mitte", 52.5321, 13.3967)]
+        f = [wp_rec("ffa", "Holmes Place Berlin Schlossstrasse", "Schloßstraße 1", 52.4575, 13.3200, postalCode="12163"),
+             wp_rec("ffb", "YOU GLOW Yoga & Womanhood Mitte", "Ackerstraße 23", 52.5321, 13.3964)]
+        aliases = link_fair_for_fitness(o, f)
+        self.assertEqual(aliases, {"wellpass:fair-for-fitness:ffa": "wellpass:official:1"})  # ~170 m, gleicher Name
+        self.assertEqual((o[0].street, o[0].postalCode), ("Schloßstraße 1", "12163"))
+        self.assertIsNone(o[1].street)  # nur „Mitte“ gemeinsam → keine Verknüpfung
+
+    def test_old_decision_follows_alias(self):
+        u = usc_rec("9", "Holmes Place Schlossstrasse", "Schloßstraße 1", 52.4560, 13.3201)
+        o = self.off("1", "Ganz anderer Name", 52.4600, 13.3300)
+        d = [{"pair": "urbanSportsClub:official:9~wellpass:fair-for-fitness:ffa", "decision": "confirm", "decidedAt": "x"}]
+        out = merge([u, o], d, {"wellpass:fair-for-fitness:ffa": "wellpass:official:1"})
+        self.assertEqual(len(out["studios"]), 1)
+        self.assertEqual(out["studios"][0]["matchConfidence"], "verified")
+
+    def test_same_name_without_address_merges_up_to_250m(self):
+        u = usc_rec("9", "Sommerbad Pankow", "Wolfshagener Str. 91", 52.5800, 13.4000)
+        o = self.off("1", "Sommerbad Pankow", 52.5815, 13.4000)  # ~167 m
+        out = merge([u, o])
+        self.assertEqual(len(out["studios"]), 1)
+        self.assertEqual(out["studios"][0]["providerDetails"]["wellpass"]["plus1"], True)
+
+    def test_reverse_geocoding_parse_and_apply(self):
+        res = {"lat": "52.46278", "lon": "13.34087", "name": "MO.VE",
+               "address": {"road": "Kissinger Straße", "house_number": "9", "postcode": "12157", "borough": "Steglitz-Zehlendorf", "city": "Berlin"}}
+        hit = addresses.parse_reverse(res, 52.462781, 13.340874)
+        self.assertEqual((hit["street"], hit["postalCode"], hit["district"], hit["place"]), ("Kissinger Straße 9", "12157", "Steglitz-Zehlendorf", "MO.VE"))
+        far = addresses.parse_reverse({**res, "lat": "52.4640"}, 52.462781, 13.340874)  # ~135 m daneben
+        self.assertEqual(far["street"], "Kissinger Straße")  # ohne Hausnummer
+        self.assertIsNone(addresses.parse_reverse({"error": "Unable to geocode"}, 0, 0))
+        ds = merge([self.off("1", "MO.VE Berlin", 52.462781, 13.340874), usc_rec("9", "Anderes", "Weg 1", 52.5, 13.4)])
+        cache = {"1": {**hit, "lat": 52.462781, "lng": 13.340874}}
+        self.assertEqual(addresses.apply_addresses(ds, cache), 1)
+        s = next(x for x in ds["studios"] if x["name"] == "MO.VE Berlin")
+        self.assertEqual((s["address"]["street"], s["address"]["approximate"]), ("Kissinger Straße 9", True))
+        moved = merge([self.off("1", "MO.VE Berlin", 52.47, 13.34)])
+        self.assertEqual(addresses.apply_addresses(moved, cache), 0)  # Position geändert → nicht übernehmen
+
+    def test_osm_address_only_counts_when_equal(self):
+        u = usc_rec("9", "Yogic Escape Yoga & Wellness Studio", "Kissinger Str. 9", 52.4628, 13.3409)
+        w = self.off("1", "Yogic Escape & Friends", 52.4644, 13.3409)  # ~180 m (Pin auf dem Hof)
+        self.assertEqual(compare(u, w).level, "review")  # ohne Adresse: zu weit für eine automatische Zuordnung
+        w.extra["osmStreet"] = "Kissinger Straße 9"
+        r = compare(u, w)
+        self.assertEqual((r.address_match, r.level), ("exact", "auto"))
+        w.extra["osmStreet"] = "Kissinger Straße 11"  # Nachbarhaus: zählt nicht dagegen
+        self.assertEqual(compare(u, w).address_match, "unknown")
+        lw = self.off("3", "Padel Lankwitz Berlin", 52.43, 13.35)
+        lw.extra["osmStreet"] = "Leonorenstraße 37"
+        r = compare(usc_rec("7", "Eisbahn Lankwitz", "Leonorenstraße 37", 52.43, 13.35), lw)
+        self.assertEqual((r.address_match, r.level), ("exact", "review"))  # gleiche Anlage, anderes Angebot
+        same = self.off("2", "Sommerbad Pankow", 52.5815, 13.4000)
+        same.extra["osmStreet"] = "Andere Straße 3"
+        self.assertEqual(compare(usc_rec("8", "Sommerbad Pankow", "Wolfshagener Str. 91", 52.58, 13.40), same).level, "auto")
+
+    def test_split_core_and_tiles(self):
+        recs = [usc_rec("9", "USC Berlin", "Weg 1", 52.5, 13.4), self.off("1", "Yoga Berlin", 52.51, 13.41),
+                self.off("2", "Yoga Bad Tölz", 47.76, 11.56, region="BY", city="Bad Tölz")]
+        core, tiles, index = publish.split(merge(recs))
+        self.assertEqual(sorted(s["name"] for s in core["studios"]), ["USC Berlin", "Yoga Berlin"])
+        self.assertEqual(list(tiles), ["47_11"])
+        t = tiles["47_11"][0]
+        self.assertEqual((t["i"], t["n"], t["o"], t["r"], t["s"], t["p"]), ("2", "Yoga Bad Tölz", "Bad Tölz", "BY", "2-slug", 1))
+        self.assertEqual([index["activities"][i] for i in t["a"]], ["Yoga"])
+        self.assertEqual(index["total"], 1)
+        self.assertEqual(core["tiles"]["total"], 1)
 
 
 class ActivityAndOverrideTests(unittest.TestCase):

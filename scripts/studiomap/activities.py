@@ -57,6 +57,53 @@ EGYM_DE = {
 }
 
 
+# Aktivitätscodes des offiziellen Gym-Finders (Feld "ac") → einheitliche Namen.
+# Wo es eine USC-Entsprechung gibt, wird deren Bezeichnung verwendet, damit der
+# Aktivitätsfilter beide Anbieter gemeinsam erfasst. Sonst die deutsche
+# Bezeichnung aus dem Filtermenü des Gym-Finders.
+EGYM_ACTIVITY_DE: dict[str, tuple[str, ...]] = {
+    "FITNESS": ("Fitness",), "MUSCULATION": ("Fitness",), "YOGA": ("Yoga",), "PILATES": ("Pilates",),
+    "PILATES_REFORMER": ("Pilates Reformer",), "BARRE": ("Barre",), "BOOTCAMP": ("Bootcamp",),
+    "CROSS_TRAINING": ("Funktionelles Training",), "CIRCUIT_TRAINING": ("Zirkeltraining",),
+    "OUTDOOR_SPORTS": ("Outdoortraining",), "MOBILITY_TRAINING": ("Beweglichkeitstraining",),
+    "PERSONAL_TRAINING": ("Personal Training",), "MEDICAL_TRAINING": ("Medizinische Trainingstherapie",),
+    "EMS_TRAINING": ("EMS",), "CYCLING": ("Indoorcycling",), "BOXING": ("Boxsport",),
+    "COMBAT_SPORTS": ("Kampfsport",), "DANCE": ("Tanzen",), "POLE_DANCE": ("Pole Dance",), "AERIAL": ("Aerial",),
+    "SWIMMING": ("Schwimmen",), "AQUAFITNESS": ("Aqua",), "AQUACYCLING": ("Aqua",), "WATER_SPORTS": ("Wassersport",),
+    "BOULDERING_CLIMBING": ("Bouldern", "Klettern"), "SAUNA": ("Sauna",), "MASSAGE": ("Massage",),
+    "WELLNESS": ("Wellness",), "RELAXATION": ("Entspannung",), "CRYOTHERAPY": ("Kryotherapie",),
+    "TENNIS": ("Tennis",), "SQUASH": ("Squash",), "BADMINTON": ("Badminton",), "PADEL": ("Padel",),
+    "PICKLEBALL": ("Pickleball",), "TABLE_TENNIS": ("Tischtennis",), "GOLF": ("Golfspielen",),
+    "FOOTBALL": ("Fußball",), "VOLLEYBALL": ("Volleyball",), "BASKETBALL": ("Basketball",), "HANDBALL": ("Handball",),
+    "RECREATIONAL_SPORTS": ("Freizeitsport",),
+}
+
+# Studiotyp des Gym-Finders (Feld "st")
+EGYM_STUDIO_TYPE_DE = {
+    "GYM": "Fitnessstudio", "YOGA_STUDIO": "Yogastudio", "SWIMMING_POOL": "Schwimmbad", "OUTDOOR": "Outdoor",
+    "MARTIAL_ARTS": "Kampfsport", "WELLNESS": "Wellness", "EMS_STUDIO": "EMS-Studio", "PILATES": "Pilates-Studio",
+    "DANCE": "Tanzschule", "BOULDER_HALL": "Boulderhalle", "RACKET": "Racketsport", "PHYSIO": "Physiotherapie",
+    "WATER_SPORT": "Wassersport", "CROSSFIT": "CrossFit-Box", "OTHERS": "Sonstiges", "GOLF": "Golf",
+    "BALL_SPORT": "Ballsport", "CYCLING": "Cycling-Studio", "ONLINE": "Online",
+}
+
+# Bundesländer (Feld "sp" des Gym-Finders)
+REGION_DE = {
+    "BE": "Berlin", "BB": "Brandenburg", "BW": "Baden-Württemberg", "BY": "Bayern", "HB": "Bremen", "HE": "Hessen",
+    "HH": "Hamburg", "MV": "Mecklenburg-Vorpommern", "NDS": "Niedersachsen", "NRW": "Nordrhein-Westfalen",
+    "RP": "Rheinland-Pfalz", "SA": "Sachsen-Anhalt", "SH": "Schleswig-Holstein", "SL": "Saarland", "SN": "Sachsen",
+    "TH": "Thüringen",
+}
+
+
+def egym_activities(codes: list[str]) -> list[str]:
+    out: list[str] = []
+    for c in codes:
+        names = EGYM_ACTIVITY_DE.get(c) or (c.replace("_", " ").title(),)
+        out.extend(n for n in names if n not in out)
+    return sorted(out)
+
+
 def usc_activity(name: str) -> str:
     return USC_EN_DE.get(name, name)
 

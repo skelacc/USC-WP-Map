@@ -18,7 +18,8 @@ Schutz vor dem Zusammenlegen verschiedener Filialen einer Kette:
   verhindert ``auto``;
 * widersprüchliche Bezirksangaben im Namen („… Mitte“ vs. „… Spandau“)
   verhindern jede Zuordnung;
-* über 250 m Abstand wird nie automatisch zugeordnet.
+* über 250 m Abstand wird nie automatisch zugeordnet; über 120 m nur bei
+  praktisch gleichem Namen und fehlender Adresse (Wellpass-Gym-Finder).
 
 Manuelle Entscheidungen (``data/manual/match_decisions.json``) haben
 Vorrang: bestätigt → zusammengeführt (``verified``), abgelehnt → getrennt.
@@ -67,6 +68,15 @@ def compare(u: SourceRecord, w: SourceRecord) -> MatchResult:
             reasons.append(
                 f"{'Hausnummer' if su == sw else 'Adresse'} abweichend ({u.street} ≠ {w.street})"
             )
+    elif ku and (kosm := address_key(w.extra.get("osmStreet"))):
+        # Wellpass-Adresse nur aus der Position ermittelt (OSM, ungefähr): Übereinstimmung
+        # zählt als Beleg, Abweichung zählt nicht dagegen (Nachbarhausnummer, Eckhaus …)
+        if kosm == ku:
+            addr = "exact"
+            reasons.append(f"Adresse an der Wellpass-Position identisch ({u.street} ≙ {w.extra['osmStreet']}, OpenStreetMap)")
+        else:
+            addr = "unknown"
+            reasons.append(f"Adresse an der Wellpass-Position abweichend ({w.extra['osmStreet']}, OpenStreetMap) – nicht gewertet")
     else:
         addr = "unknown"
         reasons.append("Adressvergleich nicht möglich (Angabe fehlt)")
@@ -95,10 +105,16 @@ def compare(u: SourceRecord, w: SourceRecord) -> MatchResult:
         score += 0.1 * max(0.0, 1 - dist / MAX_CANDIDATE_DISTANCE_M)
     score = round(max(0.0, min(1.0, score)), 3)
 
+    # Adresse nur aus der Wellpass-Position ermittelt (OSM): oft mehrere Anbieter im selben Haus
+    # (Sportanlage, Schule) → für eine automatische Zuordnung deutlich ähnlicherer Name nötig
+    osm_only = addr == "exact" and not w.street and bool(w.extra.get("osmStreet"))
     level = "none"
-    if addr == "exact" and sim >= 0.6 and (dist is None or dist <= MAX_CANDIDATE_DISTANCE_M):
+    if addr == "exact" and sim >= (0.75 if osm_only else 0.6) and (dist is None or dist <= MAX_CANDIDATE_DISTANCE_M):
         level = "auto"
     elif addr != "different" and sim >= 0.85 and near:
+        level = "auto"
+    elif addr == "unknown" and sim >= 0.95 and dist is not None and dist <= MAX_CANDIDATE_DISTANCE_M:
+        # ohne Adressvergleich (Wellpass-Gym-Finder): praktisch gleicher Name, z. B. Bäder und Parks mit weit auseinanderliegenden Pins
         level = "auto"
     elif addr == "exact" and close and sim >= 0.45:
         level = "review"  # gleiche Adresse, Namen nur teilweise ähnlich
@@ -134,7 +150,7 @@ def _provider_detail(r: SourceRecord) -> dict[str, Any]:
         "key": r.key,
         "name": r.name,
         "url": r.providerUrl,
-        "address": {"street": r.street, "postalCode": r.postalCode, "city": r.city or "Berlin", "district": r.district},
+        "address": _address(r),
         "coordinates": (
             {"latitude": r.latitude, "longitude": r.longitude, "precision": r.coordinatePrecision or "source"}
             if r.latitude is not None else None
@@ -153,9 +169,21 @@ def _provider_detail(r: SourceRecord) -> dict[str, Any]:
         d["ratingCount"] = det.get("ratingCount")
         d["visitLimits"] = {l["size"]: l["perMonth"] if l["included"] else 0 for l in det.get("limits") or [] if l.get("size")} or None
         d["detailsFetchedAt"] = det.get("fetchedAt")
+    elif "activities" in r.extra:  # offizieller Gym-Finder: Aktivitätscodes bereits übersetzt
+        d["activities"] = [{"name": n, "limits": None} for n in r.extra["activities"]]
+        d["plus1"] = bool(r.extra.get("plus1"))
     else:
         d["activities"] = [{"name": n, "limits": None} for n in sorted({wellpass_activity(c) for c in r.categories})]
     return d
+
+
+def _address(r: SourceRecord) -> dict[str, Any]:
+    from .activities import REGION_DE
+
+    a: dict[str, Any] = {"street": r.street, "postalCode": r.postalCode, "city": r.city, "district": r.district}
+    if r.region and r.region != "BE":
+        a["region"] = REGION_DE.get(r.region, r.region)
+    return a
 
 
 FIELD_PROVIDERS = ("urbanSportsClub", "wellpass")
@@ -228,8 +256,9 @@ def _build_studio(records: list[SourceRecord], confidence: str, match: dict | No
         "address": {
             "street": first("street"),
             "postalCode": first("postalCode") or next((r.extra.get("details", {}).get("postalCode") for r in ordered if r.extra.get("details", {}).get("postalCode")), None),
-            "city": first("city") or "Berlin",
+            "city": first("city"),
             "district": first("district"),
+            **({"region": _address(reg)["region"]} if (reg := next((r for r in ordered if r.region and r.region != "BE"), None)) else {}),
         },
         "coordinates": (
             {
@@ -255,13 +284,27 @@ def _build_studio(records: list[SourceRecord], confidence: str, match: dict | No
     }
 
 
-def merge(records: list[SourceRecord], decisions: list[dict] | None = None) -> dict[str, Any]:
+def translate_decision(d: dict, aliases: dict[str, str]) -> dict:
+    """Ersetzt veraltete Eintragsschlüssel (z. B. Fair for Fitness → offizieller
+    Gym-Finder) in einer Entscheidung, auch in den gewählten Feldern."""
+    if not aliases:
+        return d
+    keys = d.get("keys") or (d.get("pair") or "").split("~")
+    if not any(k in aliases for k in keys):
+        return d
+    out = {**d, "keys": [aliases.get(k, k) for k in keys]}
+    if isinstance(d.get("fields"), dict):
+        out["fields"] = {f: (aliases.get(v, v) if isinstance(v, str) else v) for f, v in d["fields"].items()}
+    return out
+
+
+def merge(records: list[SourceRecord], decisions: list[dict] | None = None, aliases: dict[str, str] | None = None) -> dict[str, Any]:
     usc = [r for r in records if r.provider == "urbanSportsClub"]
     wp = [r for r in records if r.provider == "wellpass"]
     by_key = {r.key: r for r in records}
     # Entscheidungen betreffen Gruppen von Einträgen (beliebig viele, auch vom
     # selben Anbieter). Spätere Entscheidungen überschreiben frühere.
-    valid = [d for d in (decisions or []) if d.get("pair") and d.get("decision") in ("confirm", "reject")]
+    valid = [translate_decision(d, aliases or {}) for d in (decisions or []) if d.get("pair") and d.get("decision") in ("confirm", "reject")]
     groups: list[tuple[list[str], dict]] = []
     decided: dict[str, dict] = {}  # USC~Wellpass-Paare, die der Automatik entzogen sind
     for d in valid:

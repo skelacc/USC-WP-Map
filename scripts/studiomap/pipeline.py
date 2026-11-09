@@ -21,7 +21,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable
 
-from . import paths
+from . import addresses, paths, publish
 from .diff import diff, plausibility_warnings
 from .geocode import geocode_missing
 from .http import FetchError, PoliteClient
@@ -29,9 +29,13 @@ from .io import emit, now_iso, read_json, write_json_atomic
 from .merge import merge
 from .records import SourceRecord, validate_record
 from .sources import manual, usc, usc_details, wellpass_egym, wellpass_fff
+from .supplement import link_fair_for_fitness
 
 STAGING_RAW = paths.STAGING / "raw"
 USC_DETAILS = paths.RAW / "usc_details.json"
+WELLPASS_FFF = paths.RAW / "wellpass_fff.json"  # frühere Fair-for-Fitness-Daten: Adressen + alte Schlüssel
+WELLPASS_ADDRESSES = paths.RAW / "wellpass_addresses.json"  # Adressen per Rückwärtssuche (OSM), Zwischenspeicher
+WELLPASS_EXPORTS = paths.DATA / "WP-network"  # Browser-Exporte des Gym-Finders (HAR/JSON, nicht versioniert)
 
 SOURCES: dict[str, dict[str, Any]] = {
     "usc": {
@@ -63,6 +67,10 @@ class Cancelled(Exception):
     pass
 
 
+class KeepPrevious(Exception):
+    """Quelle bewusst nicht neu geladen – bisheriger Stand bleibt (kein Fehler)."""
+
+
 _stop = False
 
 
@@ -86,24 +94,58 @@ def _load_raw(path: Path) -> tuple[list[SourceRecord], dict]:
     return [SourceRecord.from_dict(r) for r in data.get("records", [])], data.get("meta", {})
 
 
+def _without_defaults(r: SourceRecord) -> dict:
+    """Nur Felder, die vom Standardwert abweichen (city=None bleibt erhalten, weil der Standard „Berlin“ ist)."""
+    import dataclasses
+    defaults = {f.name: (f.default if f.default is not dataclasses.MISSING else f.default_factory())  # type: ignore[misc]
+                for f in dataclasses.fields(SourceRecord) if f.default is not dataclasses.MISSING or f.default_factory is not dataclasses.MISSING}
+    return {k: v for k, v in r.to_dict().items() if k not in defaults or v != defaults[k]}
+
+
 def _save_raw(path: Path, records: list[SourceRecord], meta: dict) -> None:
-    write_json_atomic(path, {"meta": meta, "records": [r.to_dict() for r in records]})
+    # leere Felder weglassen (beim Einlesen gelten die Standardwerte) – hält die Dateien im Repo klein
+    big = len(records) > 5000
+    rows = [_without_defaults(r) for r in records]
+    if big:  # eine Zeile je Datensatz: kompakt und trotzdem zeilenweise vergleichbar
+        import json
+        body = ",\n".join(json.dumps(x, ensure_ascii=False, separators=(",", ":")) for x in rows)
+        tmp = path.with_suffix(".tmp")
+        tmp.write_text('{"meta":' + json.dumps(meta, ensure_ascii=False) + ',"records":[\n' + body + "\n]}\n", encoding="utf-8")
+        tmp.replace(path)
+    else:
+        write_json_atomic(path, {"meta": meta, "records": rows})
 
 
 WELLPASS_OFFICIAL_META = {
-    "label": "EGYM Wellpass – offizieller Gym-Finder (einmaliger Abgleich)",
+    "label": "EGYM Wellpass – offizieller Gym-Finder (Export aus dem Browser)",
     "url": "https://de.egym-wellpass.com/de-de/gym-finder",
     "kind": "official",
-    "note": "Daten des offiziellen Wellpass-Gym-Finders, einmalig für den privaten Gebrauch abgerufen.",
+    "note": "Alle Wellpass-Partner in Deutschland aus dem offiziellen Gym-Finder, im eigenen Browser gespeichert (privater Gebrauch). "
+            "Der Gym-Finder liefert keine Adressen; Adressen stammen, soweit vorhanden, von Fair for Fitness oder Urban Sports Club.",
 }
 
 
-def fetch_source(name: str, client: PoliteClient, progress: Callable[[str], None], geocode: bool, wellpass_official: bool = False) -> tuple[list[SourceRecord], list[str]]:
+def _published_meta(name: str) -> dict:
+    return (read_json(paths.RAW / f"{name}.json", None) or {}).get("meta", {})
+
+
+def fetch_source(name: str, client: PoliteClient, progress: Callable[[str], None], geocode: bool, wellpass_official: bool = False,
+                 wellpass_file: str | None = None) -> tuple[list[SourceRecord], list[str]]:
     if name == "usc":
         return usc.fetch(client, progress, should_stop), []
     if name == "wellpass":
+        if wellpass_file:
+            return wellpass_egym.import_file(Path(wellpass_file), progress), []
         if wellpass_official:
             return wellpass_egym.fetch(client, progress, should_stop), []
+        export = wellpass_egym.newest_export(WELLPASS_EXPORTS)
+        if export:
+            return wellpass_egym.import_file(export, progress), []
+        if _published_meta("wellpass").get("kind") == "official":
+            raise KeepPrevious(
+                f"kein Gym-Finder-Export in {WELLPASS_EXPORTS.relative_to(paths.ROOT)} – der offizielle Stand bleibt erhalten "
+                "(Fair for Fitness wäre unvollständiger)"
+            )
         return wellpass_fff.fetch(client, progress, should_stop), []
     if name == "manual":
         records, errors = manual.import_dir(MANUAL_IMPORT_DIR)
@@ -114,10 +156,20 @@ def fetch_source(name: str, client: PoliteClient, progress: Callable[[str], None
     raise ValueError(f"Unbekannte Quelle: {name}")
 
 
+def _fff_supplement() -> list[SourceRecord]:
+    """Frühere Fair-for-Fitness-Daten (für Adressen und alte Schlüssel)."""
+    if WELLPASS_FFF.exists():
+        return _load_raw(WELLPASS_FFF)[0]
+    recs, _ = _load_raw(paths.RAW / "wellpass.json")
+    return [r for r in recs if r.source == wellpass_fff.SOURCE_THIRD_PARTY]
+
+
 def _published_dataset(records_by_source: dict[str, tuple[list[SourceRecord], dict]]) -> dict:
     all_records: list[SourceRecord] = []
     for recs, _ in records_by_source.values():
         all_records.extend(recs)
+    official_wp = [r for r in all_records if r.provider == "wellpass" and r.source == "official"]
+    aliases = link_fair_for_fitness(official_wp, _fff_supplement()) if official_wp else {}
     # USC-Detailangaben (Plus, Limits je Stufe/Aktivität, PLZ …) anhängen
     details = read_json(USC_DETAILS, {}) or {}
     for r in all_records:
@@ -126,7 +178,12 @@ def _published_dataset(records_by_source: dict[str, tuple[list[SourceRecord], di
             if det:
                 r.extra["details"] = det
     decisions = read_json(paths.DECISIONS, [])
-    dataset = merge(all_records, decisions)
+    osm = read_json(WELLPASS_ADDRESSES, {}) or {}
+    # ermittelte Adressen: im Abgleich nur als positiver Beleg, angezeigt erst danach
+    addresses.annotate_records(all_records, osm)
+    dataset = merge(all_records, decisions, aliases)
+    dataset["keyAliases"] = aliases
+    addresses.apply_addresses(dataset, osm)
     dataset["sources"] = [
         {"id": k, **{kk: vv for kk, vv in SOURCES[k].items()}, **meta}
         for k, (recs, meta) in records_by_source.items()
@@ -135,7 +192,7 @@ def _published_dataset(records_by_source: dict[str, tuple[list[SourceRecord], di
     return dataset
 
 
-def cmd_fetch(source_names: list[str], geocode: bool = False, wellpass_official: bool = False) -> int:
+def cmd_fetch(source_names: list[str], geocode: bool = False, wellpass_official: bool = False, wellpass_file: str | None = None) -> int:
     _install_signal_handlers()
     paths.ensure_dirs()
     STAGING_RAW.mkdir(parents=True, exist_ok=True)
@@ -151,7 +208,7 @@ def cmd_fetch(source_names: list[str], geocode: bool = False, wellpass_official:
             records_by_source[name] = _load_raw(published_path)
             continue
         try:
-            recs, row_errors = fetch_source(name, client, lambda m: emit("progress", m), geocode, wellpass_official)
+            recs, row_errors = fetch_source(name, client, lambda m: emit("progress", m), geocode, wellpass_official, wellpass_file)
             if should_stop():
                 raise InterruptedError
             invalid = []
@@ -161,9 +218,10 @@ def cmd_fetch(source_names: list[str], geocode: bool = False, wellpass_official:
                 (invalid if problems else valid).append((r, problems))
             errors = row_errors + [f"{r.name or r.sourceId}: {'; '.join(p)}" for r, p in invalid]
             meta = {"fetchedAt": now_iso(), "count": len(valid), "status": "ok", "skipped": len(invalid)}
-            if name == "wellpass" and wellpass_official:
-                meta.update(WELLPASS_OFFICIAL_META)
             records = [r for r, _ in valid]
+            if name == "wellpass" and records and all(r.source == "official" for r in records):
+                meta.update(WELLPASS_OFFICIAL_META)
+                meta["fetchedAt"] = max(r.fetchedAt or "" for r in records) or meta["fetchedAt"]
             _save_raw(STAGING_RAW / f"{name}.json", records, meta)
             records_by_source[name] = (records, meta)
             report["sources"][name] = {**meta, "errors": errors[:200]}
@@ -171,6 +229,11 @@ def cmd_fetch(source_names: list[str], geocode: bool = False, wellpass_official:
         except (InterruptedError, KeyboardInterrupt):
             emit("cancelled", "Import abgebrochen – bestehender Datenbestand bleibt unverändert.")
             return 130
+        except KeepPrevious as e:
+            old, old_meta = _load_raw(published_path)
+            records_by_source[name] = (old, old_meta)
+            report["sources"][name] = {**old_meta, "status": "unchanged", "note": str(e)}
+            emit("source-done", f"{name}: {e}", source=name, count=len(old), errors=0)
         except (FetchError, ValueError, KeyError, OSError) as e:
             old, old_meta = _load_raw(published_path)
             records_by_source[name] = (old, old_meta)
@@ -185,7 +248,7 @@ def cmd_fetch(source_names: list[str], geocode: bool = False, wellpass_official:
 
     emit("progress", "Führe Anbieterlisten zusammen und erkenne Dubletten …")
     dataset = _published_dataset(records_by_source)
-    published = read_json(paths.PUBLISHED, None)
+    published = publish.read_published()
     d = diff(published, dataset)
     report.update({
         "finishedAt": now_iso(),
@@ -206,11 +269,24 @@ def _backup_published() -> Path | None:
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     target = paths.BACKUPS / f"studios-{stamp}.json"
     shutil.copy2(paths.PUBLISHED, target)
+    if publish.TILES.exists():
+        shutil.copytree(publish.TILES, paths.BACKUPS / f"tiles-{stamp}")
     # nur die letzten 10 Sicherungen behalten
-    backups = sorted(paths.BACKUPS.glob("studios-*.json"))
-    for old in backups[:-10]:
-        old.unlink()
+    for pattern in ("studios-*.json", "tiles-*"):
+        for old in sorted(paths.BACKUPS.glob(pattern))[:-10]:
+            shutil.rmtree(old) if old.is_dir() else old.unlink()
     return target
+
+
+def _keep_fair_for_fitness() -> None:
+    """Wird Fair for Fitness durch den offiziellen Gym-Finder ersetzt, bleiben
+    dessen Daten als Ergänzung (Adressen, alte Schlüssel) erhalten."""
+    new = read_json(STAGING_RAW / "wellpass.json", None)
+    if not new or new.get("meta", {}).get("kind") != "official" or WELLPASS_FFF.exists():
+        return
+    old = read_json(paths.RAW / "wellpass.json", None)
+    if old and old.get("meta", {}).get("kind") != "official" and old.get("records"):
+        shutil.copy2(paths.RAW / "wellpass.json", WELLPASS_FFF)
 
 
 def cmd_apply(force: bool = False) -> int:
@@ -223,12 +299,14 @@ def cmd_apply(force: bool = False) -> int:
         emit("error", "Übernahme blockiert wegen Auffälligkeiten: " + " | ".join(report["warnings"]) + " (mit --force trotzdem übernehmen)")
         return 3
     backup = _backup_published()
+    _keep_fair_for_fitness()
     for f in STAGING_RAW.glob("*.json"):
         shutil.move(str(f), paths.RAW / f.name)
-    write_json_atomic(paths.PUBLISHED, dataset, compact=True)
+    info = publish.write_published(dataset)
     paths.STAGING_STUDIOS.unlink(missing_ok=True)
     paths.STAGING_REPORT.unlink(missing_ok=True)
-    emit("done", f"Datenbestand übernommen ({len(dataset['studios'])} Studios)." + (f" Sicherung: {backup.relative_to(paths.ROOT)}" if backup else ""))
+    emit("done", f"Datenbestand übernommen ({len(dataset['studios'])} Studios: {info['core']} Berlin, {info['tiles']} übriges Deutschland in {info['cells']} Kacheln)."
+         + (f" Sicherung: {backup.relative_to(paths.ROOT)}" if backup else ""))
     return 0
 
 
@@ -249,7 +327,7 @@ def cmd_rebuild() -> int:
         return 1
     dataset = _published_dataset(records_by_source)
     _backup_published()
-    write_json_atomic(paths.PUBLISHED, dataset, compact=True)
+    publish.write_published(dataset)
     emit("done", f"Datenbestand neu erzeugt: {len(dataset['studios'])} Studios, {len(dataset['matchCandidates'])} offene Zuordnungsvorschläge.")
     return 0
 
@@ -309,6 +387,40 @@ def cmd_validate(file: str) -> int:
          providers={p: sum(1 for r in records if r.provider == p) for p in ("urbanSportsClub", "wellpass")})
     return 0 if records else 1
 
+
+
+def cmd_enrich_wellpass(everywhere: bool = False, limit: int | None = None) -> int:
+    """Ermittelt Adressen für Wellpass-Studios ohne Adresse (Rückwärtssuche über
+    Nominatim/OpenStreetMap). Standard: nur Großraum Berlin. Danach automatisch rebuild."""
+    _install_signal_handlers()
+    records_by_source = {name: _load_raw(paths.RAW / f"{name}.json") for name in SOURCES}
+    dataset = _published_dataset(records_by_source)
+    targets = []
+    for s in dataset["studios"]:
+        d = s["providerDetails"].get("wellpass")
+        c = s.get("coordinates")
+        if not d or d.get("source") != "official" or s["providers"].get("urbanSportsClub") or s["address"].get("street") or not c:
+            continue
+        if not everywhere and not publish.in_core(c["latitude"], c["longitude"]):
+            continue
+        targets.append((d["sourceId"], c["latitude"], c["longitude"], s["name"]))
+    targets.sort(key=lambda t: t[3].lower())
+    if limit:
+        targets = targets[:limit]
+    cache = read_json(WELLPASS_ADDRESSES, {}) or {}
+    try:
+        cache, errors = addresses.fetch_addresses(
+            targets, cache, PoliteClient(delay=1.1), lambda m: emit("progress", m), should_stop,
+            lambda c: write_json_atomic(WELLPASS_ADDRESSES, c),
+        )
+    except InterruptedError:
+        emit("cancelled", "Abgebrochen – bisher gefundene Adressen sind gespeichert.")
+        return 130
+    for e in errors[:50]:
+        emit("error", e)
+    found = sum(1 for t in targets if (cache.get(t[0]) or {}).get("street"))
+    emit("progress", f"Adressen: {found} von {len(targets)} gefunden, {len(errors)} Fehler.")
+    return cmd_rebuild() or (2 if errors else 0)
 
 
 def cmd_enrich_usc(max_age_days: int = 30, limit: int | None = None) -> int:

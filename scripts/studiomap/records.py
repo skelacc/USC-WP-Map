@@ -23,6 +23,7 @@ class SourceRecord:
     postalCode: str | None = None
     city: str | None = "Berlin"
     district: str | None = None
+    region: str | None = None  # Bundesland-Kürzel (z. B. "BE", "BY"), soweit bekannt
     latitude: float | None = None
     longitude: float | None = None
     # source = Koordinaten aus der Quelle; geocoded = per Adresssuche ermittelt (unsicherer)
@@ -65,6 +66,6 @@ def validate_record(r: SourceRecord) -> list[str]:
     if (r.latitude is None) != (r.longitude is None):
         problems.append("nur eine Koordinate angegeben")
     if r.latitude is not None and r.longitude is not None:
-        if not (52.3 <= r.latitude <= 52.7 and 13.0 <= r.longitude <= 13.8):
-            problems.append(f"Koordinaten außerhalb Berlins ({r.latitude}, {r.longitude})")
+        if not (47.2 <= r.latitude <= 55.1 and 5.8 <= r.longitude <= 15.1):
+            problems.append(f"Koordinaten außerhalb Deutschlands ({r.latitude}, {r.longitude})")
     return problems
