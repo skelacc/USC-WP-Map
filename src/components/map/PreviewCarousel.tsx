@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { ChevronRight, Star, X } from 'lucide-react'
+import { ChevronRight, Star, X, ZoomIn } from 'lucide-react'
 import { categoryOf, CATEGORY_META } from '@/lib/categories'
 import { distanceM, formatDistance, type LatLng } from '@/lib/geo'
 import type { ViewStudio } from '@/lib/plans'
@@ -11,6 +11,7 @@ interface Props {
   activeId: string
   onActiveChange: (id: string) => void
   onOpen: (id: string) => void
+  onZoom: (id: string) => void
   onClose: () => void
   userLocation: LatLng | null
   highlight: string[]
@@ -21,7 +22,7 @@ interface Props {
  * gehört zum markierten Pin, seitliches Wischen wechselt zum nächstgelegenen
  * Studio, Antippen öffnet die Details.
  */
-export function PreviewCarousel({ items, activeId, onActiveChange, onOpen, onClose, userLocation, highlight }: Props) {
+export function PreviewCarousel({ items, activeId, onActiveChange, onOpen, onZoom, onClose, userLocation, highlight }: Props) {
   const scroller = useRef<HTMLDivElement>(null)
   const programmatic = useRef(false)
   const timer = useRef<number | undefined>(undefined)
@@ -61,14 +62,25 @@ export function PreviewCarousel({ items, activeId, onActiveChange, onOpen, onClo
 
   return (
     <div className="pointer-events-none relative">
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Vorschau schließen"
-        className="pointer-events-auto absolute -top-11 right-3 flex size-9 items-center justify-center rounded-full border bg-background shadow-md"
-      >
-        <X className="size-4" />
-      </button>
+      <div className="pointer-events-none absolute -top-12 right-3 flex gap-2">
+        <button
+          type="button"
+          onClick={() => onZoom(activeId)}
+          aria-label="Zum Studio heranzoomen"
+          title="Heranzoomen"
+          className="pointer-events-auto flex h-9 items-center gap-1.5 rounded-full border bg-background px-3 text-xs font-medium shadow-md"
+        >
+          <ZoomIn className="size-4" /> Heranzoomen
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Vorschau schließen"
+          className="pointer-events-auto flex size-9 items-center justify-center rounded-full border bg-background shadow-md"
+        >
+          <X className="size-4" />
+        </button>
+      </div>
       <div
         ref={scroller}
         onScroll={onScroll}

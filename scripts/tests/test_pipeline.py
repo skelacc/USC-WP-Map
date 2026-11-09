@@ -228,6 +228,29 @@ class ActivityAndOverrideTests(unittest.TestCase):
         self.assertEqual(s["website"], "https://wp.example")
         self.assertEqual(s["providerDetails"]["wellpass"]["address"]["street"], "Torstr. 1")
 
+    def test_group_of_three_including_same_provider(self):
+        u1 = usc_rec("1", "Motions Tanzen", "Tempelhofer Ufer 36", 52.4990, 13.3770)
+        u2 = usc_rec("2", "Motions Fitness", "Tempelhofer Ufer 36", 52.4990, 13.3770)
+        u3 = usc_rec("3", "Booty Therapy", "Tempelhofer Ufer 36", 52.4991, 13.3771)
+        w = wp_rec("a", "Motions Gleisdreieck", "Tempelhofer Ufer 36", 52.4990, 13.3770, postalCode="10963")
+        keys = [u1.key, u2.key, u3.key, w.key]
+        dec = {"pair": "~".join(keys), "keys": keys, "decision": "confirm",
+               "fields": {"name": w.key, "address": w.key}}
+        out = merge([u1, u2, u3, w], [dec])
+        self.assertEqual(len(out["studios"]), 1)
+        s = out["studios"][0]
+        self.assertEqual(s["name"], "Motions Gleisdreieck")
+        self.assertEqual(s["address"]["postalCode"], "10963")
+        self.assertEqual(len(s["extraMembers"]), 2)
+        # nur USC untereinander
+        out2 = merge([u1, u2, w], [{"pair": f"{u1.key}~{u2.key}", "keys": [u1.key, u2.key], "decision": "confirm"}])
+        grouped = [x for x in out2["studios"] if x.get("extraMembers")]
+        self.assertEqual(len(grouped), 1)
+        self.assertFalse(grouped[0]["providers"]["wellpass"])
+        # Trennen der Gruppe: wieder einzeln, keine automatische Zusammenführung
+        out3 = merge([u1, u2, u3, w], [dec, {"pair": "~".join(keys), "keys": keys, "decision": "reject"}])
+        self.assertEqual(len(out3["studios"]), 4)
+
     def test_usc_details_parser(self):
         from studiomap.sources.usc_details import parse_venue_page
         page = ('<script type="application/ld+json">{"@context":"https://schema.org","@type":"SportsActivityLocation","name":"X",'

@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { AlertTriangle, ArrowLeft, ExternalLink, Globe, Link2, MapPin, Phone, Star, Unlink } from 'lucide-react'
+import { AlertTriangle, ArrowLeft, ExternalLink, Globe, Link2, MapPin, Pencil, Phone, Plus, Star, Unlink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CATEGORY_META, SOURCE_LABEL, categoryOf } from '@/lib/categories'
 import { distanceM, formatDistance, type LatLng } from '@/lib/geo'
+import { memberKey, membersOf } from '@/lib/merges'
 import { USC_PLANS, formatLimit, minActivityPlan, minUscPlan, planLabel, planSize, type UscPlan, type ViewStudio } from '@/lib/plans'
 import { cn } from '@/lib/utils'
-import type { Activity, Address, MatchCandidate, ProviderDetail, ProviderKey, Studio } from '@/types/studio'
+import type { Activity, Address, MatchCandidate, Member, ProviderDetail, ProviderKey, Studio } from '@/types/studio'
 import { ProviderBadges } from '../ProviderBadges'
 
 const PROVIDER_NAME: Record<ProviderKey, string> = { urbanSportsClub: 'Urban Sports Club', wellpass: 'Wellpass' }
@@ -31,7 +32,7 @@ interface Props {
   candidates: MatchCandidate[]
   userLocation: LatLng | null
   onClose: () => void
-  onMerge: (partnerId?: string) => void
+  onMerge: (opts: { partnerIds?: string[]; editOnly?: boolean }) => void
   onUnmerge: () => void
   onRejectCandidate: (pair: string) => void
   onShowStudio: (id: string) => void
@@ -40,9 +41,14 @@ interface Props {
 
 export function StudioDetail(p: Props) {
   const { full: s, studio: view, plan, onClose, className } = p
-  const both = !!(s.providerDetails.urbanSportsClub && s.providerDetails.wellpass)
+  const members = membersOf(s)
   const [tab, setTab] = useState('overview')
   const category = categoryOf(view)
+  const label = (m: Member) => {
+    const same = members.filter((x) => x.provider === m.provider)
+    const short = m.provider === 'urbanSportsClub' ? 'USC' : 'Wellpass'
+    return same.length > 1 ? `${short} ${same.indexOf(m) + 1}` : short
+  }
 
   return (
     <section aria-label={`Details zu ${s.name}`} className={cn('flex max-h-full min-h-0 flex-col overflow-hidden rounded-t-2xl border bg-background shadow-xl md:rounded-xl', className)}>
@@ -55,47 +61,93 @@ export function StudioDetail(p: Props) {
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
             <ProviderBadges studio={s} />
             {s.providerDetails.urbanSportsClub?.plus && <span className="rounded border px-1.5 py-0.5 text-[11px] font-semibold">Plus</span>}
+            {members.length > 2 && <span className="text-xs text-muted-foreground">{members.length} Einträge</span>}
           </div>
         </div>
       </header>
 
-      {both ? (
+      {members.length > 1 ? (
         <Tabs value={tab} onValueChange={setTab} className="min-h-0 flex-1 gap-0">
-          <TabsList className="mx-3 mt-2 grid w-auto grid-cols-3">
-            <TabsTrigger value="overview">Übersicht</TabsTrigger>
-            <TabsTrigger value="urbanSportsClub">USC</TabsTrigger>
-            <TabsTrigger value="wellpass">Wellpass</TabsTrigger>
+          <TabsList className="mx-3 mt-2 flex w-auto justify-start overflow-x-auto [scrollbar-width:none]">
+            <TabsTrigger value="overview" className="flex-none px-3">Übersicht</TabsTrigger>
+            {members.map((m) => (
+              <TabsTrigger key={memberKey(m)} value={memberKey(m)} className="flex-none px-3">
+                {label(m)}
+              </TabsTrigger>
+            ))}
           </TabsList>
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
             <TabsContent value="overview">
               <Overview {...p} />
             </TabsContent>
-            <TabsContent value="urbanSportsClub">
-              <ProviderSection provider="urbanSportsClub" detail={s.providerDetails.urbanSportsClub!} studioName={s.name} plan={plan} highlight={p.highlight} />
-            </TabsContent>
-            <TabsContent value="wellpass">
-              <ProviderSection provider="wellpass" detail={s.providerDetails.wellpass!} studioName={s.name} plan={plan} highlight={p.highlight} />
-            </TabsContent>
+            {members.map((m) => (
+              <TabsContent key={memberKey(m)} value={memberKey(m)}>
+                <ProviderSection provider={m.provider} detail={m.detail} studioName={s.name} plan={plan} highlight={p.highlight} />
+              </TabsContent>
+            ))}
           </div>
         </Tabs>
       ) : (
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           <Overview {...p} />
-          {(Object.keys(PROVIDER_NAME) as ProviderKey[]).map((k) =>
-            s.providerDetails[k] ? (
-              <ProviderSection key={k} provider={k} detail={s.providerDetails[k]!} studioName={s.name} plan={plan} highlight={p.highlight} compact />
-            ) : null,
-          )}
+          {members.map((m) => (
+            <ProviderSection key={memberKey(m)} provider={m.provider} detail={m.detail} studioName={s.name} plan={plan} highlight={p.highlight} compact />
+          ))}
         </div>
       )}
     </section>
   )
 }
 
-function Overview({ studio: view, full: s, plan, userLocation, candidates, onMerge, onUnmerge, onRejectCandidate, onShowStudio }: Props) {
+/** Alle Aktivitäten aller Einträge mit Verfügbarkeit in der gewählten Stufe. */
+function CombinedActivities({ s, plan, highlight }: { s: Studio; plan: UscPlan; highlight: string[] }) {
+  const size = planSize(plan)
+  // Wert je Aktivität: -1 unbegrenzt, 0 nicht verfügbar, n pro Monat, null unbekannt
+  const rank = (v: number | null) => (v === null ? 0.5 : v < 0 ? Infinity : v)
+  const value = (a: Activity): number | null => {
+    if (!a.limits) return null
+    if (size) return a.limits[size]
+    return Object.values(a.limits).reduce((best, v) => (rank(v) > rank(best) ? v : best), 0)
+  }
+  const rows = new Map<string, { usc?: number | null; wp: boolean }>()
+  for (const m of membersOf(s)) {
+    const acts: Activity[] = m.detail.activities ?? (m.detail.categories ?? []).map((name) => ({ name, limits: null }))
+    for (const a of acts) {
+      const r = rows.get(a.name) ?? { wp: false }
+      if (m.provider === 'wellpass') r.wp = true
+      else {
+        const v = value(a)
+        if (r.usc === undefined || rank(v) > rank(r.usc)) r.usc = v
+      }
+      rows.set(a.name, r)
+    }
+  }
+  const list = [...rows.entries()].sort((a, b) => Number(highlight.includes(b[0])) - Number(highlight.includes(a[0])) || a[0].localeCompare(b[0], 'de'))
+  if (!list.length) return null
+  return (
+    <div>
+      <h4 className="mb-1 text-xs font-semibold text-muted-foreground uppercase">Aktivitäten (alle Anbieter)</h4>
+      <ul className="divide-y rounded-md border text-xs">
+        {list.map(([name, r]) => (
+          <li key={name} className={cn('flex items-center gap-2 px-2 py-1.5', highlight.includes(name) && 'bg-amber-50 font-medium')}>
+            <span className="flex-1">{name}</span>
+            {r.usc !== undefined && (
+              <span className={cn('rounded px-1', r.usc === 0 ? 'text-muted-foreground line-through' : 'bg-blue-50 text-blue-800')}>
+                USC{size && r.usc !== null && r.usc !== undefined ? ` ${size}: ${r.usc === 0 ? 'nein' : r.usc < 0 ? '∞' : `${r.usc}×`}` : ''}
+              </span>
+            )}
+            {r.wp && <span className="rounded bg-orange-50 px-1 text-orange-800">WP</span>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function Overview({ studio: view, full: s, plan, highlight, userLocation, candidates, onMerge, onUnmerge, onRejectCandidate, onShowStudio }: Props) {
   const [l1, l2] = addressLines(s.address)
   const dist = userLocation && s.coordinates ? distanceM(userLocation, { lat: s.coordinates.latitude, lng: s.coordinates.longitude }) : null
-  const both = !!(s.providerDetails.urbanSportsClub && s.providerDetails.wellpass)
+  const multi = membersOf(s).length > 1
   const uscMin = minUscPlan(s)
   return (
     <div className="space-y-3 p-3 text-sm">
@@ -138,10 +190,12 @@ function Overview({ studio: view, full: s, plan, userLocation, candidates, onMer
       )}
       <Contact website={s.website} phone={s.phone} />
 
-      {both && (
+      {multi && <CombinedActivities s={s} plan={plan} highlight={highlight} />}
+
+      {multi && (
         <div className="rounded-md border p-2 text-xs">
           <p className="font-medium">
-            {s.matchConfidence === 'verified' ? 'Von dir zusammengeführt' : 'Automatisch zusammengeführt'} – Details je Anbieter in den Tabs.
+            {s.matchConfidence === 'verified' ? 'Von dir zusammengeführt' : 'Automatisch zusammengeführt'} ({membersOf(s).length} Einträge) – Details je Eintrag in den Tabs.
           </p>
           {s.match && s.matchConfidence !== 'verified' && (
             <details className="mt-1">
@@ -154,8 +208,11 @@ function Overview({ studio: view, full: s, plan, userLocation, candidates, onMer
             </details>
           )}
           <div className="mt-2 flex flex-wrap gap-1.5">
-            <Button size="sm" variant="outline" onClick={() => onMerge()}>
-              <Link2 /> Angaben ändern
+            <Button size="sm" variant="outline" onClick={() => onMerge({ editOnly: true })}>
+              <Pencil /> Angaben ändern
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => onMerge({})}>
+              <Plus /> Weitere hinzufügen
             </Button>
             <Button size="sm" variant="outline" onClick={onUnmerge}>
               <Unlink /> Trennen
@@ -164,7 +221,7 @@ function Overview({ studio: view, full: s, plan, userLocation, candidates, onMer
         </div>
       )}
 
-      {!both && (
+      {!multi && (
         <div className="space-y-2">
           {candidates.map((c) => {
             const otherIsWp = c.urbanSportsClub.studioId === s.id
@@ -176,7 +233,7 @@ function Overview({ studio: view, full: s, plan, userLocation, candidates, onMer
                 </p>
                 <p className="mt-0.5 text-muted-foreground">{c.reasons.slice(0, 3).join(' · ')}</p>
                 <div className="mt-2 flex flex-wrap gap-1.5">
-                  <Button size="sm" onClick={() => onMerge(other.studioId ?? undefined)}>
+                  <Button size="sm" onClick={() => onMerge({ partnerIds: other.studioId ? [other.studioId] : undefined })}>
                     <Link2 /> Zusammenführen…
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => onRejectCandidate(c.id)}>
@@ -191,8 +248,8 @@ function Overview({ studio: view, full: s, plan, userLocation, candidates, onMer
               </div>
             )
           })}
-          <Button size="sm" variant="outline" className="w-full" onClick={() => onMerge()}>
-            <Link2 /> Mit {s.providerDetails.urbanSportsClub ? 'einem Wellpass' : 'einem USC'}-Studio zusammenführen…
+          <Button size="sm" variant="outline" className="w-full" onClick={() => onMerge({})}>
+            <Link2 /> Mit anderen Einträgen zusammenführen…
           </Button>
         </div>
       )}

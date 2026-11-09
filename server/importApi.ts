@@ -137,6 +137,7 @@ export function importApi(): Plugin {
             }
             const args = ['decide', body.pair, body.decision]
             if (body.fields && typeof body.fields === 'object') args.push('--fields', JSON.stringify(body.fields))
+            if (Array.isArray(body.keys) && body.keys.every((k: unknown) => typeof k === 'string')) args.push('--keys', JSON.stringify(body.keys))
             const r = await runCollect(args)
             return json(res, r.code === 0 ? 200 : 422, r)
           }

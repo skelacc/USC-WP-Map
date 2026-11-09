@@ -1,17 +1,20 @@
 /**
- * Eigene Zusammenführungs-Entscheidungen – im Browser gespeichert und direkt
- * auf den geladenen Datenbestand angewendet. Dadurch funktionieren sie auch
- * auf der statischen Seite (GitHub Pages) ohne Server. Unter `npm run dev`
- * werden sie zusätzlich in data/manual/match_decisions.json übernommen.
+ * Eigene Zusammenführungs-Entscheidungen – im Browser gespeichert (und per
+ * Sync geteilt) und direkt auf den geladenen Datenbestand angewendet.
  *
- * Format wie in Python (scripts/studiomap/merge.py):
- *   { pair: "<usc-key>~<wellpass-key>", decision: "confirm" | "reject", fields?, decidedAt }
+ * Eine Entscheidung betrifft eine Gruppe von Einträgen (beliebig viele, auch
+ * mehrere desselben Anbieters):
+ *   { pair: "<key>~<key>~…", keys?: [...], decision: "confirm" | "reject", fields?, decidedAt }
+ * Ein Eintragsschlüssel hat die Form provider:source:sourceId. Ältere
+ * Entscheidungen bestehen nur aus `pair` (USC~Wellpass) und gelten weiter.
  */
-import type { Coordinates, Dataset, FieldChoices, ProviderDetail, ProviderKey, Studio } from '@/types/studio'
+import type { Coordinates, Dataset, FieldChoice, FieldChoices, Member, ProviderDetail, ProviderKey, Studio } from '@/types/studio'
 import { loadSetting, saveSetting } from './storage'
 
 export interface Decision {
+  /** Kennung der Entscheidung = Schlüssel der Einträge, mit ~ verbunden */
   pair: string
+  keys?: string[]
   decision: 'confirm' | 'reject'
   fields?: FieldChoices
   decidedAt: string
@@ -28,120 +31,151 @@ export function saveDecisions(d: Decision[]) {
   saveSetting(KEY, d)
 }
 
+/** Neue Entscheidung ersetzt frühere zu denselben Einträgen. */
 export function upsertDecision(list: Decision[], d: Decision): Decision[] {
-  return [...list.filter((x) => x.pair !== d.pair), d]
+  const keys = new Set(keysOf(d))
+  return [...list.filter((x) => x.pair !== d.pair && !(d.decision === 'confirm' && keysOf(x).every((k) => keys.has(k)))), d]
+}
+
+export function keysOf(d: Decision): string[] {
+  return d.keys?.length ? d.keys : d.pair.split('~')
 }
 
 export function detailKey(p: ProviderKey, d: ProviderDetail): string {
   return d.key ?? `${p}:${d.source}:${d.sourceId}`
 }
 
-export function pairOf(usc: Studio, wp: Studio): string {
-  return `${detailKey('urbanSportsClub', usc.providerDetails.urbanSportsClub!)}~${detailKey('wellpass', wp.providerDetails.wellpass!)}`
+export function memberKey(m: Member): string {
+  return detailKey(m.provider, m.detail)
 }
 
-/** Studio, das nur aus den Angaben eines Anbieters besteht. */
+/** Alle Einträge eines Studios (erster je Anbieter + weitere). */
+export function membersOf(s: Studio): Member[] {
+  const primary = (Object.entries(s.providerDetails) as [ProviderKey, ProviderDetail][])
+    .filter(([, d]) => !!d)
+    .map(([provider, detail]) => ({ provider, detail }))
+  // USC zuerst, dann Wellpass, dann weitere
+  primary.sort((a, b) => (a.provider === 'urbanSportsClub' ? -1 : 1) - (b.provider === 'urbanSportsClub' ? -1 : 1))
+  const order = (p: ProviderKey) => (p === 'urbanSportsClub' ? 0 : 1)
+  return [...primary, ...(s.extraMembers ?? [])].map((m, i) => ({ m, i })).sort((a, b) => order(a.m.provider) - order(b.m.provider) || a.i - b.i).map((x) => x.m)
+}
+
+export function membersOfProvider(s: Studio, p: ProviderKey): ProviderDetail[] {
+  return membersOf(s)
+    .filter((m) => m.provider === p)
+    .map((m) => m.detail)
+}
+
+export function decisionFor(keys: string[], decision: 'confirm' | 'reject', fields?: FieldChoices): Decision {
+  return { pair: keys.join('~'), keys, decision, fields, decidedAt: new Date().toISOString() }
+}
+
+/** Studio aus einem einzelnen Eintrag. */
 export function singleFromDetail(p: ProviderKey, d: ProviderDetail, id: string): Studio {
-  return {
-    id,
-    name: d.name,
-    address: d.address ?? { street: null, postalCode: null, city: 'Berlin', district: null },
-    coordinates: d.coordinates ? ({ ...d.coordinates, from: p } as Coordinates) : null,
-    providers: { urbanSportsClub: p === 'urbanSportsClub', wellpass: p === 'wellpass' },
-    providerDetails: { [p]: d },
-    website: d.website ?? null,
-    phone: d.phone ?? null,
-    categories: d.categories ?? [],
-    activities: (d.activities ?? []).map((a) => a.name),
-    source: { urbanSportsClub: p === 'urbanSportsClub' ? d.source : null, wellpass: p === 'wellpass' ? d.source : null },
-    lastVerified: d.fetchedAt?.slice(0, 10) ?? null,
-    matchConfidence: 'single',
-    match: null,
-  }
+  return buildStudio([{ provider: p, detail: d }], id, undefined, 'single')
 }
 
-function pick<T>(choice: ProviderKey | undefined, u: T, w: T, fallback: T): T {
-  if (choice === 'urbanSportsClub') return u
-  if (choice === 'wellpass') return w
-  return fallback
+function resolve(choice: FieldChoice | undefined, members: Member[]): Member | undefined {
+  if (!choice || typeof choice === 'object') return undefined
+  return members.find((m) => memberKey(m) === choice) ?? members.find((m) => m.provider === choice)
 }
 
-/** Neues zusammengeführtes Studio aus den Angaben beider Anbieter. */
-export function mergedStudio(id: string, u: ProviderDetail, w: ProviderDetail, fields: FieldChoices = {}, decidedAt?: string): Studio {
-  const name =
-    typeof fields.name === 'object' ? fields.name.custom : pick(fields.name as ProviderKey | undefined, u.name, w.name, u.name)
-  const address = pick(fields.address, u.address, w.address, u.address?.street ? u.address : (w.address ?? u.address)) ?? {
-    street: null,
-    postalCode: null,
-    city: 'Berlin',
-    district: null,
+/** Studio aus mehreren Einträgen; fields legt fest, welche Angaben gelten. */
+export function buildStudio(
+  members: Member[],
+  id: string,
+  fields: FieldChoices = {},
+  confidence: Studio['matchConfidence'] = 'verified',
+  decidedAt?: string,
+): Studio {
+  const ordered = [...members]
+  const first = ordered[0]
+  const providerDetails: Studio['providerDetails'] = {}
+  const extra: Member[] = []
+  for (const m of ordered) {
+    if (!providerDetails[m.provider]) providerDetails[m.provider] = m.detail
+    else extra.push(m)
   }
-  const coordSrc: ProviderKey = fields.coordinates ?? (u.coordinates ? 'urbanSportsClub' : 'wellpass')
-  const coord = coordSrc === 'urbanSportsClub' ? u.coordinates : w.coordinates
-  const website =
-    typeof fields.website === 'object'
-      ? fields.website.custom
-      : pick(fields.website as ProviderKey | undefined, u.website ?? null, w.website ?? null, w.website ?? u.website ?? null)
+  const nameSrc = resolve(fields.name, ordered) ?? first
+  const addrSrc = resolve(fields.address, ordered) ?? ordered.find((m) => /[a-zäöü]{3}/i.test(m.detail.address?.street ?? '')) ?? first
+  const coordSrc = resolve(fields.coordinates, ordered) ?? ordered.find((m) => m.detail.coordinates) ?? first
+  const webSrc = resolve(fields.website, ordered) ?? ordered.find((m) => m.detail.website)
+  const name = typeof fields.name === 'object' ? fields.name.custom : nameSrc.detail.name
+  const website = typeof fields.website === 'object' ? fields.website.custom : (webSrc?.detail.website ?? null)
+  const address = addrSrc.detail.address ?? { street: null, postalCode: null, city: 'Berlin', district: null }
+  const coord = coordSrc.detail.coordinates
+  const uniq = (xs: string[]) => [...new Set(xs)].sort((a, b) => a.localeCompare(b, 'de'))
+  const fetched = ordered.map((m) => m.detail.fetchedAt).filter(Boolean).sort() as string[]
+  const multi = ordered.length > 1
   return {
     id,
     name,
-    address: { ...address, postalCode: address.postalCode ?? u.address?.postalCode ?? w.address?.postalCode ?? null },
-    coordinates: coord ? ({ ...coord, from: coordSrc } as Coordinates) : null,
-    providers: { urbanSportsClub: true, wellpass: true },
-    providerDetails: { urbanSportsClub: u, wellpass: w },
+    address: { ...address, postalCode: address.postalCode ?? ordered.find((m) => m.detail.address?.postalCode)?.detail.address?.postalCode ?? null },
+    coordinates: coord ? ({ ...coord, from: coordSrc.provider } as Coordinates) : null,
+    providers: { urbanSportsClub: !!providerDetails.urbanSportsClub, wellpass: !!providerDetails.wellpass },
+    providerDetails,
+    extraMembers: extra.length ? extra : undefined,
     website,
-    phone: u.phone ?? w.phone ?? null,
-    categories: [...new Set([...(u.categories ?? []), ...(w.categories ?? [])])].sort(),
-    activities: [...new Set([...(u.activities ?? []), ...(w.activities ?? [])].map((a) => a.name))].sort(),
-    source: { urbanSportsClub: u.source, wellpass: w.source },
-    lastVerified: [u.fetchedAt, w.fetchedAt].filter(Boolean).sort()[0]?.slice(0, 10) ?? null,
-    matchConfidence: 'verified',
-    match: { method: 'manual', score: 1, reasons: ['Manuell zusammengeführt'], distanceM: null, decidedAt, fields },
-    fieldChoices: fields,
+    phone: ordered.find((m) => m.detail.phone)?.detail.phone ?? null,
+    categories: uniq(ordered.flatMap((m) => m.detail.categories ?? [])),
+    activities: uniq(ordered.flatMap((m) => (m.detail.activities ?? []).map((a) => a.name))),
+    source: { urbanSportsClub: providerDetails.urbanSportsClub?.source ?? null, wellpass: providerDetails.wellpass?.source ?? null },
+    lastVerified: fetched[0]?.slice(0, 10) ?? null,
+    matchConfidence: multi ? confidence : 'single',
+    match: multi ? { method: 'manual', score: 1, reasons: ['Manuell zusammengeführt'], distanceM: null, decidedAt, fields } : null,
+    fieldChoices: multi ? fields : undefined,
   }
 }
 
-/** Wendet die Entscheidungen auf den Datenbestand an (idempotent). */
+/** Wendet die Entscheidungen auf den Datenbestand an (idempotent, in Reihenfolge). */
 export function applyDecisions(ds: Dataset, decisions: Decision[]): Dataset {
   if (!decisions.length) return ds
   let studios = [...ds.studios]
-  const findBy = (key: string) =>
-    studios.find((s) =>
-      (Object.entries(s.providerDetails) as [ProviderKey, ProviderDetail][]).some(([p, d]) => detailKey(p, d) === key),
-    )
-  const replace = (remove: Studio[], add: Studio[]) => {
-    const ids = new Set(remove.map((s) => s.id))
-    studios = [...studios.filter((s) => !ids.has(s.id)), ...add]
-  }
-  // Ein zusammengeführtes Studio in seine zwei Einzelstudios aufteilen
-  const split = (s: Studio): Studio[] => {
-    const u = s.providerDetails.urbanSportsClub!
-    const w = s.providerDetails.wellpass!
-    return [singleFromDetail('urbanSportsClub', u, s.id), singleFromDetail('wellpass', w, `${s.id}~wp`)]
-  }
+  let counter = 0
+  const containing = (key: string) => studios.find((s) => membersOf(s).some((m) => memberKey(m) === key))
 
   for (const d of decisions) {
-    const [uk, wk] = d.pair.split('~')
-    const su = findBy(uk)
-    const sw = findBy(wk)
-    if (!su || !sw) continue // Datensatz nicht (mehr) im Bestand
+    const keys = keysOf(d)
+    const hit = [...new Set(keys.map(containing).filter(Boolean) as Studio[])]
+    if (!hit.length) continue
+    const ids = new Set(hit.map((s) => s.id))
+    const all = hit.flatMap((s) => membersOf(s).map((m) => ({ m, from: s })))
+    const added: Studio[] = []
+    const single = (m: Member, from: Studio, i: number) =>
+      buildStudio([m], i === 0 ? from.id : `${from.id}~${memberKey(m)}`, undefined, 'single')
+
     if (d.decision === 'reject') {
-      if (su === sw) replace([su], split(su))
+      // Gruppe auflösen: jeder Eintrag wird wieder ein eigenes Studio
+      const touched = hit.filter((s) => membersOf(s).filter((m) => keys.includes(memberKey(m))).length >= 2)
+      if (!touched.length) continue
+      const tIds = new Set(touched.map((s) => s.id))
+      for (const s of touched) membersOf(s).forEach((m, i) => added.push(single(m, s, i)))
+      studios = [...studios.filter((s) => !tIds.has(s.id)), ...added]
       continue
     }
-    const u = su.providerDetails.urbanSportsClub!
-    const w = sw.providerDetails.wellpass!
-    const leftovers: Studio[] = []
-    if (su !== sw) {
-      if (su.providers.wellpass && su.providerDetails.wellpass) leftovers.push(split(su)[1])
-      if (sw.providers.urbanSportsClub && sw.providerDetails.urbanSportsClub) leftovers.push(split(sw)[0])
+
+    // confirm: gewählte Einträge (in Reihenfolge der Entscheidung) zu einem Studio
+    const chosen = keys.map((k) => all.find((x) => memberKey(x.m) === k)).filter(Boolean) as { m: Member; from: Studio }[]
+    if (chosen.length < 2) continue
+    const rest = all.filter((x) => !keys.includes(memberKey(x.m)))
+    const id = chosen[0].from.id
+    added.push(buildStudio(chosen.map((x) => x.m), id, d.fields, 'verified', d.decidedAt))
+    // Übrige Einträge betroffener Studios bleiben zusammen (falls ≥ 2) bzw. einzeln
+    const byOrigin = new Map<Studio, Member[]>()
+    for (const x of rest) byOrigin.set(x.from, [...(byOrigin.get(x.from) ?? []), x.m])
+    for (const [from, ms] of byOrigin) {
+      const rid = from.id === id ? `${from.id}~rest${++counter}` : from.id
+      added.push(ms.length > 1 ? buildStudio(ms, rid, from.fieldChoices, from.matchConfidence) : single(ms[0], { ...from, id: rid }, 0))
     }
-    replace(su === sw ? [su] : [su, sw], [mergedStudio(su.id, u, w, d.fields, d.decidedAt), ...leftovers])
+    studios = [...studios.filter((s) => !ids.has(s.id)), ...added]
   }
-  const decided = new Set(decisions.map((d) => d.pair))
+  const decided = new Set(decisions.flatMap((d) => (keysOf(d).length === 2 ? [keysOf(d).join('~')] : [])))
+  const present = new Set(studios.map((s) => s.id))
   return {
     ...ds,
     studios,
-    matchCandidates: ds.matchCandidates.filter((c) => !decided.has(c.id)),
+    matchCandidates: ds.matchCandidates.filter(
+      (c) => !decided.has(c.id) && (!c.urbanSportsClub.studioId || present.has(c.urbanSportsClub.studioId)) && (!c.wellpass.studioId || present.has(c.wellpass.studioId)),
+    ),
   }
 }

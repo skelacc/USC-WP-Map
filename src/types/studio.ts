@@ -60,11 +60,19 @@ export interface ProviderDetail {
   detailsFetchedAt?: string | null
 }
 
-export type FieldChoice = ProviderKey | { custom: string }
+/** Ein Eintrag eines Anbieters, der zu einem Studio gehört. */
+export interface Member {
+  provider: ProviderKey
+  detail: ProviderDetail
+}
+
+/** Gewählte Quelle je Feld: Schlüssel eines Eintrags (provider:source:id),
+ *  ältere Form: Anbieter („urbanSportsClub“/„wellpass“) – oder eigener Text. */
+export type FieldChoice = string | { custom: string }
 export interface FieldChoices {
   name?: FieldChoice
-  address?: ProviderKey
-  coordinates?: ProviderKey
+  address?: string
+  coordinates?: string
   website?: FieldChoice
 }
 
@@ -83,7 +91,10 @@ export interface Studio {
   address: Address
   coordinates: Coordinates | null
   providers: Record<ProviderKey, boolean>
+  /** erster Eintrag je Anbieter */
   providerDetails: Partial<Record<ProviderKey, ProviderDetail>>
+  /** weitere Einträge (z. B. mehrere USC-Angebote einer Einrichtung) */
+  extraMembers?: Member[]
   website: string | null
   phone: string | null
   categories: string[]

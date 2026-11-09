@@ -59,6 +59,14 @@ describe('USC-Stufe, Plus und Aktivitäten', () => {
     const r = applyView(data, { plan: 'Premium', showPlus: true, activities: ['Massage'] })
     expect(r.map((s) => s.id).sort()).toEqual(['massage-m', 'plus-l', 'yoga-m'])
   })
+  it('Aktivitätsfilter: grüne Studios bleiben grün, wenn einer der Anbieter die Aktivität hat', () => {
+    const both = mk('both', { included: all, acts: [{ name: 'Yoga', limits: L(4, 4, 4, 4) }], wellpass: ['Schwimmen'] })
+    const r = applyView([both], { plan: 'Classic', showPlus: false, activities: ['Schwimmen'] })
+    expect(r).toHaveLength(1)
+    expect(categoryOf(r[0])).toBe('both')
+    expect(applyView([both], { plan: 'Classic', showPlus: false, activities: ['Yoga'] })).toHaveLength(1)
+    expect(applyView([both], { plan: 'Classic', showPlus: false, activities: ['Massage'] })).toHaveLength(0)
+  })
   it('Studios ohne Detaildaten nutzen die Stufenliste', () => {
     expect(applyView(data, { plan: 'Premium', showPlus: false, activities: [] }).some((s) => s.id === 'legacy')).toBe(true)
     expect(applyView(data, { plan: 'Classic', showPlus: false, activities: [] }).some((s) => s.id === 'legacy')).toBe(false)

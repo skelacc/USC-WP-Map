@@ -1,4 +1,5 @@
-import type { Activity, PlanSize, Studio } from '@/types/studio'
+import type { Activity, PlanSize, ProviderDetail, Studio } from '@/types/studio'
+import { membersOfProvider } from './merges'
 
 /** USC-Mitgliedschaften (Kürzel S/M/L/XL wie in der USC-App). */
 export const USC_PLANS = [
@@ -22,15 +23,22 @@ export function planLabel(p: UscPlan): string {
   return `${meta.size} (${meta.id})`
 }
 
-/** Ist der Standort in Stufe size enthalten? null = unbekannt. */
-export function uscIncluded(s: Studio, size: PlanSize): boolean | null {
-  const d = s.providerDetails.urbanSportsClub
-  if (!d) return false
+function detailIncluded(d: ProviderDetail, size: PlanSize): boolean | null {
   if (d.planIncluded && size in d.planIncluded) return !!d.planIncluded[size]
   if (d.plans?.length) {
     const id = USC_PLANS.find((p) => p.size === size)!.id
     return d.plans.includes(id)
   }
+  return null
+}
+
+/** Ist (mindestens ein USC-Eintrag des) Studios in Stufe size enthalten? null = unbekannt. */
+export function uscIncluded(s: Studio, size: PlanSize): boolean | null {
+  const ds = membersOfProvider(s, 'urbanSportsClub')
+  if (!ds.length) return false
+  const vals = ds.map((d) => detailIncluded(d, size))
+  if (vals.some((v) => v === true)) return true
+  if (vals.every((v) => v === false)) return false
   return null
 }
 
@@ -64,50 +72,56 @@ export type UscExclusion = 'plan' | 'plus' | 'activity'
 
 export type ViewStudio = Studio & { uscExcluded?: UscExclusion }
 
-function uscActivityOk(s: Studio, size: PlanSize | null, wanted: string[]): boolean {
-  const d = s.providerDetails.urbanSportsClub
-  const acts = d?.activities ?? (d?.categories ?? []).map((name) => ({ name, limits: null }))
-  return acts.some(
-    (a) => wanted.includes(a.name) && (a.limits === null || (size ? a.limits[size] !== 0 : Object.values(a.limits).some((v) => v !== 0))),
-  )
+/** USC-Einträge, die mit Stufe und Plus-Einstellung nutzbar sind. */
+function usableUsc(s: Studio, size: PlanSize | null, showPlus: boolean): ProviderDetail[] {
+  return membersOfProvider(s, 'urbanSportsClub').filter((d) => (!size || detailIncluded(d, size) !== false) && (showPlus || !d.plus))
 }
 
-function wellpassActivityOk(s: Studio, wanted: string[]): boolean {
-  const d = s.providerDetails.wellpass
-  const acts = d?.activities?.map((a) => a.name) ?? []
-  return acts.some((a) => wanted.includes(a))
+function uscActivities(d: ProviderDetail): Activity[] {
+  return d.activities ?? (d.categories ?? []).map((name) => ({ name, limits: null }))
+}
+
+function activityAvailable(a: Activity, size: PlanSize | null): boolean {
+  return a.limits === null || (size ? a.limits[size] !== 0 : Object.values(a.limits).some((v) => v !== 0))
 }
 
 /** Warum USC (nicht) zählt – ohne Aktivitätsfilter. */
-function uscBaseExclusion(s: Studio, size: PlanSize | null, showPlus: boolean): UscExclusion | null {
-  const d = s.providerDetails.urbanSportsClub
-  if (size && uscIncluded(s, size) === false) return 'plan'
-  if (!showPlus && d?.plus) return 'plus'
-  return null
+function uscExclusion(s: Studio, size: PlanSize | null, showPlus: boolean): UscExclusion | null {
+  const all = membersOfProvider(s, 'urbanSportsClub')
+  if (!all.length || usableUsc(s, size, showPlus).length) return null
+  return size && all.every((d) => detailIncluded(d, size) === false) ? 'plan' : 'plus'
+}
+
+/** Aktivitäten eines Studios, die unter Stufe + Plus verfügbar sind (beide Anbieter). */
+export function availableActivities(s: Studio, size: PlanSize | null, showPlus: boolean): Set<string> {
+  const names = new Set<string>()
+  for (const d of usableUsc(s, size, showPlus)) for (const a of uscActivities(d)) if (activityAvailable(a, size)) names.add(a.name)
+  for (const d of membersOfProvider(s, 'wellpass')) for (const a of d.activities ?? []) names.add(a.name)
+  return names
 }
 
 /**
- * Wendet USC-Stufe, Plus-Einstellung und Aktivitätsfilter an. Zählt USC für
- * ein Studio nicht, erscheint es als „Nur Wellpass“ (falls vorhanden) oder
- * wird ausgeblendet. Studios ohne Angaben (z. B. manuell) bleiben sichtbar.
+ * Wendet USC-Stufe und Plus-Einstellung an: Zählt USC für ein Studio nicht,
+ * erscheint es als „Nur Wellpass“ (falls vorhanden) oder wird ausgeblendet.
+ * Der Aktivitätsfilter ändert die Anbieter nicht: Ein Studio passt, wenn
+ * einer seiner (nutzbaren) Anbieter die Aktivität hat – grüne Studios bleiben grün.
  */
 export function applyView(studios: Studio[], o: ViewOptions): ViewStudio[] {
   const size = planSize(o.plan)
-  const filterActs = o.activities.length > 0
   const out: ViewStudio[] = []
   for (const s of studios) {
     let usc = s.providers.urbanSportsClub
-    let reason: UscExclusion | undefined
-    if (usc) {
-      const base = uscBaseExclusion(s, size, o.showPlus)
-      if (base) reason = base
-      else if (filterActs && !uscActivityOk(s, size, o.activities)) reason = 'activity'
-      if (reason) usc = false
-    }
-    const wp = s.providers.wellpass && (!filterActs || wellpassActivityOk(s, o.activities))
+    const reason = usc ? uscExclusion(s, size, o.showPlus) : null
+    if (reason) usc = false
+    const wp = s.providers.wellpass
     if (!usc && !wp) continue
-    if (usc === s.providers.urbanSportsClub && wp === s.providers.wellpass) out.push(s)
-    else out.push({ ...s, providers: { urbanSportsClub: usc, wellpass: wp }, uscExcluded: reason })
+    if (o.activities.length) {
+      const view = usc === s.providers.urbanSportsClub ? s : { ...s, providers: { urbanSportsClub: usc, wellpass: wp } }
+      const acts = availableActivities(view, size, o.showPlus)
+      if (!o.activities.some((a) => acts.has(a))) continue
+    }
+    if (usc === s.providers.urbanSportsClub) out.push(s)
+    else out.push({ ...s, providers: { urbanSportsClub: usc, wellpass: wp }, uscExcluded: reason ?? undefined })
   }
   return out
 }
@@ -116,15 +130,6 @@ export function applyView(studios: Studio[], o: ViewOptions): ViewStudio[] {
 export function activityCounts(studios: Studio[], plan: UscPlan, showPlus: boolean): Map<string, number> {
   const size = planSize(plan)
   const counts = new Map<string, number>()
-  for (const s of studios) {
-    const names = new Set<string>()
-    const u = s.providerDetails.urbanSportsClub
-    if (u && !uscBaseExclusion(s, size, showPlus)) {
-      const acts = u.activities ?? (u.categories ?? []).map((name) => ({ name, limits: null }))
-      for (const a of acts) if (a.limits === null || (size ? a.limits[size] !== 0 : true)) names.add(a.name)
-    }
-    for (const a of s.providerDetails.wellpass?.activities ?? []) names.add(a.name)
-    for (const n of names) counts.set(n, (counts.get(n) ?? 0) + 1)
-  }
+  for (const s of studios) for (const n of availableActivities(s, size, showPlus)) counts.set(n, (counts.get(n) ?? 0) + 1)
   return counts
 }

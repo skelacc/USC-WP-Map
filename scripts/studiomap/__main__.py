@@ -28,6 +28,7 @@ def main(argv: list[str] | None = None) -> int:
     d = sub.add_parser("decide", help="Zuordnungsvorschlag bestätigen/ablehnen")
     d.add_argument("pair", help="Paar-ID aus matchCandidates[].id")
     d.add_argument("decision", choices=["confirm", "reject", "reset"])
+    d.add_argument("--keys", default=None, help='JSON-Liste der Eintragsschlüssel (für Gruppen > 2)')
     d.add_argument("--fields", default=None, help='JSON, z. B. {"name": "wellpass", "address": "urbanSportsClub"}')
 
     e = sub.add_parser("enrich-usc", help="USC-Detailseiten laden (Plus, Limits je Stufe/Aktivität, PLZ, Bewertung)")
@@ -55,7 +56,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "rebuild":
         return pipeline.cmd_rebuild()
     if args.cmd == "decide":
-        return pipeline.cmd_decide(args.pair, args.decision, args.fields)
+        return pipeline.cmd_decide(args.pair, args.decision, args.fields, args.keys)
     return 1
 
 

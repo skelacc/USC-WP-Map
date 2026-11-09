@@ -102,5 +102,5 @@ async function post(path: string, body: unknown) {
 
 export const applyImport = (force = false) => post('/api/import/apply', { force })
 export const discardImport = () => post('/api/import/discard', {})
-export const decideMatch = (pair: string, decision: 'confirm' | 'reject' | 'reset', fields?: unknown) => post('/api/decide', { pair, decision, fields })
+export const decideMatch = (pair: string, decision: 'confirm' | 'reject' | 'reset', fields?: unknown, keys?: string[]) => post('/api/decide', { pair, decision, fields, keys })
 export const uploadImportFile = (filename: string, content: string) => post('/api/upload', { filename, content })

@@ -6,7 +6,8 @@ import { searchScore } from './search'
 export type CategoryFilter = Record<Category, boolean>
 export type SortMode = 'name' | 'distance'
 
-export const DEFAULT_FILTER: CategoryFilter = { both: true, usc: true, wellpass: true }
+/** Standard: nur Studios, die beide Anbieter akzeptieren */
+export const DEFAULT_FILTER: CategoryFilter = { both: true, usc: false, wellpass: false }
 
 export function filterStudios<T extends Studio>(studios: T[], filter: CategoryFilter, query: string): T[] {
   return studios.filter((s) => filter[categoryOf(s)] && searchScore(s, query) > 0)

@@ -175,15 +175,20 @@ def _apply_overrides(studio: dict[str, Any], fields: dict[str, Any] | None) -> N
             elif field == "website":
                 studio["website"] = value
             continue
-        if choice not in FIELD_PROVIDERS or choice not in det:
+        members = {d["key"]: d for d in det.values()} | {m["detail"]["key"]: m["detail"] for m in studio.get("extraMembers", [])}
+        if choice in FIELD_PROVIDERS and choice in det:
+            src = det[choice]
+        elif choice in members:
+            src = members[choice]
+        else:
             continue
-        src = det[choice]
+        prov = choice if choice in FIELD_PROVIDERS else choice.split(":", 1)[0]
         if field == "name":
             studio["name"] = src["name"]
         elif field == "address":
             studio["address"] = dict(src["address"])
         elif field == "coordinates" and src.get("coordinates"):
-            studio["coordinates"] = {**src["coordinates"], "from": choice}
+            studio["coordinates"] = {**src["coordinates"], "from": prov}
         elif field == "website":
             studio["website"] = src.get("website")
     studio["fieldChoices"] = fields
@@ -205,13 +210,18 @@ def _build_studio(records: list[SourceRecord], confidence: str, match: dict | No
     providers = {"urbanSportsClub": False, "wellpass": False}
     source: dict[str, str | None] = {"urbanSportsClub": None, "wellpass": None}
     details: dict[str, Any] = {}
-    for r in records:
+    extra: list[dict[str, Any]] = []
+    for r in records:  # Reihenfolge der Gruppe bleibt erhalten
         providers[r.provider] = True
+        if r.provider in details:
+            extra.append({"provider": r.provider, "detail": _provider_detail(r)})
+            continue
         source[r.provider] = r.source
         details[r.provider] = _provider_detail(r)
     fetched = sorted(r.fetchedAt for r in records if r.fetchedAt)
     categories = sorted({c for r in records for c in r.categories})
-    activities = sorted({a["name"] for d in details.values() for a in d.get("activities") or []})
+    all_details = list(details.values()) + [m["detail"] for m in extra]
+    activities = sorted({a["name"] for d in all_details for a in d.get("activities") or []})
     return {
         "id": _studio_id(p),
         "name": p.name,
@@ -233,6 +243,7 @@ def _build_studio(records: list[SourceRecord], confidence: str, match: dict | No
         ),
         "providers": providers,
         "providerDetails": details,
+        **({"extraMembers": extra} if extra else {}),
         "website": first("website"),
         "phone": first("phone"),
         "categories": categories,
@@ -247,8 +258,23 @@ def _build_studio(records: list[SourceRecord], confidence: str, match: dict | No
 def merge(records: list[SourceRecord], decisions: list[dict] | None = None) -> dict[str, Any]:
     usc = [r for r in records if r.provider == "urbanSportsClub"]
     wp = [r for r in records if r.provider == "wellpass"]
-    decided = {d["pair"]: d for d in (decisions or []) if d.get("pair") and d.get("decision") in ("confirm", "reject")}
     by_key = {r.key: r for r in records}
+    # Entscheidungen betreffen Gruppen von Einträgen (beliebig viele, auch vom
+    # selben Anbieter). Spätere Entscheidungen überschreiben frühere.
+    valid = [d for d in (decisions or []) if d.get("pair") and d.get("decision") in ("confirm", "reject")]
+    groups: list[tuple[list[str], dict]] = []
+    decided: dict[str, dict] = {}  # USC~Wellpass-Paare, die der Automatik entzogen sind
+    for d in valid:
+        keys = d.get("keys") or d["pair"].split("~")
+        for uk in (k for k in keys if k.startswith("urbanSportsClub:")):
+            for wk in (k for k in keys if k.startswith("wellpass:")):
+                decided[f"{uk}~{wk}"] = d
+        if d["decision"] == "confirm":
+            ks = set(keys)
+            groups = [(g, gd) for g, gd in groups if not set(g) <= ks]  # umfassendere Gruppe ersetzt
+            groups.append((keys, d))
+        else:
+            groups = [(g, gd) for g, gd in groups if not (len(set(g) & set(keys)) >= 2)]
 
     # Grobe räumliche Vorauswahl über ein ~500-m-Raster
     def cell(r: SourceRecord) -> tuple[int, int] | None:
@@ -289,19 +315,19 @@ def merge(records: list[SourceRecord], decisions: list[dict] | None = None) -> d
     used: set[str] = set()
     merged_groups: list[tuple[list[SourceRecord], str, dict]] = []
 
-    # 1) Manuell bestätigte Paare haben Vorrang
-    for pid, d in decided.items():
-        if d["decision"] != "confirm":
-            continue
-        uk, wk = pid.split("~", 1)
-        u, w = by_key.get(uk), by_key.get(wk)
-        if not u or not w or uk in used or wk in used:
-            continue  # Datensatz nicht mehr in den Quellen → Entscheidung ruht
-        used.update((uk, wk))
-        res = compare(u, w)
-        merged_groups.append(([u, w], "verified", {
-            "method": "manual", "score": res.score, "reasons": res.reasons,
-            "decidedAt": d.get("decidedAt"), "distanceM": round(res.distance_m) if res.distance_m is not None else None,
+    # 1) Manuell bestätigte Gruppen haben Vorrang
+    for keys, d in groups:
+        recs = [by_key[k] for k in keys if k in by_key and k not in used]
+        if len(recs) < 2:
+            continue  # Einträge nicht (mehr) in den Quellen → Entscheidung ruht
+        used.update(r.key for r in recs)
+        u = next((r for r in recs if r.provider == "urbanSportsClub"), None)
+        w = next((r for r in recs if r.provider == "wellpass"), None)
+        res = compare(u, w) if u and w else None
+        merged_groups.append((recs, "verified", {
+            "method": "manual", "score": res.score if res else 1.0, "reasons": res.reasons if res else ["Manuell zusammengeführt"],
+            "decidedAt": d.get("decidedAt"),
+            "distanceM": round(res.distance_m) if res and res.distance_m is not None else None,
             "fields": d.get("fields"),
         }))
 

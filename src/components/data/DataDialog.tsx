@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { usePersistentState } from '@/hooks/usePersistentState'
+import { loadSetting, saveSetting } from '@/lib/storage'
 import { Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -14,6 +16,8 @@ import { SyncPanel } from './SyncPanel'
 import type { SyncConfig } from '@/lib/sync'
 
 interface Props {
+  open: boolean
+  onOpenChange: (o: boolean) => void
   dataset: Dataset | null
   api: ApiStatus
   onDataChanged: () => void
@@ -36,8 +40,23 @@ function fmt(iso?: string) {
 
 export function DataDialog(props: Props) {
   const { dataset, api, onDataChanged, decisions, onImportDecisions, onMergeCandidate, onRejectCandidate, onShowStudio } = props
-  const [open, setOpen] = useState(false)
+  const { open, onOpenChange: setOpen } = props
   const [status, setStatus] = useState<ApiStatus>(api)
+  // Zuletzt geöffneten Tab und Scrollposition je Tab merken
+  const [tab, setTab] = usePersistentState<string>('settingsTab', 'hints')
+  const scrollRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!open) return
+    const pos = loadSetting<Record<string, number>>('settingsScroll', {})[tab] ?? 0
+    // nach dem Rendern der Inhalte wiederherstellen
+    const id = requestAnimationFrame(() => requestAnimationFrame(() => scrollRef.current?.scrollTo({ top: pos })))
+    return () => cancelAnimationFrame(id)
+  }, [open, tab])
+  const onScroll = () => {
+    const el = scrollRef.current
+    if (!el) return
+    saveSetting('settingsScroll', { ...loadSetting<Record<string, number>>('settingsScroll', {}), [tab]: Math.round(el.scrollTop) })
+  }
   const pending = dataset?.matchCandidates.length ?? 0
 
   useEffect(() => {
@@ -49,7 +68,7 @@ export function DataDialog(props: Props) {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="relative" aria-label="Einstellungen und Info">
           <Settings /> <span className="hidden sm:inline">Einstellungen</span>
-          {props.syncStatus.state === 'error' && <span className="absolute -top-1 -right-1 size-2.5 rounded-full bg-red-500" aria-label="Sync-Fehler" />}
+          {props.syncStatus.state === 'error' && props.syncConfig.token && <span className="absolute -top-1 -right-1 size-2.5 rounded-full bg-red-500" aria-label="Sync-Fehler" />}
         </Button>
       </DialogTrigger>
       <DialogContent className="flex max-h-[90dvh] flex-col gap-3 sm:max-w-xl">
@@ -57,14 +76,14 @@ export function DataDialog(props: Props) {
           <DialogTitle>Einstellungen & Info</DialogTitle>
           <DialogDescription className="sr-only">Hinweise, Synchronisation, Zuordnungen und Datenbestand.</DialogDescription>
         </DialogHeader>
-        <Tabs defaultValue={status.staging ? 'data' : 'hints'} className="min-h-0 flex-1">
+        <Tabs value={tab} onValueChange={setTab} className="min-h-0 flex-1">
           <TabsList className="w-full">
             <TabsTrigger value="hints">Info</TabsTrigger>
             <TabsTrigger value="sync">Sync</TabsTrigger>
             <TabsTrigger value="matches">Zuordn.{pending ? ` (${pending})` : ''}</TabsTrigger>
             <TabsTrigger value="data">Daten</TabsTrigger>
           </TabsList>
-          <div className="min-h-0 overflow-y-auto pt-2">
+          <div ref={scrollRef} onScroll={onScroll} className="min-h-0 overflow-y-auto pt-2">
             <TabsContent value="hints">
               <InfoPanel dataset={dataset} />
             </TabsContent>

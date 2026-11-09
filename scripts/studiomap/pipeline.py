@@ -254,16 +254,29 @@ def cmd_rebuild() -> int:
     return 0
 
 
-def cmd_decide(pair: str, decision: str, fields: str | None = None) -> int:
+def cmd_decide(pair: str, decision: str, fields: str | None = None, keys: str | None = None) -> int:
     if decision not in ("confirm", "reject", "reset"):
         emit("error", f"Ungültige Entscheidung: {decision}")
         return 1
     if "~" not in pair:
         emit("error", f"Ungültige Paar-ID: {pair}")
         return 1
-    decisions = [d for d in read_json(paths.DECISIONS, []) if d.get("pair") != pair]
+    key_list = pair.split("~")
+    if keys:
+        try:
+            key_list = [k for k in json.loads(keys) if isinstance(k, str)]
+        except json.JSONDecodeError as e:
+            emit("error", f"--keys ist kein gültiges JSON: {e}")
+            return 1
+    ks = set(key_list)
+    decisions = [
+        d for d in read_json(paths.DECISIONS, [])
+        if d.get("pair") != pair and not (decision == "confirm" and set(d.get("keys") or d.get("pair", "").split("~")) <= ks)
+    ]
     if decision != "reset":
         entry: dict[str, Any] = {"pair": pair, "decision": decision, "decidedAt": now_iso()}
+        if keys:
+            entry["keys"] = key_list
         if fields:
             try:
                 parsed = json.loads(fields)

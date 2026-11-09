@@ -19,7 +19,7 @@ import { usePersistentState } from '@/hooks/usePersistentState'
 import { DEFAULT_FILTER, countByCategory, filterStudios, searchStudios, sortStudios, type CategoryFilter, type SortMode } from '@/lib/filter'
 import { BERLIN_CENTER, distanceM, type LatLng } from '@/lib/geo'
 import { decideMatch, getStatus, type ApiStatus } from '@/lib/importApi'
-import { applyDecisions, loadDecisions, pairOf, saveDecisions, upsertDecision, type Decision } from '@/lib/merges'
+import { applyDecisions, decisionFor, loadDecisions, memberKey, membersOf, saveDecisions, upsertDecision, type Decision } from '@/lib/merges'
 import { DEFAULT_USC_PLAN, activityCounts, applyView, planLabel, type UscPlan, type ViewStudio } from '@/lib/plans'
 import { SyncNotSetUp, loadSyncConfig, saveSyncConfig, syncNow, type SyncConfig } from '@/lib/sync'
 import { cn } from '@/lib/utils'
@@ -31,7 +31,7 @@ export default function App() {
   const { dataset: rawDataset, error, loading, reload } = useDataset()
   const isDesktop = useMediaQuery('(min-width: 768px)')
 
-  const [filter, setFilter] = usePersistentState<CategoryFilter>('filter', DEFAULT_FILTER)
+  const [filter, setFilter] = usePersistentState<CategoryFilter>('filter-v2', DEFAULT_FILTER)
   const [plan, setPlan] = usePersistentState<UscPlan>('uscPlan', DEFAULT_USC_PLAN)
   const [showPlus, setShowPlus] = usePersistentState<boolean>('showPlus', false)
   const [activities, setActivities] = usePersistentState<string[]>('activities', [])
@@ -48,7 +48,8 @@ export default function App() {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [anchorId, setAnchorId] = useState<string | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
-  const [mergeFor, setMergeFor] = useState<{ baseId: string; partnerId?: string } | null>(null)
+  const [mergeFor, setMergeFor] = useState<{ baseId: string; partnerIds?: string[]; editOnly?: boolean; fromSettings?: boolean } | null>(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const [focus, setFocus] = useState<FocusRequest | null>(null)
   const [fit, setFit] = useState<FitRequest | null>(null)
@@ -174,7 +175,7 @@ export default function App() {
         return next
       })
       if (api.available) {
-        decideMatch(d.pair, d.decision, d.fields).catch((e: Error) => setMessage(`Nur im Browser gespeichert: ${e.message}`))
+        decideMatch(d.pair, d.decision, d.fields, d.keys).catch((e: Error) => setMessage(`Nur im Browser gespeichert: ${e.message}`))
       }
     },
     [api.available],
@@ -220,26 +221,34 @@ export default function App() {
     return () => window.clearTimeout(t)
   }, [decisions, syncConfig.token, runSync])
 
+  const closeMerge = useCallback(() => {
+    if (mergeFor?.fromSettings) setSettingsOpen(true)
+    setMergeFor(null)
+  }, [mergeFor])
+
   const confirmMerge = useCallback(
-    (usc: Studio, wp: Studio, fields: FieldChoices) => {
-      addDecision({ pair: pairOf(usc, wp), decision: 'confirm', fields, decidedAt: new Date().toISOString() })
-      setMergeFor(null)
-      // Das neue Studio übernimmt die ID des USC-Studios
-      setActiveId(usc.id)
-      setAnchorId(usc.id)
+    (keys: string[], fields: FieldChoices) => {
+      const baseId = mergeFor?.baseId
+      addDecision(decisionFor(keys, 'confirm', fields))
+      closeMerge()
+      // Das zusammengeführte Studio behält die ID des Ausgangsstudios
+      if (baseId) {
+        setActiveId(baseId)
+        setAnchorId(baseId)
+      }
       setMessage(
-        'Zusammengeführt.' +
+        `${keys.length} Einträge zusammengeführt.` +
           (syncConfig.token ? ' Wird mit GitHub synchronisiert.' : ' Nur auf diesem Gerät gespeichert – für andere Geräte: Einstellungen → Sync.'),
       )
     },
-    [addDecision, syncConfig.token],
+    [addDecision, closeMerge, mergeFor, syncConfig.token],
   )
 
   const unmerge = useCallback(
     (s: Studio) => {
-      addDecision({ pair: pairOf(s, s), decision: 'reject', decidedAt: new Date().toISOString() })
+      addDecision(decisionFor(membersOf(s).map(memberKey), 'reject'))
       setDetailOpen(false)
-      setMessage('Getrennt – beide erscheinen wieder einzeln.')
+      setMessage('Getrennt – die Einträge erscheinen wieder einzeln.')
     },
     [addDecision],
   )
@@ -275,7 +284,7 @@ export default function App() {
       candidates={selectedCandidates}
       userLocation={userLocation}
       onClose={() => setDetailOpen(false)}
-      onMerge={(partnerId) => setMergeFor({ baseId: activeFull.id, partnerId })}
+      onMerge={(o) => setMergeFor({ baseId: activeFull.id, ...o })}
       onUnmerge={() => unmerge(activeFull)}
       onRejectCandidate={rejectPair}
       onShowStudio={showStudio}
@@ -311,7 +320,13 @@ export default function App() {
               onSyncConfigChange={setSyncConfig}
               onSync={runSync}
               syncStatus={syncStatus}
-              onMergeCandidate={(c) => c.urbanSportsClub.studioId && setMergeFor({ baseId: c.urbanSportsClub.studioId, partnerId: c.wellpass.studioId ?? undefined })}
+              open={settingsOpen}
+              onOpenChange={setSettingsOpen}
+              onMergeCandidate={(c) => {
+                if (!c.urbanSportsClub.studioId) return
+                setSettingsOpen(false)
+                setMergeFor({ baseId: c.urbanSportsClub.studioId, partnerIds: c.wellpass.studioId ? [c.wellpass.studioId] : undefined, fromSettings: true })
+              }}
               onRejectCandidate={rejectPair}
               onShowStudio={showStudio}
             />
@@ -391,10 +406,8 @@ export default function App() {
                 <PreviewCarousel
                   items={nearby}
                   activeId={active!.id}
-                  onActiveChange={(id) => {
-                    setActiveId(id)
-                    setFocus({ id, nonce: Date.now() })
-                  }}
+                  onActiveChange={(id) => setActiveId(id)}
+                  onZoom={(id) => setFocus({ id, nonce: Date.now() })}
                   onOpen={() => setDetailOpen(true)}
                   onClose={closeAll}
                   userLocation={userLocation}
@@ -429,9 +442,10 @@ export default function App() {
         <MergeDialog
           base={allById.get(mergeFor.baseId)!}
           all={allStudios}
-          initialPartnerId={mergeFor.partnerId}
+          initialPartnerIds={mergeFor.partnerIds}
+          editOnly={mergeFor.editOnly}
           onConfirm={confirmMerge}
-          onClose={() => setMergeFor(null)}
+          onClose={closeMerge}
         />
       )}
     </div>

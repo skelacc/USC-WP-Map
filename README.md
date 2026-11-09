@@ -18,22 +18,22 @@ Farbe **und** Form unterscheiden die Kategorien, damit sie auch bei Farbsehschw�
 
 **Karte (Verhalten wie in der Urban-Sports-Club-App):**
 - **Cluster antippen:** Die Karte zoomt auf die Studios im Cluster. Liegen mehrere Angebote an derselben Adresse, fächern sie sich auf.
-- **Pin antippen:** Der Pin wird markiert, unten erscheint eine **Vorschaukarte** mit Name, Anbietern, Bewertung, Entfernung, Adresse und den ersten Aktivitäten (gewählte Aktivitäten fett). **Seitlich wischen** wechselt zu den nächstgelegenen Studios, die Karte folgt.
+- **Pin antippen:** Der Pin wird markiert, unten erscheint eine **Vorschaukarte** mit Name, Anbietern, Bewertung, Entfernung, Adresse und den ersten Aktivitäten (gewählte Aktivitäten fett). **Seitlich wischen** wechselt zu den nächstgelegenen Studios. Ausschnitt und Zoom bleiben dabei gleich; die Karte verschiebt sich nur, wenn das Studio außerhalb des sichtbaren Bereichs liegt. **„Heranzoomen“** zoomt bei Bedarf auf das Studio.
 - **Vorschaukarte antippen:** Die **Details** öffnen sich (mobil als großes Sheet, am Desktop links).
 - **Freie Karte antippen:** Die Auswahl schließt sich.
 - Am Desktop zeigt das Überfahren eines Pins den Namen.
 
 **Filterleiste** (mobil seitlich wischbar, Einstellungen werden gespeichert):
 - **USC-Stufe** (Standard **M / Classic**): Studios und Aktivitäten, die bei USC erst in höheren Stufen enthalten sind, zählen nicht als USC.
-- **Aktivität** (z. B. Massage, Mehrfachauswahl): Zeigt nur Studios, in denen die Aktivität **mit deiner Stufe buchbar** ist. Grundlage sind die Kategorie-Limits je Stufe von der USC-Studioseite. Beispiel: Massage in einem Yoga-Studio, das M-Mitglieder nutzen dürfen, ist oft erst ab L buchbar. Bei Wellpass zählt, ob die Aktivität angeboten wird.
+- **Aktivität** (z. B. Massage, Mehrfachauswahl): Zeigt nur Studios, in denen die Aktivität **mit deiner Stufe buchbar** ist (USC: Kategorie-Limits je Stufe von der Studioseite; Wellpass: angeboten). Bei Studios beider Anbieter zählen die Aktivitäten **beider** Anbieter, das Studio bleibt grün.
 - **Plus** (Standard **aus**): USC-Plus-Angebote (nur mit Plus-Check-in) sind ausgeblendet. Eingeschaltet erscheinen sie wieder.
-- **Beide / Nur USC / Nur Wellpass**: Auswahl der Anbieter-Kategorien (Doppelklick: nur diese).
+- **Beide / Nur USC / Nur Wellpass**: Auswahl der Anbieter-Kategorien. **Standard: nur „Beide“.** Doppelklick zeigt nur diese Kategorie.
 
 **Details:** Bei zusammengeführten Studios gibt es Tabs **Übersicht | USC | Wellpass** mit allen Angaben je Anbieter: Name dort, Adresse, Website, Telefon, Bewertung, Plus-Kennzeichen, **Besuche pro Monat je Stufe (S/M/L/XL)** und **Aktivitäten mit Verfügbarkeit in deiner Stufe** (z. B. „M: 4× / Monat“, „erst ab L“).
 
 **Zusammenführen:**
 - **„Ähnlich wie …“-Hinweis:** In den Details direkt „Zusammenführen…“ oder „Verschieden“ wählen.
-- **Beliebiges Studio:** „Mit einem Wellpass-/USC-Studio zusammenführen…“ zeigt die Studios des anderen Anbieters in der Nähe (mit Suche).
+- **Beliebig viele Einträge:** Mit „Mit anderen Einträgen zusammenführen…“ bzw. „Weitere hinzufügen“ wählst du mehrere Einträge in der Nähe aus (mit Suche), **auch vom selben Anbieter**. Ein Beispiel ist eine Einrichtung, die bei USC mit je einem Eintrag für Tanzen, Fitness usw. gelistet ist. Die Details zeigen dann je Eintrag einen Tab („USC 1“, „USC 2“, „Wellpass“) und in der Übersicht alle Aktivitäten aller Anbieter.
 - **Angaben wählen:** Im Dialog legst du fest, welcher **Name** (USC, Wellpass oder eigener), welche **Adresse**, welche **Position** und welche **Website** gelten.
 - **Ändern und trennen:** Zusammengeführte Studios lassen sich über „Angaben ändern“ anpassen oder über „Trennen“ wieder aufteilen. Das geht auch bei automatischen Zuordnungen.
 - **Speicherort und Sync zwischen Geräten:** Entscheidungen liegen zunächst im Browser des Geräts. Unter **Einstellungen → Sync** gibt es zwei Wege:
@@ -41,7 +41,7 @@ Farbe **und** Form unterscheiden die Kategorien, damit sie auch bei Farbsehschw�
   - **Per Datei:** Auf einem Gerät exportieren, auf dem anderen importieren (wird zusammengeführt, nichts geht verloren).
   - Unter `npm run dev` landen Entscheidungen zusätzlich in `data/manual/match_decisions.json`.
 
-**Einstellungen & Info** (Zahnrad oben rechts):
+**Einstellungen & Info** (Zahnrad oben rechts; der zuletzt geöffnete Tab und die Scrollposition werden gemerkt, nach einem Zusammenführen aus den Einstellungen öffnen sie sich wieder):
 - **Info:** wichtige Hinweise zur Aussagekraft der Daten (Wellpass unvollständig, USC-Limits gelten für Privatmitgliedschaften, Plus, Lücken) und Datenstand.
 - **Sync:** wie oben beschrieben.
 - **Zuordnungen:** offene Vorschläge.
@@ -70,6 +70,24 @@ Die Studiodaten liegen bereits in `public/data/studios.json`, die App ist also s
 
 - **Auf dem Smartphone im WLAN:** `npm run dev` zeigt zusätzlich eine Netzwerk-Adresse an (z. B. `http://192.168.x.x:5173`). Browser erlauben die Standortbestimmung nur über HTTPS oder `localhost`. Über die LAN-Adresse sortiert die Liste deshalb nach Entfernung zur Kartenmitte.
 - **Statischer Build (ohne Node-Server):** `npm run build` erzeugt `dist/`, das sich mit jedem statischen Webserver ausliefern lässt (z. B. `npx vite preview` oder `python3 -m http.server -d dist`). Im statischen Build gibt es keine Aktualisierung per Knopfdruck. Die App zeigt dann die passenden Kommandozeilenbefehle an.
+
+## Alle Wellpass-Standorte holen (einmalig, am PC)
+
+Standardmäßig stammen die Wellpass-Studios aus der Drittquelle Fair for Fitness (unvollständig). Der vollständige Abgleich mit dem offiziellen Wellpass-Gym-Finder läuft auf deinem PC (aus der Cloud-Umgebung war er nicht möglich):
+
+```bash
+git clone https://github.com/skelacc/USC-WP-Map.git && cd USC-WP-Map   # bzw. git pull
+cd scripts
+python3 -m studiomap fetch --sources wellpass --wellpass-official   # Windows: python statt python3
+python3 -m studiomap apply
+cd ..
+git add data public && git commit -m "Wellpass: offizieller Gym-Finder" && git push
+```
+
+- Nötig ist nur Python ≥ 3.10, weder Node noch Pakete.
+- `fetch` zeigt am Ende, wie viele Studios neu sind.
+- GitHub Pages baut die Seite nach dem Push automatisch neu.
+- **Vorher erledigen, bevor du viel zusammenführst:** Die Wellpass-Einträge bekommen neue IDs. Frühere Zusammenführungen mit Wellpass-Einträgen aus Fair for Fitness finden ihre Einträge dann nicht mehr und müssen neu gemacht werden. Zusammenführungen nur zwischen USC-Einträgen bleiben erhalten.
 
 ## Online stellen (GitHub Pages)
 
