@@ -31,3 +31,5 @@ __pycache__/
 data/staging/
 data/backups/
 data/manual/import/.upload-*
+# Browser-Exporte des Wellpass-Gym-Finders (HAR enthält Cookies/Tracking-IDs)
+data/WP-network/
