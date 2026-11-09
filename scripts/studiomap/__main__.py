@@ -37,9 +37,10 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--max-age-days", type=int, default=30)
     e.add_argument("--limit", type=int, default=None)
 
-    w = sub.add_parser("enrich-wellpass", help="Adressen für Wellpass-Studios ohne Adresse per OpenStreetMap ermitteln")
-    w.add_argument("--all", action="store_true", help="ganz Deutschland statt nur Großraum Berlin (~16.000 Anfragen, ca. 5 Std.)")
-    w.add_argument("--limit", type=int, default=None)
+    for cmd in ("enrich-addresses", "enrich-wellpass"):  # enrich-wellpass: früherer Name
+        w = sub.add_parser(cmd, help="fehlende Straße/PLZ/Bezirk per OpenStreetMap aus der Position ergänzen")
+        w.add_argument("--all", action="store_true", help="ganz Deutschland statt nur Großraum Berlin (~16.000 Anfragen, ca. 5 Std.)")
+        w.add_argument("--limit", type=int, default=None)
 
     v = sub.add_parser("validate", help="Importdatei (CSV/JSON) prüfen, ohne etwas zu ändern")
     v.add_argument("file")
@@ -47,8 +48,8 @@ def main(argv: list[str] | None = None) -> int:
     args = p.parse_args(argv)
     if args.cmd == "enrich-usc":
         return pipeline.cmd_enrich_usc(args.max_age_days, args.limit)
-    if args.cmd == "enrich-wellpass":
-        return pipeline.cmd_enrich_wellpass(args.all, args.limit)
+    if args.cmd in ("enrich-addresses", "enrich-wellpass"):
+        return pipeline.cmd_enrich_addresses(args.all, args.limit)
     if args.cmd == "validate":
         return pipeline.cmd_validate(args.file)
     if args.cmd == "fetch":

@@ -282,12 +282,23 @@ class OfficialWellpassMergeTests(unittest.TestCase):
         self.assertEqual(far["street"], "Kissinger Straße")  # ohne Hausnummer
         self.assertIsNone(addresses.parse_reverse({"error": "Unable to geocode"}, 0, 0))
         ds = merge([self.off("1", "MO.VE Berlin", 52.462781, 13.340874), usc_rec("9", "Anderes", "Weg 1", 52.5, 13.4)])
-        cache = {"1": {**hit, "lat": 52.462781, "lng": 13.340874}}
+        cache = {"wellpass:official:1": {**hit, "lat": 52.462781, "lng": 13.340874}}
         self.assertEqual(addresses.apply_addresses(ds, cache), 1)
         s = next(x for x in ds["studios"] if x["name"] == "MO.VE Berlin")
         self.assertEqual((s["address"]["street"], s["address"]["approximate"]), ("Kissinger Straße 9", True))
         moved = merge([self.off("1", "MO.VE Berlin", 52.47, 13.34)])
         self.assertEqual(addresses.apply_addresses(moved, cache), 0)  # Position geändert → nicht übernehmen
+
+    def test_fill_only_missing_fields_for_usc(self):
+        u = usc_rec("9", "Studio X", "Kissinger Str. 9", 52.462781, 13.340874)  # ohne PLZ und Bezirk
+        ds = merge([u])
+        cache = {u.key: {"street": "Kissinger Straße 11", "postalCode": "12157", "district": "Steglitz-Zehlendorf",
+                         "city": "Berlin", "lat": 52.462781, "lng": 13.340874}}
+        self.assertEqual(addresses.missing_fields(ds["studios"][0]["address"]), ["postalCode", "district"])
+        self.assertEqual(addresses.apply_addresses(ds, cache), 1)
+        a = ds["studios"][0]["address"]
+        self.assertEqual((a["street"], a["postalCode"], a["district"], a.get("approximate")), ("Kissinger Str. 9", "12157", "Steglitz-Zehlendorf", None))
+        self.assertEqual(addresses.load_cache(Path("/nonexistent")), {})
 
     def test_osm_address_only_counts_when_equal(self):
         u = usc_rec("9", "Yogic Escape Yoga & Wellness Studio", "Kissinger Str. 9", 52.4628, 13.3409)

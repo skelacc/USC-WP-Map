@@ -34,7 +34,7 @@ from typing import Any
 from . import SCHEMA_VERSION
 from .io import now_iso
 from .normalize import (address_key, branch_hint, haversine_m, name_similarity,
-                        split_street)
+                        same_address, split_street)
 from .records import SourceRecord
 
 MAX_CANDIDATE_DISTANCE_M = 250
@@ -59,7 +59,7 @@ def compare(u: SourceRecord, w: SourceRecord) -> MatchResult:
 
     ku, kw = address_key(u.street, u.postalCode), address_key(w.street, w.postalCode)
     if ku and kw:
-        if ku == kw and not (u.postalCode and w.postalCode and u.postalCode != w.postalCode):
+        if (ku == kw or same_address(u.street, w.street)) and not (u.postalCode and w.postalCode and u.postalCode != w.postalCode):
             addr = "exact"
             reasons.append(f"Adresse identisch ({u.street} ≙ {w.street})")
         else:
@@ -71,7 +71,7 @@ def compare(u: SourceRecord, w: SourceRecord) -> MatchResult:
     elif ku and (kosm := address_key(w.extra.get("osmStreet"))):
         # Wellpass-Adresse nur aus der Position ermittelt (OSM, ungefähr): Übereinstimmung
         # zählt als Beleg, Abweichung zählt nicht dagegen (Nachbarhausnummer, Eckhaus …)
-        if kosm == ku:
+        if kosm == ku or same_address(u.street, w.extra["osmStreet"]):
             addr = "exact"
             reasons.append(f"Adresse an der Wellpass-Position identisch ({u.street} ≙ {w.extra['osmStreet']}, OpenStreetMap)")
         else:

@@ -104,9 +104,11 @@ npm run data:apply
 - Den Ort liest der Import aus dem Slug ab (z. B. `kiel-…`), wenn er auch im Namen vorkommt.
 - **Frühere Zusammenführungen bleiben erhalten:** Fair-for-Fitness-Einträge werden über Name und Abstand ihren offiziellen Gegenstücken zugeordnet (`keyAliases` im Datenbestand). Entscheidungen mit alten Schlüsseln gelten so weiter, im Browser, per Sync und in `match_decisions.json`.
 - **Ohne neuen Export** (z. B. beim monatlichen Import in GitHub Actions) bleibt der offizielle Stand erhalten. Es wird **nicht** auf das unvollständigere Fair for Fitness zurückgefallen.
-- **Adressen ergänzen:** `npm run data:enrich-wellpass` fragt für reine Wellpass-Studios ohne Adresse im Großraum Berlin die nächstgelegene Adresse bei OpenStreetMap ab (Nominatim-Rückwärtssuche).
-  - Etwa 480 Anfragen, 1 pro Sekunde, ca. 9 Minuten. Der Zwischenspeicher `data/raw/wellpass_addresses.json` sorgt dafür, dass ein abgebrochener Lauf fortsetzt und spätere Läufe nur neue Studios abfragen.
-  - Die Adressen werden erst nach der Zusammenführung eingesetzt, verfälschen den Abgleich mit USC also nicht, und erscheinen als „ca. …“.
+- **Fehlende Angaben ergänzen:** `npm run data:enrich-addresses` arbeitet mit OpenStreetMap (Nominatim), 1 Anfrage pro Sekunde.
+  - Studios **ohne Koordinaten** bekommen eine Position aus ihrer Adresse. Die Suche ist strukturiert nach Straße und PLZ bzw. Ort, und ein Treffer zählt nur bei passender PLZ bzw. passendem Ort. Die Position gilt als ungefähr. Falsche Berlin-Angaben der Quelle werden dabei korrigiert (z. B. USC „Berlin, Mitte“ bei einem Studio in Rathenow).
+  - Studios im Großraum Berlin, bei denen **Straße, PLZ oder Bezirk fehlt**, bekommen diese Angaben aus ihrer Position (Rückwärtssuche), egal von welchem Anbieter. Ergänzt werden nur fehlende Felder. Eine so ergänzte Straße erscheint als „ca. …“.
+  - Zwischenspeicher: `data/raw/osm_addresses.json`. Ein abgebrochener Lauf setzt fort, spätere Läufe fragen nur neue Lücken ab.
+  - **Im Abgleich mit USC** zählt eine ermittelte Wellpass-Adresse nur als Beleg: Stimmt sie mit der USC-Adresse überein, auch bei Zusätzen wie „Bürgerhaus …, Straße 24–26“, spricht das für dasselbe Studio. Weicht sie ab, zählt das nicht dagegen. Weil in Sportanlagen und Schulen oft mehrere Anbieter im selben Haus sitzen, braucht es dann für eine automatische Zuordnung zusätzlich eine Namensähnlichkeit von mindestens 0,75, sonst wird es ein Vorschlag.
   - Mit `--all` läuft es für ganz Deutschland (~16.000 Anfragen, ca. 5 Stunden).
 - Der direkte Abruf per `--wellpass-official` funktioniert technisch weiter. Die robots.txt von locations.egym.com untersagt automatisierte Zugriffe, deshalb ist der Browser-Export der vorgesehene Weg.
 
@@ -160,7 +162,7 @@ npm run data:fetch -- --sources manual --geocode   # fehlende Koordinaten per No
 npm run data:apply                         # geprüften Stand veröffentlichen
 npm run data:discard                       # vorbereiteten Stand verwerfen
 npm run data:rebuild                       # offline neu zusammenführen (z. B. nach Änderungen am Algorithmus)
-npm run data:enrich-wellpass               # Adressen für Wellpass-Studios ohne Adresse (OSM, Großraum Berlin, ca. 9 Min.)
+npm run data:enrich-addresses              # fehlende Position/Straße/PLZ/Bezirk per OpenStreetMap ergänzen (Großraum Berlin)
 npm run data:enrich-usc                    # USC-Studioseiten laden: Plus, Limits je Stufe/Aktivität, PLZ, Bewertung
                                            # (~2.200 Seiten, ca. 1 Std.; Zwischenspeicher, setzt nach Abbruch fort,
                                            #  holt danach nur Einträge älter als 30 Tage) – anschließend data:rebuild
@@ -287,7 +289,7 @@ Außerdem im Browser geprüft (Playwright, Desktop und Pixel 7): Marker, Cluster
 
 ## Bekannte Einschränkungen
 
-- **Wellpass ohne Adressen:** Der Gym-Finder liefert keine Straße und PLZ. Adressen kommen von USC oder Fair for Fitness. Für die übrigen reinen Wellpass-Studios im Großraum Berlin ermittelt `npm run data:enrich-wellpass` die nächstgelegene Adresse aus der Position (siehe unten). Sie ist als „ca.“ gekennzeichnet. Außerhalb Berlins steht nur der Ort, die Route-Links nutzen die Koordinaten.
+- **Wellpass ohne Adressen:** Der Gym-Finder liefert keine Straße und PLZ. Adressen kommen von USC oder Fair for Fitness. Für die übrigen Studios im Großraum Berlin ermittelt `npm run data:enrich-addresses` die nächstgelegene Adresse aus der Position (siehe unten). Sie ist als „ca.“ gekennzeichnet. Außerhalb Berlins steht nur der Ort, die Route-Links nutzen die Koordinaten.
 - **Außerhalb Berlins kein USC:** Dort erscheint alles als „Nur Wellpass“. Der USC-Import lädt bisher nur Berlin (`city_id=1`).
 - **Wellpass-Aktualisierung ist Handarbeit:** Ein neuer Stand braucht einen neuen Browser-Export.
 - **USC hat keine dokumentierte API.** Ändert USC seine Website, schlägt der Import mit klarer Meldung fehl, und der bisherige Stand bleibt erhalten. Dann muss `sources/usc.py` angepasst werden.

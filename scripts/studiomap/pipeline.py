@@ -34,7 +34,7 @@ from .supplement import link_fair_for_fitness
 STAGING_RAW = paths.STAGING / "raw"
 USC_DETAILS = paths.RAW / "usc_details.json"
 WELLPASS_FFF = paths.RAW / "wellpass_fff.json"  # frühere Fair-for-Fitness-Daten: Adressen + alte Schlüssel
-WELLPASS_ADDRESSES = paths.RAW / "wellpass_addresses.json"  # Adressen per Rückwärtssuche (OSM), Zwischenspeicher
+OSM_ADDRESSES = paths.RAW / "osm_addresses.json"  # fehlende Adressangaben per Rückwärtssuche (OSM), Zwischenspeicher
 WELLPASS_EXPORTS = paths.DATA / "WP-network"  # Browser-Exporte des Gym-Finders (HAR/JSON, nicht versioniert)
 
 SOURCES: dict[str, dict[str, Any]] = {
@@ -164,21 +164,26 @@ def _fff_supplement() -> list[SourceRecord]:
     return [r for r in recs if r.source == wellpass_fff.SOURCE_THIRD_PARTY]
 
 
+def _attach_usc_details(records: list[SourceRecord]) -> None:
+    """USC-Detailangaben (Plus, Limits je Stufe/Aktivität, PLZ …) anhängen."""
+    details = read_json(USC_DETAILS, {}) or {}
+    for r in records:
+        if r.provider == "urbanSportsClub" and r.providerUrl:
+            det = details.get(r.providerUrl.rsplit("/", 1)[1])
+            if det:
+                r.extra["details"] = det
+
+
 def _published_dataset(records_by_source: dict[str, tuple[list[SourceRecord], dict]]) -> dict:
     all_records: list[SourceRecord] = []
     for recs, _ in records_by_source.values():
         all_records.extend(recs)
     official_wp = [r for r in all_records if r.provider == "wellpass" and r.source == "official"]
     aliases = link_fair_for_fitness(official_wp, _fff_supplement()) if official_wp else {}
-    # USC-Detailangaben (Plus, Limits je Stufe/Aktivität, PLZ …) anhängen
-    details = read_json(USC_DETAILS, {}) or {}
-    for r in all_records:
-        if r.provider == "urbanSportsClub" and r.providerUrl:
-            det = details.get(r.providerUrl.rsplit("/", 1)[1])
-            if det:
-                r.extra["details"] = det
+    _attach_usc_details(all_records)
     decisions = read_json(paths.DECISIONS, [])
-    osm = read_json(WELLPASS_ADDRESSES, {}) or {}
+    osm = addresses.load_cache(OSM_ADDRESSES)
+    addresses.apply_geocodes(all_records, osm)  # Positionen für Einträge ohne Koordinaten
     # ermittelte Adressen: im Abgleich nur als positiver Beleg, angezeigt erst danach
     addresses.annotate_records(all_records, osm)
     dataset = merge(all_records, decisions, aliases)
@@ -389,33 +394,45 @@ def cmd_validate(file: str) -> int:
 
 
 
-def cmd_enrich_wellpass(everywhere: bool = False, limit: int | None = None) -> int:
-    """Ermittelt Adressen für Wellpass-Studios ohne Adresse (Rückwärtssuche über
-    Nominatim/OpenStreetMap). Standard: nur Großraum Berlin. Danach automatisch rebuild."""
+def cmd_enrich_addresses(everywhere: bool = False, limit: int | None = None) -> int:
+    """Ergänzt fehlende Straße, PLZ und Bezirk per Rückwärtssuche (Nominatim/OpenStreetMap)
+    für alle Studios mit Koordinaten. Standard: Großraum Berlin. Danach automatisch rebuild."""
     _install_signal_handlers()
+    records_by_source = {name: _load_raw(paths.RAW / f"{name}.json") for name in SOURCES}
+    cache = addresses.load_cache(OSM_ADDRESSES)
+    client = PoliteClient(delay=1.1)
+    # 1. Einträge ohne Koordinaten: Position aus der Adresse
+    all_records = [r for recs, _ in records_by_source.values() for r in recs]
+    _attach_usc_details(all_records)
+    geo_errors = addresses.geocode_records(all_records, cache, client, lambda m: emit("progress", m),
+                                           lambda c: write_json_atomic(OSM_ADDRESSES, c))
+    # 2. Studios mit Lücken: Adresse aus der Position
     records_by_source = {name: _load_raw(paths.RAW / f"{name}.json") for name in SOURCES}
     dataset = _published_dataset(records_by_source)
     targets = []
     for s in dataset["studios"]:
-        d = s["providerDetails"].get("wellpass")
         c = s.get("coordinates")
-        if not d or d.get("source") != "official" or s["providers"].get("urbanSportsClub") or s["address"].get("street") or not c:
+        key = addresses.lookup_key(s)
+        if not c or not key or not addresses.missing_fields(s["address"]):
             continue
         if not everywhere and not publish.in_core(c["latitude"], c["longitude"]):
             continue
-        targets.append((d["sourceId"], c["latitude"], c["longitude"], s["name"]))
+        if key in cache and abs(cache[key]["lat"] - c["latitude"]) <= 1e-4 and abs(cache[key]["lng"] - c["longitude"]) <= 1e-4:
+            continue  # schon abgefragt (OSM kennt nicht mehr)
+        cache.pop(key, None)  # Position geändert → neu abfragen
+        targets.append((key, c["latitude"], c["longitude"], s["name"]))
     targets.sort(key=lambda t: t[3].lower())
     if limit:
         targets = targets[:limit]
-    cache = read_json(WELLPASS_ADDRESSES, {}) or {}
     try:
         cache, errors = addresses.fetch_addresses(
-            targets, cache, PoliteClient(delay=1.1), lambda m: emit("progress", m), should_stop,
-            lambda c: write_json_atomic(WELLPASS_ADDRESSES, c),
+            targets, cache, client, lambda m: emit("progress", m), should_stop,
+            lambda c: write_json_atomic(OSM_ADDRESSES, c),
         )
     except InterruptedError:
         emit("cancelled", "Abgebrochen – bisher gefundene Adressen sind gespeichert.")
         return 130
+    errors = geo_errors + errors
     for e in errors[:50]:
         emit("error", e)
     found = sum(1 for t in targets if (cache.get(t[0]) or {}).get("street"))

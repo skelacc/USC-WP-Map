@@ -17,7 +17,7 @@
     "data:decide": "cd scripts && python3 -m studiomap decide",
     "data:validate": "cd scripts && python3 -m studiomap validate",
     "data:enrich-usc": "cd scripts && python3 -m studiomap enrich-usc",
-    "data:enrich-wellpass": "cd scripts && python3 -m studiomap enrich-wellpass"
+    "data:enrich-addresses": "cd scripts && python3 -m studiomap enrich-addresses"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",

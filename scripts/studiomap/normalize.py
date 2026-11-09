@@ -63,6 +63,11 @@ def split_street(street: str | None) -> tuple[str, str]:
     ('Aufgang 2', '1. OG') werden ignoriert."""
     if not street:
         return "", ""
+    # Zusätze vor der eigentlichen Adresse („Bürgerhaus Südspitze, Marchwitzastraße 24“):
+    # das erste Komma-Segment nehmen, das Straße und Hausnummer enthält
+    if "," in street:
+        parts = [p.strip() for p in street.split(",")]
+        street = next((p for p in parts if re.search(r"[A-Za-zÄÖÜäöüß]{3}.*\d", p)), street)
     s = ascii_fold(street.lower())
     matches = [m for m in _NUMBER.finditer(s) if m.start() > 0 and not s[m.end():].startswith(".")]
     number = ""
@@ -80,6 +85,21 @@ def split_street(street: str | None) -> tuple[str, str]:
 def first_house_number(number: str) -> str:
     m = re.match(r"\d+", number or "")
     return m.group(0) if m else ""
+
+
+def house_numbers(number: str) -> set[int]:
+    """'24-26' → {24, 25, 26}, '45/46' → {45, 46}, '12a' → {12}."""
+    nums = [int(n) for n in re.findall(r"\d+", number or "")]
+    if len(nums) >= 2 and 0 <= nums[1] - nums[0] <= 20:
+        return set(range(nums[0], nums[1] + 1))
+    return set(nums[:1])
+
+
+def same_address(a: str | None, b: str | None) -> bool:
+    """Gleiche Straße und überlappende Hausnummern (Bereiche wie '24 - 26' eingeschlossen)."""
+    sa, na = split_street(a)
+    sb, nb = split_street(b)
+    return bool(sa and na and sa == sb and house_numbers(na) & house_numbers(nb))
 
 
 def address_key(street: str | None, postal_code: str | None = None) -> str:
