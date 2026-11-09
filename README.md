@@ -1,6 +1,6 @@
 # Studio Map Berlin
 
-Persönliche, lokal laufende Webanwendung, die Fitness- und Sportstudios in Berlin auf einer interaktiven Karte zeigt und die Partnerstandorte von **Urban Sports Club (USC)** und **EGYM Wellpass** zusammenführt. Auf einen Blick sieht man:
+Persönliche, lokal laufende Webanwendung, die Fitness- und Sportstudios in Berlin auf einer interaktiven Karte zeigt und die Partnerstandorte von **Urban Sports Club (USC)** und **EGYM Wellpass** zusammenführt. Außerhalb Berlins zeigt sie alle Wellpass-Partner in Deutschland (ohne USC). Auf einen Blick sieht man:
 
 | Kategorie | Marker |
 |---|---|
@@ -10,7 +10,10 @@ Persönliche, lokal laufende Webanwendung, die Fitness- und Sportstudios in Berl
 
 Farbe **und** Form unterscheiden die Kategorien, damit sie auch bei Farbsehschwäche erkennbar sind. Cluster zeigen die Anzahl und als Farbring die Anteile der drei Kategorien.
 
-**Datenstand im Repository:** 3. November 2026 (Standorte), 9. November 2026 (USC-Details). 2.314 Standorte (2.221 USC, 239 Wellpass, davon 146 bei beiden Anbietern). Für alle 2.221 USC-Studios liegen Plus-Kennzeichen (310 Plus-Studios), Besuchs- und Aktivitätslimits je Stufe, PLZ und Bewertung vor. Beispiel: Massage ist mit M in 32 Studios buchbar. Dazu kommen 20 unsichere Zuordnungsvorschläge, die auf eine manuelle Prüfung warten.
+**Datenstand im Repository:** USC-Standorte 3. November 2026, USC-Details und Wellpass 9. November 2026.
+- **Berlin:** 2.221 USC-Studios und 731 Wellpass-Studios, davon 343 bei beiden Anbietern. Für alle USC-Studios liegen Plus-Kennzeichen (310 Plus-Studios), Besuchs- und Aktivitätslimits je Stufe, PLZ und Bewertung vor. Beispiel: Massage ist mit M in 32 Studios buchbar.
+- **Ganz Deutschland:** 17.175 Wellpass-Studios aus dem offiziellen Gym-Finder.
+- **Zuordnungen:** 170 unsichere Vorschläge warten auf eine manuelle Prüfung.
 
 ---
 
@@ -27,7 +30,13 @@ Farbe **und** Form unterscheiden die Kategorien, damit sie auch bei Farbsehschw�
 - **USC-Stufe** (Standard **M / Classic**): Studios und Aktivitäten, die bei USC erst in höheren Stufen enthalten sind, zählen nicht als USC.
 - **Aktivität** (z. B. Massage, Mehrfachauswahl): Zeigt nur Studios, in denen die Aktivität **mit deiner Stufe buchbar** ist (USC: Kategorie-Limits je Stufe von der Studioseite; Wellpass: angeboten). Bei Studios beider Anbieter zählen die Aktivitäten **beider** Anbieter, das Studio bleibt grün.
 - **Plus** (Standard **aus**): USC-Plus-Angebote (nur mit Plus-Check-in) sind ausgeblendet. Eingeschaltet erscheinen sie wieder.
-- **Beide / Nur USC / Nur Wellpass**: Auswahl der Anbieter-Kategorien. **Standard: nur „Beide“.** Doppelklick zeigt nur diese Kategorie.
+- **Beide / Nur USC / Nur Wellpass**: Auswahl der Anbieter-Kategorien. **Standard: nur „Beide“.** Doppelklick zeigt nur diese Kategorie. Außerhalb Berlins gibt es nur Wellpass-Daten. Die App weist darauf hin und blendet „Nur Wellpass“ auf Knopfdruck ein.
+
+**Kartenausschnitt oder alle** (Umschalter oben in der Liste, wird gespeichert):
+- **Ausschnitt** (Standard): Liste, Zähler in den Filtern und Aktivitätszahlen beziehen sich auf den sichtbaren Kartenausschnitt. Die Suche läuft über alles Geladene. Liegen Treffer außerhalb, nennt die Liste deren Anzahl und bietet „Hinzoomen“ oder „Alle zeigen“ an.
+- **Alle**: Liste, Suche und Zähler über alle Studios in Deutschland. Dafür werden alle Wellpass-Daten geladen (ca. 0,6 MB). Beim Tippen zoomt die Karte auf die Treffer.
+
+**Laden** (Einstellungen → Daten): Berlin mit allen Anbietern ist sofort da (ca. 350 KB). Wellpass außerhalb Berlins liegt in Kacheln von 1° × 1° und wird standardmäßig nur für den Kartenausschnitt nachgeladen. Wahlweise lädt die App beim Start gleich alles.
 
 **Details:** Bei zusammengeführten Studios gibt es Tabs **Übersicht | USC | Wellpass** mit allen Angaben je Anbieter: Name dort, Adresse, Website, Telefon, Bewertung, Plus-Kennzeichen, **Besuche pro Monat je Stufe (S/M/L/XL)** und **Aktivitäten mit Verfügbarkeit in deiner Stufe** (z. B. „M: 4× / Monat“, „erst ab L“).
 
@@ -71,23 +80,35 @@ Die Studiodaten liegen bereits in `public/data/studios.json`, die App ist also s
 - **Auf dem Smartphone im WLAN:** `npm run dev` zeigt zusätzlich eine Netzwerk-Adresse an (z. B. `http://192.168.x.x:5173`). Browser erlauben die Standortbestimmung nur über HTTPS oder `localhost`. Über die LAN-Adresse sortiert die Liste deshalb nach Entfernung zur Kartenmitte.
 - **Statischer Build (ohne Node-Server):** `npm run build` erzeugt `dist/`, das sich mit jedem statischen Webserver ausliefern lässt (z. B. `npx vite preview` oder `python3 -m http.server -d dist`). Im statischen Build gibt es keine Aktualisierung per Knopfdruck. Die App zeigt dann die passenden Kommandozeilenbefehle an.
 
-## Alle Wellpass-Standorte holen (einmalig, am PC)
+## Wellpass-Daten aus dem Gym-Finder (Export im Browser)
 
-Standardmäßig stammen die Wellpass-Studios aus der Drittquelle Fair for Fitness (unvollständig). Der vollständige Abgleich mit dem offiziellen Wellpass-Gym-Finder läuft auf deinem PC (aus der Cloud-Umgebung war er nicht möglich):
+Der Gym-Finder lädt beim Öffnen **alle** Wellpass-Partner (DE und AT, ca. 18.000) in einer einzigen Antwort. Diese speicherst du im eigenen Browser und legst sie in `data/WP-network/` ab. Der Ordner ist nicht versioniert, weil HAR-Dateien Cookies enthalten können.
+
+1. [Gym-Finder](https://de.egym-wellpass.com/de-de/gym-finder) öffnen.
+2. Entwicklertools öffnen (F12), Reiter **Network**.
+3. Häkchen bei **Preserve log** und **Disable cache** setzen und den Filter auf **Fetch/XHR** stellen.
+4. Seite neu laden (Strg+R). Es erscheint ein Eintrag **`overview?searchFilter=wellpass&limit=20000`** (Host `gymfinder.int.api.egym.com`, ca. 23 MB).
+5. Speichern, auf eine dieser beiden Arten:
+   - **Als HAR:** Download-Symbol bzw. „Export HAR“.
+   - **Als JSON:** Rechtsklick auf den Eintrag → Copy → Copy response, dann in eine `.json`-Datei einfügen. Versehentlich doppelt eingefügte Antworten sind kein Problem.
+6. Importieren und übernehmen:
 
 ```bash
-git clone https://github.com/skelacc/USC-WP-Map.git && cd USC-WP-Map   # bzw. git pull
-cd scripts
-python3 -m studiomap fetch --sources wellpass --wellpass-official   # Windows: python statt python3
-python3 -m studiomap apply
-cd ..
-git add data public && git commit -m "Wellpass: offizieller Gym-Finder" && git push
+npm run data:fetch -- --sources wellpass        # nimmt die neueste Datei in data/WP-network/
+# oder: npm run data:fetch -- --sources wellpass --wellpass-file data/WP-network/datei.har
+npm run data:apply
 ```
 
-- Nötig ist nur Python ≥ 3.10, weder Node noch Pakete.
-- `fetch` zeigt am Ende, wie viele Studios neu sind.
-- GitHub Pages baut die Seite nach dem Push automatisch neu.
-- **Vorher erledigen, bevor du viel zusammenführst:** Die Wellpass-Einträge bekommen neue IDs. Frühere Zusammenführungen mit Wellpass-Einträgen aus Fair for Fitness finden ihre Einträge dann nicht mehr und müssen neu gemacht werden. Zusammenführungen nur zwischen USC-Einträgen bleiben erhalten.
+- Übernommen werden nur Studios in Deutschland. Der Gym-Finder liefert Name, Position, Bundesland, Studiotyp, Aktivitäten und Plus1, aber **keine Adressen**.
+- Straße und PLZ kommen, soweit vorhanden, von USC (bei zusammengeführten Studios) oder aus den früheren Fair-for-Fitness-Daten (`data/raw/wellpass_fff.json`).
+- Den Ort liest der Import aus dem Slug ab (z. B. `kiel-…`), wenn er auch im Namen vorkommt.
+- **Frühere Zusammenführungen bleiben erhalten:** Fair-for-Fitness-Einträge werden über Name und Abstand ihren offiziellen Gegenstücken zugeordnet (`keyAliases` im Datenbestand). Entscheidungen mit alten Schlüsseln gelten so weiter, im Browser, per Sync und in `match_decisions.json`.
+- **Ohne neuen Export** (z. B. beim monatlichen Import in GitHub Actions) bleibt der offizielle Stand erhalten. Es wird **nicht** auf das unvollständigere Fair for Fitness zurückgefallen.
+- **Adressen ergänzen:** `npm run data:enrich-wellpass` fragt für reine Wellpass-Studios ohne Adresse im Großraum Berlin die nächstgelegene Adresse bei OpenStreetMap ab (Nominatim-Rückwärtssuche).
+  - Etwa 480 Anfragen, 1 pro Sekunde, ca. 9 Minuten. Der Zwischenspeicher `data/raw/wellpass_addresses.json` sorgt dafür, dass ein abgebrochener Lauf fortsetzt und spätere Läufe nur neue Studios abfragen.
+  - Die Adressen werden erst nach der Zusammenführung eingesetzt, verfälschen den Abgleich mit USC also nicht, und erscheinen als „ca. …“.
+  - Mit `--all` läuft es für ganz Deutschland (~16.000 Anfragen, ca. 5 Stunden).
+- Der direkte Abruf per `--wellpass-official` funktioniert technisch weiter. Die robots.txt von locations.egym.com untersagt automatisierte Zugriffe, deshalb ist der Browser-Export der vorgesehene Weg.
 
 ## Online stellen (GitHub Pages)
 
@@ -109,7 +130,7 @@ Hinweise:
 | **Urban Sports Club**<br>urbansportsclub.com/de/venues | Keine dokumentierte API, kein Export | Die öffentliche Standortsuche lädt ihre Daten ohne Login selbst nach: `/de/studios-map?city_id=1&plan_type=N` (JSON mit Name, Koordinaten, Slug) und `/de/venues?…&page=N` (HTML-Liste mit Straße, Bezirk, Sportarten). Diese Abfragen stellt der Import auf die gleiche Weise. | Name, Koordinaten, Straße (ohne PLZ), Bezirk, Sportarten, Link zur Studioseite, **USC-Stufen** (pro Stufe abgefragt) |
 | **EGYM Wellpass**<br>de.egym-wellpass.com/de-de/gym-finder | Keine dokumentierte API, kein Export | Der Gym-Finder bettet `locations.egym.com` ein. **Deren robots.txt sperrt alle automatisierten Zugriffe (`Disallow: /`)**, daher gibt es keinen direkten Abruf. Stattdessen wird die **dokumentierte öffentliche API von Fair for Fitness** verwendet (siehe nächste Zeile). | – |
 | **USC-Studioseiten**<br>urbansportsclub.com/de/venues/&lt;studio&gt; | Nein; die Seite lädt ihre Daten in einem eigenen Format (Next.js) | `enrich-usc`: eine Anfrage je Studio (Header `RSC: 1`, ~100 KB), 1 Anfrage/s, Zwischenspeicher `data/raw/usc_details.json` | **Plus**-Kennzeichen, **Besuchslimits je Stufe**, **Kategorie-Limits je Stufe** (z. B. Massage: M 0, L 1, XL 2 pro Monat), PLZ, Telefon, Bewertung |
-| **EGYM Wellpass – offiziell** (optional) | Nicht dokumentiert: `gymfinder.int.api.egym.com/v1/gym/overview` (vom Gym-Finder genutzt) | Nur mit `--wellpass-official`, gedacht für einen **einmaligen** privaten Abgleich, weil die robots.txt automatisierte Zugriffe untersagt. Eine Anfrage für Berlin, 30 km Radius. | Name, Adresse mit PLZ, Koordinaten, Website, Telefon, Sportarten. Vollständiger als Fair for Fitness. |
+| **EGYM Wellpass – offiziell** (Standard, sobald ein Export vorliegt) | Nicht dokumentiert: `gymfinder.int.api.egym.com/v1/gym/overview` (vom Gym-Finder genutzt) | **Export aus dem eigenen Browser** (HAR/JSON in `data/WP-network/`, siehe oben). Kein automatisierter Abruf, weil die robots.txt das untersagt. | Alle Partner in Deutschland: Name, Koordinaten, Bundesland, Studiotyp, Aktivitäten, Plus1, Link zum Gym-Finder. **Keine Adressen.** |
 | **Fair for Fitness**<br>fair-for-fitness.de | **Ja**: OpenAPI unter `/openapi.json`; robots.txt erlaubt `/api/search` ausdrücklich. Lizenz: „Daten ohne Gewähr; Nutzung mit Attribution + Link erlaubt“ | `GET /api/search?lat=…&lng=…&radius=30&networks=wellpass`, gefiltert auf Berliner PLZ | Name, Koordinaten, Adresse (meist mit PLZ), teils Website und Telefon. Die Wellpass-Zuordnung stammt von Fair for Fitness (**Drittquelle**) und ist überall so gekennzeichnet. |
 | **Eigene Dateien** | – | CSV/JSON in `data/manual/import/` oder Upload über die App | was man selbst einträgt (z. B. aus dem offiziellen Wellpass-Gym-Finder abgeschrieben) |
 
@@ -139,6 +160,7 @@ npm run data:fetch -- --sources manual --geocode   # fehlende Koordinaten per No
 npm run data:apply                         # geprüften Stand veröffentlichen
 npm run data:discard                       # vorbereiteten Stand verwerfen
 npm run data:rebuild                       # offline neu zusammenführen (z. B. nach Änderungen am Algorithmus)
+npm run data:enrich-wellpass               # Adressen für Wellpass-Studios ohne Adresse (OSM, Großraum Berlin, ca. 9 Min.)
 npm run data:enrich-usc                    # USC-Studioseiten laden: Plus, Limits je Stufe/Aktivität, PLZ, Bewertung
                                            # (~2.200 Seiten, ca. 1 Std.; Zwischenspeicher, setzt nach Abbruch fort,
                                            #  holt danach nur Einträge älter als 30 Tage) – anschließend data:rebuild
@@ -163,7 +185,7 @@ Eine Vorlage liegt in `data/manual/import/_vorlage.csv` (Dateien mit `_` am Anfa
 | `latitude`, `longitude` | | Dezimalgrad. Wenn sie fehlen, erscheint das Studio nur in der Liste (oder `--geocode` ermittelt eine als „ungefähr“ markierte Position). |
 | `website`, `sourceId`, `categories` (mit `\|` getrennt), `sourceNote` | | optional |
 
-Trennzeichen `,` oder `;`, Dezimalkomma wird akzeptiert. Ungültige Zeilen (unbekannter Anbieter, fehlender Name, Koordinaten außerhalb Berlins, unlesbare Zahlen) werden mit Zeilennummer gemeldet und übersprungen. Fehlen Pflichtspalten oder ist das JSON kaputt, wird die ganze Datei abgelehnt.
+Trennzeichen `,` oder `;`, Dezimalkomma wird akzeptiert. Ungültige Zeilen (unbekannter Anbieter, fehlender Name, Koordinaten außerhalb Deutschlands, unlesbare Zahlen) werden mit Zeilennummer gemeldet und übersprungen. Fehlen Pflichtspalten oder ist das JSON kaputt, wird die ganze Datei abgelehnt.
 
 ## Zusammenführung und Dublettenerkennung
 
@@ -175,7 +197,7 @@ Trennzeichen `,` oder `;`, Dezimalkomma wird akzeptiert. Ungültige Zeilen (unbe
 4. **Namensähnlichkeit**: Zeichenfolgen-Ähnlichkeit sowie Überdeckung der *unterscheidungskräftigen* Namensteile. Gattungswörter wie „Yoga“, „Fitness“ oder „Pilates“ und Ortsangaben zählen dabei nicht.
 5. **Geografische Distanz** der Koordinaten.
 6. **Einstufung:**
-   - **automatisch zusammengeführt** (`matchConfidence: "high"`): gleiche Adresse und ähnlicher Name, oder identische Namenskerne bei höchstens 120 m Abstand ohne widersprüchliche Adresse.
+   - **automatisch zusammengeführt** (`matchConfidence: "high"`): gleiche Adresse und ähnlicher Name, oder identische Namenskerne bei höchstens 120 m Abstand ohne widersprüchliche Adresse. Fehlt die Adresse (Wellpass-Gym-Finder), reicht ein praktisch gleicher Name (Ähnlichkeit ≥ 0,95) bis 250 m. Das betrifft etwa Bäder und Parks, deren Pins weit auseinanderliegen.
    - **Prüfvorschlag** (`matchCandidates`): plausibel, aber unsicher. Diese Standorte **bleiben getrennt**, bis man sie bestätigt.
    - **kein Treffer**
 
@@ -186,6 +208,10 @@ Trennzeichen `,` oder `;`, Dezimalkomma wird akzeptiert. Ungültige Zeilen (unbe
 **Manuelle Entscheidungen:** In der App unter „Daten“ → „Zuordnungen“ oder in der Detailansicht („Gleiches Studio“ / „Verschiedene Studios“, bzw. „Zuordnung lösen“ bei automatisch zusammengeführten Studios). Per Kommandozeile geht es mit `npm run data:decide -- "<Paar-ID>" confirm|reject|reset`. Die Entscheidungen liegen in `data/manual/match_decisions.json`, haben Vorrang vor dem Algorithmus und bleiben über spätere Importe erhalten. Bestätigte Paare erhalten `matchConfidence: "verified"`.
 
 ## Datenmodell
+
+Veröffentlicht wird in zwei Teilen (`scripts/studiomap/publish.py`):
+- **`public/data/studios.json`:** Großraum Berlin mit allen Anbietern, im vollen Format (unten).
+- **`public/data/tiles/`:** reine Wellpass-Studios außerhalb Berlins in Kurzform, je Kachel von 1° × 1° eine Datei (`48_11.json` = 48–49° N, 11–12° O). Dazu kommt `index.json` mit Kachelliste, Aktivitäts- und Typnamen. Die App baut daraus dieselben Studio-Objekte (`src/lib/tiles.ts`).
 
 `public/data/studios.json`:
 
@@ -225,7 +251,10 @@ Trennzeichen `,` oder `;`, Dezimalkomma wird akzeptiert. Ungültige Zeilen (unbe
 ```
 scripts/studiomap/        Datenimport & -aufbereitung (Python, ohne Abhängigkeiten)
   sources/usc.py            Quelle Urban Sports Club
-  sources/wellpass_fff.py   Quelle Wellpass via Fair for Fitness
+  sources/wellpass_egym.py  Quelle Wellpass: Export des offiziellen Gym-Finders (HAR/JSON)
+  sources/wellpass_fff.py   Quelle Wellpass via Fair for Fitness (Rückfall)
+  supplement.py             Fair-for-Fitness-Adressen + alte Schlüssel für offizielle Einträge
+  publish.py                Aufteilung: Berlin-Kerndatei + Kacheln
   sources/manual.py         CSV/JSON-Import
   normalize.py merge.py     Normalisierung, Dublettenerkennung
   diff.py pipeline.py       Bericht, Ablauf (fetch/apply/discard/rebuild/decide/validate)
@@ -240,7 +269,9 @@ src/components/data/      Datenbereich: Import, Zuordnungen, Datei-Upload
 src/components/ui/        shadcn/ui-Komponenten
 data/raw/                 normalisierte Quelldaten des veröffentlichten Stands
 data/manual/              eigene Importdateien, Match-Entscheidungen
-public/data/studios.json  veröffentlichter Datenbestand (vom Frontend gelesen)
+data/WP-network/          Browser-Exporte des Wellpass-Gym-Finders (nicht versioniert)
+public/data/studios.json  veröffentlichter Datenbestand Berlin (vom Frontend gelesen)
+public/data/tiles/        Wellpass außerhalb Berlins, nach Kartenausschnitt geladen
 ```
 
 ## Tests
@@ -256,7 +287,9 @@ Außerdem im Browser geprüft (Playwright, Desktop und Pixel 7): Marker, Cluster
 
 ## Bekannte Einschränkungen
 
-- **Wellpass-Daten stammen standardmäßig aus einer Drittquelle.** Fair for Fitness erfasst nur einen Teil der Wellpass-Studios (Berlin: 239). Der Grund ist, dass Fair for Fitness ein Preisvergleich ist und Netzwerke nur bei bereits erfassten Studios zuordnet. Vollständiger ist der einmalige Abgleich mit `--wellpass-official`.
+- **Wellpass ohne Adressen:** Der Gym-Finder liefert keine Straße und PLZ. Adressen kommen von USC oder Fair for Fitness. Für die übrigen reinen Wellpass-Studios im Großraum Berlin ermittelt `npm run data:enrich-wellpass` die nächstgelegene Adresse aus der Position (siehe unten). Sie ist als „ca.“ gekennzeichnet. Außerhalb Berlins steht nur der Ort, die Route-Links nutzen die Koordinaten.
+- **Außerhalb Berlins kein USC:** Dort erscheint alles als „Nur Wellpass“. Der USC-Import lädt bisher nur Berlin (`city_id=1`).
+- **Wellpass-Aktualisierung ist Handarbeit:** Ein neuer Stand braucht einen neuen Browser-Export.
 - **USC hat keine dokumentierte API.** Ändert USC seine Website, schlägt der Import mit klarer Meldung fehl, und der bisherige Stand bleibt erhalten. Dann muss `sources/usc.py` angepasst werden.
 - Postleitzahlen stammen bei USC von den Studioseiten (bei 81 Standorten fehlen sie noch). Bei rund 25 Standorten fehlt die Straße, bei 5 fehlen Koordinaten (diese stehen nur in der Liste).
 - Die Aktivitätslimits je Stufe gelten laut USC für Privatmitgliedschaften (B2C). Firmenmitgliedschaften können abweichen.
@@ -275,4 +308,4 @@ Die Architektur ist dafür vorbereitet: Jeder Schritt ist ein eigener, nicht-int
 
 ## Lizenz und Quellenangaben
 
-Privates Projekt. Kartendaten © OpenStreetMap-Mitwirkende. Wellpass-Zuordnungen: Quelle [Fair for Fitness](https://fair-for-fitness.de), ohne Gewähr. Studiodaten von Urban Sports Club: [urbansportsclub.com](https://urbansportsclub.com/de/venues). Alle Angaben ohne Gewähr. Vor einem Besuch bitte beim Anbieter prüfen.
+Privates Projekt. Kartendaten © OpenStreetMap-Mitwirkende. Wellpass-Studios: offizieller [EGYM-Wellpass-Gym-Finder](https://de.egym-wellpass.com/de-de/gym-finder), ergänzende Adressen von [Fair for Fitness](https://fair-for-fitness.de), ohne Gewähr. Studiodaten von Urban Sports Club: [urbansportsclub.com](https://urbansportsclub.com/de/venues). Alle Angaben ohne Gewähr. Vor einem Besuch bitte beim Anbieter prüfen.
