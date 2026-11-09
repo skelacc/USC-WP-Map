@@ -1,4 +1,4 @@
-import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, Dumbbell, List, Loader2, LocateFixed } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
@@ -21,6 +21,7 @@ import { BERLIN_CENTER, distanceM, type LatLng } from '@/lib/geo'
 import { decideMatch, getStatus, type ApiStatus } from '@/lib/importApi'
 import { applyDecisions, loadDecisions, pairOf, saveDecisions, upsertDecision, type Decision } from '@/lib/merges'
 import { DEFAULT_USC_PLAN, activityCounts, applyView, planLabel, type UscPlan, type ViewStudio } from '@/lib/plans'
+import { SyncNotSetUp, loadSyncConfig, saveSyncConfig, syncNow, type SyncConfig } from '@/lib/sync'
 import { cn } from '@/lib/utils'
 import type { FieldChoices, Studio } from '@/types/studio'
 
@@ -36,6 +37,10 @@ export default function App() {
   const [activities, setActivities] = usePersistentState<string[]>('activities', [])
   const [sort, setSort] = usePersistentState<SortMode>('sort', 'name')
   const [decisions, setDecisions] = useState<Decision[]>(loadDecisions)
+  const [syncConfig, setSyncConfig] = useState<SyncConfig>(loadSyncConfig)
+  const [syncStatus, setSyncStatus] = useState<{ state: 'idle' | 'busy' | 'ok' | 'error'; message?: string; at?: string; url?: string }>({ state: 'idle' })
+  const decisionsRef = useRef(decisions)
+  const localChange = useRef(false)
   const [query, setQuery] = useState('')
   const deferredQuery = useDeferredValue(query)
 
@@ -162,6 +167,7 @@ export default function App() {
   // Entscheidungen speichern (Browser) und – unter npm run dev – ins Projekt übernehmen
   const addDecision = useCallback(
     (d: Decision) => {
+      localChange.current = true
       setDecisions((prev) => {
         const next = upsertDecision(prev, d)
         saveDecisions(next)
@@ -174,6 +180,46 @@ export default function App() {
     [api.available],
   )
 
+  // Synchronisation über GitHub-Issue: beim Start lesen, nach eigenen Änderungen schreiben
+  useEffect(() => {
+    decisionsRef.current = decisions
+  }, [decisions])
+
+  const runSync = useCallback(async () => {
+    setSyncStatus((s) => ({ ...s, state: 'busy' }))
+    try {
+      const r = await syncNow(syncConfig, decisionsRef.current)
+      if (r.issue !== syncConfig.issue) {
+        const next = { ...syncConfig, issue: r.issue }
+        saveSyncConfig(next)
+        setSyncConfig(next)
+      }
+      setDecisions(r.merged)
+      saveDecisions(r.merged)
+      setSyncStatus({
+        state: 'ok',
+        message: `Synchronisiert: ${r.merged.length} Zuordnungen${r.pushed ? ', hochgeladen' : ''}${syncConfig.token ? '' : ' (nur gelesen – ohne Token)'}`,
+        at: new Date().toISOString(),
+        url: r.url,
+      })
+    } catch (e) {
+      if (e instanceof SyncNotSetUp) setSyncStatus({ state: 'idle', message: e.message })
+      else setSyncStatus({ state: 'error', message: (e as Error).message, at: new Date().toISOString() })
+    }
+  }, [syncConfig])
+
+  useEffect(() => {
+    void runSync()
+    // nur beim Start bzw. nach geänderter Sync-Einstellung
+  }, [syncConfig.repo, syncConfig.token]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!localChange.current || !syncConfig.token) return
+    localChange.current = false
+    const t = window.setTimeout(() => void runSync(), 1500)
+    return () => window.clearTimeout(t)
+  }, [decisions, syncConfig.token, runSync])
+
   const confirmMerge = useCallback(
     (usc: Studio, wp: Studio, fields: FieldChoices) => {
       addDecision({ pair: pairOf(usc, wp), decision: 'confirm', fields, decidedAt: new Date().toISOString() })
@@ -181,9 +227,12 @@ export default function App() {
       // Das neue Studio übernimmt die ID des USC-Studios
       setActiveId(usc.id)
       setAnchorId(usc.id)
-      setMessage('Zusammengeführt. Gespeichert in diesem Browser' + (api.available ? ' und im Projekt.' : ' (Export unter „Daten“ → „Zuordnungen“).'))
+      setMessage(
+        'Zusammengeführt.' +
+          (syncConfig.token ? ' Wird mit GitHub synchronisiert.' : ' Nur auf diesem Gerät gespeichert – für andere Geräte: Einstellungen → Sync.'),
+      )
     },
-    [addDecision, api.available],
+    [addDecision, syncConfig.token],
   )
 
   const unmerge = useCallback(
@@ -254,9 +303,14 @@ export default function App() {
               onDataChanged={reload}
               decisions={decisions}
               onImportDecisions={(d) => {
+                localChange.current = true
                 setDecisions(d)
                 saveDecisions(d)
               }}
+              syncConfig={syncConfig}
+              onSyncConfigChange={setSyncConfig}
+              onSync={runSync}
+              syncStatus={syncStatus}
               onMergeCandidate={(c) => c.urbanSportsClub.studioId && setMergeFor({ baseId: c.urbanSportsClub.studioId, partnerId: c.wellpass.studioId ?? undefined })}
               onRejectCandidate={rejectPair}
               onShowStudio={showStudio}

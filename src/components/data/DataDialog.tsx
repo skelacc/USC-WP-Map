@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Database } from 'lucide-react'
+import { Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -8,7 +8,10 @@ import type { Decision } from '@/lib/merges'
 import type { Dataset, MatchCandidate } from '@/types/studio'
 import { FileImport } from './FileImport'
 import { ImportPanel } from './ImportPanel'
+import { InfoPanel } from './InfoPanel'
 import { MatchReview } from './MatchReview'
+import { SyncPanel } from './SyncPanel'
+import type { SyncConfig } from '@/lib/sync'
 
 interface Props {
   dataset: Dataset | null
@@ -19,6 +22,10 @@ interface Props {
   onMergeCandidate: (c: MatchCandidate) => void
   onRejectCandidate: (pair: string) => void
   onShowStudio: (id: string) => void
+  syncConfig: SyncConfig
+  onSyncConfigChange: (c: SyncConfig) => void
+  onSync: () => Promise<void>
+  syncStatus: { state: 'idle' | 'busy' | 'ok' | 'error'; message?: string; at?: string; url?: string }
 }
 
 function fmt(iso?: string) {
@@ -27,7 +34,8 @@ function fmt(iso?: string) {
   return Number.isNaN(d.getTime()) ? iso : d.toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' })
 }
 
-export function DataDialog({ dataset, api, onDataChanged, decisions, onImportDecisions, onMergeCandidate, onRejectCandidate, onShowStudio }: Props) {
+export function DataDialog(props: Props) {
+  const { dataset, api, onDataChanged, decisions, onImportDecisions, onMergeCandidate, onRejectCandidate, onShowStudio } = props
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState<ApiStatus>(api)
   const pending = dataset?.matchCandidates.length ?? 0
@@ -39,25 +47,38 @@ export function DataDialog({ dataset, api, onDataChanged, decisions, onImportDec
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="relative">
-          <Database /> <span className="hidden sm:inline">Daten</span>
-          {(pending > 0 || status.staging) && <span className="absolute -top-1 -right-1 size-2.5 rounded-full bg-amber-500" aria-label="Offene Punkte" />}
+        <Button variant="outline" size="sm" className="relative" aria-label="Einstellungen und Info">
+          <Settings /> <span className="hidden sm:inline">Einstellungen</span>
+          {props.syncStatus.state === 'error' && <span className="absolute -top-1 -right-1 size-2.5 rounded-full bg-red-500" aria-label="Sync-Fehler" />}
         </Button>
       </DialogTrigger>
       <DialogContent className="flex max-h-[90dvh] flex-col gap-3 sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Daten</DialogTitle>
-          <DialogDescription>Datenbestand, Aktualisierung und Prüfung von Zuordnungen.</DialogDescription>
+          <DialogTitle>Einstellungen & Info</DialogTitle>
+          <DialogDescription className="sr-only">Hinweise, Synchronisation, Zuordnungen und Datenbestand.</DialogDescription>
         </DialogHeader>
-        <Tabs defaultValue={status.staging ? 'update' : 'info'} className="min-h-0 flex-1">
+        <Tabs defaultValue={status.staging ? 'data' : 'hints'} className="min-h-0 flex-1">
           <TabsList className="w-full">
-            <TabsTrigger value="info">Bestand</TabsTrigger>
-            <TabsTrigger value="update">Aktualisieren</TabsTrigger>
-            <TabsTrigger value="matches">Zuordnungen{pending ? ` (${pending})` : ''}</TabsTrigger>
-            <TabsTrigger value="file">Datei</TabsTrigger>
+            <TabsTrigger value="hints">Info</TabsTrigger>
+            <TabsTrigger value="sync">Sync</TabsTrigger>
+            <TabsTrigger value="matches">Zuordn.{pending ? ` (${pending})` : ''}</TabsTrigger>
+            <TabsTrigger value="data">Daten</TabsTrigger>
           </TabsList>
           <div className="min-h-0 overflow-y-auto pt-2">
-            <TabsContent value="info" className="space-y-3 text-sm">
+            <TabsContent value="hints">
+              <InfoPanel dataset={dataset} />
+            </TabsContent>
+            <TabsContent value="sync">
+              <SyncPanel
+                config={props.syncConfig}
+                onConfigChange={props.onSyncConfigChange}
+                decisions={decisions}
+                onImport={onImportDecisions}
+                onSync={props.onSync}
+                status={props.syncStatus}
+              />
+            </TabsContent>
+            <TabsContent value="data" className="space-y-4 text-sm">
               {dataset ? (
                 <>
                   <p>
@@ -86,8 +107,7 @@ export function DataDialog({ dataset, api, onDataChanged, decisions, onImportDec
               ) : (
                 <p>Kein Datenbestand geladen.</p>
               )}
-            </TabsContent>
-            <TabsContent value="update">
+              <h3 className="border-t pt-3 font-semibold">Daten aktualisieren</h3>
               <ImportPanel
                 apiAvailable={status.available}
                 initialReport={status.staging}
@@ -96,12 +116,13 @@ export function DataDialog({ dataset, api, onDataChanged, decisions, onImportDec
                   void getStatus().then(setStatus)
                 }}
               />
+              <h3 className="border-t pt-3 font-semibold">Eigene Datei importieren</h3>
+              <FileImport apiAvailable={status.available} />
             </TabsContent>
             <TabsContent value="matches">
               <MatchReview
                 candidates={dataset?.matchCandidates ?? []}
                 decisions={decisions}
-                onImportDecisions={onImportDecisions}
                 onMerge={(c) => {
                   setOpen(false)
                   onMergeCandidate(c)
@@ -112,9 +133,6 @@ export function DataDialog({ dataset, api, onDataChanged, decisions, onImportDec
                   onShowStudio(id)
                 }}
               />
-            </TabsContent>
-            <TabsContent value="file">
-              <FileImport apiAvailable={status.available} />
             </TabsContent>
           </div>
         </Tabs>

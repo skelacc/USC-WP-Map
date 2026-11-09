@@ -1,5 +1,4 @@
-import { useRef, useState } from 'react'
-import { Download, Link2, Upload } from 'lucide-react'
+import { Link2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { Decision } from '@/lib/merges'
 import type { MatchCandidate } from '@/types/studio'
@@ -7,69 +6,18 @@ import type { MatchCandidate } from '@/types/studio'
 interface Props {
   candidates: MatchCandidate[]
   decisions: Decision[]
-  onImportDecisions: (d: Decision[]) => void
   onMerge: (c: MatchCandidate) => void
   onReject: (pair: string) => void
   onShow: (studioId: string) => void
 }
 
 /** Unsichere Zuordnungsvorschläge + eigene Entscheidungen (Export/Import). */
-export function MatchReview({ candidates, decisions, onImportDecisions, onMerge, onReject, onShow }: Props) {
-  const fileRef = useRef<HTMLInputElement>(null)
-  const [note, setNote] = useState<string | null>(null)
-
-  const exportFile = () => {
-    const blob = new Blob([JSON.stringify(decisions, null, 1)], { type: 'application/json' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = 'match_decisions.json'
-    a.click()
-    URL.revokeObjectURL(a.href)
-  }
-
-  const importFile = async (f: File) => {
-    try {
-      const data = JSON.parse(await f.text())
-      if (!Array.isArray(data) || !data.every((d) => d && typeof d.pair === 'string' && ['confirm', 'reject'].includes(d.decision))) {
-        throw new Error('Unerwartetes Format')
-      }
-      const merged = new Map(decisions.map((d) => [d.pair, d]))
-      for (const d of data as Decision[]) merged.set(d.pair, d)
-      onImportDecisions([...merged.values()])
-      setNote(`${data.length} Entscheidungen übernommen.`)
-    } catch (e) {
-      setNote(`Import fehlgeschlagen: ${(e as Error).message}`)
-    }
-  }
-
+export function MatchReview({ candidates, decisions, onMerge, onReject, onShow }: Props) {
   return (
     <div className="space-y-3 text-sm">
-      <div className="rounded-md border p-2 text-xs">
-        <p>
-          <b>Deine Entscheidungen: {decisions.length}</b> – im Browser dieses Geräts gespeichert. Für andere Geräte oder dauerhaft im Projekt: exportieren
-          und als <code>data/manual/match_decisions.json</code> committen (unter <code>npm run dev</code> passiert das automatisch).
-        </p>
-        <div className="mt-2 flex gap-1.5">
-          <Button size="sm" variant="outline" onClick={exportFile} disabled={!decisions.length}>
-            <Download /> Exportieren
-          </Button>
-          <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()}>
-            <Upload /> Importieren
-          </Button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="application/json,.json"
-            className="hidden"
-            onChange={(e) => {
-              const f = e.target.files?.[0]
-              if (f) void importFile(f)
-              e.target.value = ''
-            }}
-          />
-        </div>
-        {note && <p className="mt-1">{note}</p>}
-      </div>
+      <p className="text-xs text-muted-foreground">
+        Deine Entscheidungen: {decisions.length}. Synchronisieren zwischen Geräten unter „Sync“.
+      </p>
 
       {!candidates.length ? (
         <p className="text-sm text-muted-foreground">Keine offenen Zuordnungsvorschläge.</p>

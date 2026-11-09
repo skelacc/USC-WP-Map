@@ -36,7 +36,16 @@ Farbe **und** Form unterscheiden die Kategorien, damit sie auch bei Farbsehschw�
 - **Beliebiges Studio:** „Mit einem Wellpass-/USC-Studio zusammenführen…“ zeigt die Studios des anderen Anbieters in der Nähe (mit Suche).
 - **Angaben wählen:** Im Dialog legst du fest, welcher **Name** (USC, Wellpass oder eigener), welche **Adresse**, welche **Position** und welche **Website** gelten.
 - **Ändern und trennen:** Zusammengeführte Studios lassen sich über „Angaben ändern“ anpassen oder über „Trennen“ wieder aufteilen. Das geht auch bei automatischen Zuordnungen.
-- **Speicherort:** Entscheidungen werden **im Browser** gespeichert und funktionieren daher auch auf GitHub Pages. Unter `npm run dev` landen sie zusätzlich in `data/manual/match_decisions.json`. Unter „Daten“ → „Zuordnungen“ kannst du sie exportieren und importieren (z. B. vom Handy ins Repository).
+- **Speicherort und Sync zwischen Geräten:** Entscheidungen liegen zunächst im Browser des Geräts. Unter **Einstellungen → Sync** gibt es zwei Wege:
+  - **Automatisch über GitHub:** Die App speichert sie im Issue „Studio Map: Zuordnungen (Sync)“ deines Repositorys. **Lesen** klappt ohne Anmeldung, weil das Repository öffentlich ist; jedes Gerät übernimmt beim Start den Stand. **Schreiben** braucht auf dem jeweiligen Gerät einmalig einen Fine-grained Token. Den erstellst du unter GitHub → Settings → Developer settings → Fine-grained tokens, mit Zugriff nur auf dieses Repository und der Berechtigung *Issues: Read and write*. Der Token bleibt im Browser. Zusammengeführt wird je Studio-Paar, bei Widersprüchen gilt die neuere Entscheidung. Das Issue ist öffentlich sichtbar, enthält aber nur Studio-IDs und gewählte Namen.
+  - **Per Datei:** Auf einem Gerät exportieren, auf dem anderen importieren (wird zusammengeführt, nichts geht verloren).
+  - Unter `npm run dev` landen Entscheidungen zusätzlich in `data/manual/match_decisions.json`.
+
+**Einstellungen & Info** (Zahnrad oben rechts):
+- **Info:** wichtige Hinweise zur Aussagekraft der Daten (Wellpass unvollständig, USC-Limits gelten für Privatmitgliedschaften, Plus, Lücken) und Datenstand.
+- **Sync:** wie oben beschrieben.
+- **Zuordnungen:** offene Vorschläge.
+- **Daten:** Quellen, Aktualisierung (nur unter `npm run dev`) und Import eigener Dateien.
 
 **Weitere Funktionen:**
 - Fehlertolerante Suche (Tippfehler, fehlende Leerzeichen und Bindestriche, Umlaute).
