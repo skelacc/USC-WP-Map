@@ -65,7 +65,7 @@ export function MergeDialog({ base, all, initialPartnerIds, editOnly, onConfirm,
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="flex max-h-[90dvh] flex-col gap-3 sm:max-w-lg">
+      <DialogContent className="flex max-h-[90dvh] flex-col gap-3 sm:max-w-lg" onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>{editOnly ? 'Angaben festlegen' : 'Zusammenführen'}</DialogTitle>
           <DialogDescription>

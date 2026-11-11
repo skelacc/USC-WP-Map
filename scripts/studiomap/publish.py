@@ -111,7 +111,27 @@ def split(dataset: dict) -> tuple[dict, dict[str, list], dict]:
     return core_ds, tiles, index
 
 
+TEXTS = paths.PUBLISHED.parent / "texts.json"
+TEXT_FIELDS = ("description", "importantInfo", "openingHours")
+
+
+def extract_texts(dataset: dict) -> dict[str, dict[str, str]]:
+    """Lange Texte (Beschreibung, Wichtige Infos, Öffnungszeiten) aus den
+    Einträgen lösen – sie liegen in texts.json, die das Frontend erst beim
+    Öffnen einer Detailansicht lädt."""
+    texts: dict[str, dict[str, str]] = {}
+    for s in dataset.get("studios", []):
+        dets = list(s.get("providerDetails", {}).values()) + [m["detail"] for m in s.get("extraMembers", [])]
+        for d in dets:
+            t = {k: d.pop(k) for k in TEXT_FIELDS if d.get(k)}
+            if t and d.get("key"):
+                texts[d["key"]] = t
+    return texts
+
+
 def write_published(dataset: dict) -> dict:
+    texts = extract_texts(dataset)
+    write_json_atomic(TEXTS, texts, compact=True)
     core, tiles, index = split(dataset)
     tmp = TILES.with_name(".tiles.tmp")
     shutil.rmtree(tmp, ignore_errors=True)

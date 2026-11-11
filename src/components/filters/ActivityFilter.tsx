@@ -45,7 +45,7 @@ export function ActivityFilter({ value, onChange, counts, planLabel }: Props) {
           </button>
         )}
       </span>
-      <DialogContent className="flex max-h-[85dvh] flex-col gap-3 sm:max-w-md">
+      <DialogContent className="flex max-h-[85dvh] flex-col gap-3 sm:max-w-md" onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Aktivitäten</DialogTitle>
           <DialogDescription>

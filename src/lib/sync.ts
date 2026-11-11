@@ -11,6 +11,7 @@
  * Studio-Paar, bei Konflikten gewinnt die neuere Entscheidung.
  */
 import type { Decision } from './merges'
+import { EMPTY_USERDATA, mergeUserData, type UserData } from './userdata'
 import { loadSetting, saveSetting } from './storage'
 
 export interface SyncConfig {
@@ -82,26 +83,44 @@ async function gh<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 const BLOCK = /```json\s*([\s\S]*?)```/
 
-export function parseIssueBody(body: string | null | undefined): Decision[] {
+export interface SyncPayload {
+  decisions: Decision[]
+  userdata: UserData
+}
+
+function validDecisions(x: unknown): Decision[] {
+  return Array.isArray(x) ? x.filter((d) => d && typeof d.pair === 'string' && ['confirm', 'reject'].includes(d.decision)) : []
+}
+
+/** Liest den JSON-Block; ältere Issues enthalten nur die Liste der Zuordnungen. */
+export function parseIssueBody(body: string | null | undefined): SyncPayload {
   const m = (body ?? '').match(BLOCK)
-  if (!m) return []
+  if (!m) return { decisions: [], userdata: EMPTY_USERDATA }
+  let data: unknown
   try {
-    const data = JSON.parse(m[1])
-    return Array.isArray(data) ? data.filter((d) => d && typeof d.pair === 'string' && ['confirm', 'reject'].includes(d.decision)) : []
+    data = JSON.parse(m[1])
   } catch {
     throw new SyncError('Das Sync-Issue enthält kein gültiges JSON.')
   }
+  if (Array.isArray(data)) return { decisions: validDecisions(data), userdata: EMPTY_USERDATA }
+  const o = (data ?? {}) as Partial<{ decisions: unknown; ratings: UserData['ratings']; notes: UserData['notes']; edits: UserData['edits'] }>
+  return {
+    decisions: validDecisions(o.decisions),
+    userdata: { ratings: o.ratings ?? {}, notes: o.notes ?? {}, edits: o.edits ?? {} },
+  }
 }
 
-export function issueBody(decisions: Decision[]): string {
+export function issueBody(p: SyncPayload | Decision[]): string {
+  const payload: SyncPayload = Array.isArray(p) ? { decisions: p, userdata: EMPTY_USERDATA } : p
+  const nNotes = Object.values(payload.userdata.notes).flat().filter((n) => !n.deleted).length
   return [
-    'Dieses Issue speichert die Zusammenführungen der Studio Map, damit sie auf allen Geräten gleich sind.',
+    'Dieses Issue speichert Zusammenführungen, Bewertungen, Notizen und Korrekturen der Studio Map, damit sie auf allen Geräten gleich sind.',
     'Es wird von der App automatisch aktualisiert – bitte den JSON-Block nicht von Hand ändern.',
     '',
-    `Stand: ${new Date().toISOString()} · ${decisions.length} Entscheidungen`,
+    `Stand: ${new Date().toISOString()} · ${payload.decisions.length} Zuordnungen · ${nNotes} Notizen`,
     '',
     '```json',
-    JSON.stringify(decisions, null, 1),
+    JSON.stringify({ version: 2, decisions: payload.decisions, ...payload.userdata }, null, 1),
     '```',
   ].join('\n')
 }
@@ -128,29 +147,36 @@ export async function findOrCreateIssue(cfg: SyncConfig): Promise<number> {
   return created.number
 }
 
-export async function pullDecisions(cfg: SyncConfig): Promise<{ issue: number; decisions: Decision[]; url: string }> {
+export async function pullPayload(cfg: SyncConfig): Promise<{ issue: number; payload: SyncPayload; url: string }> {
   const issue = await findOrCreateIssue(cfg)
   const data = await gh<Issue>(`/repos/${cfg.repo}/issues/${issue}`, { headers: headers(cfg.token) })
-  return { issue, decisions: parseIssueBody(data.body), url: data.html_url }
+  return { issue, payload: parseIssueBody(data.body), url: data.html_url }
 }
 
-export async function pushDecisions(cfg: SyncConfig, decisions: Decision[]): Promise<void> {
+export async function pushPayload(cfg: SyncConfig, payload: SyncPayload): Promise<void> {
   if (!cfg.token) throw new SyncError('Zum Hochladen wird ein Token benötigt.')
   const issue = await findOrCreateIssue(cfg)
   await gh<Issue>(`/repos/${cfg.repo}/issues/${issue}`, {
     method: 'PATCH',
     headers: headers(cfg.token, true),
-    body: JSON.stringify({ body: issueBody(decisions) }),
+    body: JSON.stringify({ body: issueBody(payload) }),
   })
 }
 
-/** Holen, zusammenführen, ggf. zurückschreiben. Liefert die vereinigte Liste. */
-export async function syncNow(cfg: SyncConfig, local: Decision[]): Promise<{ merged: Decision[]; issue: number; pushed: boolean; url: string }> {
-  const remote = await pullDecisions(cfg)
-  const merged = mergeDecisionLists(remote.decisions, local)
+/** Holen, zusammenführen, ggf. zurückschreiben. */
+export async function syncNow(
+  cfg: SyncConfig,
+  local: SyncPayload,
+): Promise<{ merged: SyncPayload; issue: number; pushed: boolean; url: string }> {
+  const remote = await pullPayload(cfg)
+  const merged: SyncPayload = {
+    decisions: mergeDecisionLists(remote.payload.decisions, local.decisions),
+    userdata: mergeUserData(remote.payload.userdata, local.userdata),
+  }
   let pushed = false
-  if (cfg.token && !sameDecisions(merged, remote.decisions)) {
-    await pushDecisions({ ...cfg, issue: remote.issue }, merged)
+  const changed = !sameDecisions(merged.decisions, remote.payload.decisions) || JSON.stringify(merged.userdata) !== JSON.stringify(mergeUserData(remote.payload.userdata, EMPTY_USERDATA))
+  if (cfg.token && changed) {
+    await pushPayload({ ...cfg, issue: remote.issue }, merged)
     pushed = true
   }
   return { merged, issue: remote.issue, pushed, url: remote.url }

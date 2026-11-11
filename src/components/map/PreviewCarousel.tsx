@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react'
-import { ChevronRight, Star, X, ZoomIn } from 'lucide-react'
+import { ChevronRight, Heart, StickyNote, Star, ThumbsDown, X, ZoomIn } from 'lucide-react'
 import { addressSummary } from '@/lib/address'
+import type { Rating } from '@/lib/userdata'
+import type { Studio } from '@/types/studio'
 import { categoryOf, CATEGORY_META } from '@/lib/categories'
 import { distanceM, formatDistance, type LatLng } from '@/lib/geo'
 import type { ViewStudio } from '@/lib/plans'
@@ -16,6 +18,8 @@ interface Props {
   onClose: () => void
   userLocation: LatLng | null
   highlight: string[]
+  ratingOf: (s: Studio) => Rating | null
+  hasNotes: (s: Studio) => boolean
 }
 
 /**
@@ -23,7 +27,7 @@ interface Props {
  * gehört zum markierten Pin, seitliches Wischen wechselt zum nächstgelegenen
  * Studio, Antippen öffnet die Details.
  */
-export function PreviewCarousel({ items, activeId, onActiveChange, onOpen, onZoom, onClose, userLocation, highlight }: Props) {
+export function PreviewCarousel({ items, activeId, onActiveChange, onOpen, onZoom, onClose, userLocation, highlight, ratingOf, hasNotes }: Props) {
   const scroller = useRef<HTMLDivElement>(null)
   const programmatic = useRef(false)
   const timer = useRef<number | undefined>(undefined)
@@ -111,6 +115,9 @@ export function PreviewCarousel({ items, activeId, onActiveChange, onOpen, onZoo
                 <span className="min-w-0 flex-1">
                   <span className="line-clamp-2 text-[15px] leading-snug font-semibold">{s.name}</span>
                 </span>
+                {ratingOf(s) === 'like' && <Heart className="mt-0.5 size-4 shrink-0 fill-rose-500 text-rose-500" aria-label="Favorit" />}
+                {ratingOf(s) === 'dislike' && <ThumbsDown className="mt-0.5 size-4 shrink-0 text-slate-500" aria-label="Abgelehnt" />}
+                {(hasNotes(s) || s.userHint) && <StickyNote className="mt-0.5 size-4 shrink-0 text-amber-600" aria-label="Notiz vorhanden" />}
                 <ChevronRight className="mt-0.5 size-5 shrink-0 text-muted-foreground" />
               </span>
               <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">

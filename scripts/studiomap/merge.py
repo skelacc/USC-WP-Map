@@ -155,7 +155,7 @@ def _provider_detail(r: SourceRecord) -> dict[str, Any]:
             {"latitude": r.latitude, "longitude": r.longitude, "precision": r.coordinatePrecision or "source"}
             if r.latitude is not None else None
         ),
-        "website": r.website,
+        "website": r.website or det.get("website"),
         "phone": r.phone or det.get("phone"),
         "plans": r.plans or None,
         "categories": r.categories or None,
@@ -169,6 +169,13 @@ def _provider_detail(r: SourceRecord) -> dict[str, Any]:
         d["ratingCount"] = det.get("ratingCount")
         d["visitLimits"] = {l["size"]: l["perMonth"] if l["included"] else 0 for l in det.get("limits") or [] if l.get("size")} or None
         d["detailsFetchedAt"] = det.get("fetchedAt")
+        # Studio-ID statt Namens-Slug: so öffnet die USC-App direkt das Studio
+        # (die Website leitet /de/venues/<ID> ebenfalls richtig weiter)
+        if det.get("venueId"):
+            d["url"] = f"https://urbansportsclub.com/de/venues/{det['venueId']}"
+        for k in ("description", "importantInfo", "openingHours", "image"):
+            if det.get(k):
+                d[k] = det[k]
     elif "activities" in r.extra:  # offizieller Gym-Finder: Aktivitätscodes bereits übersetzt
         d["activities"] = [{"name": n, "limits": None} for n in r.extra["activities"]]
         d["plus1"] = bool(r.extra.get("plus1"))

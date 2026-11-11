@@ -17,12 +17,16 @@ import { useElementHeight } from '@/hooks/useElementHeight'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { usePersistentState } from '@/hooks/usePersistentState'
 import { DEFAULT_FILTER, countByCategory, filterStudios, searchStudios, sortStudios, type CategoryFilter, type LoadMode, type Scope, type SortMode } from '@/lib/filter'
+import { RatingFilterSelect, type RatingFilter } from '@/components/filters/RatingFilter'
 import { BERLIN_CENTER, distanceM, type LatLng } from '@/lib/geo'
 import { boundsIntersect, cellsInBounds, coreBounds, inBounds } from '@/lib/tiles'
 import { decideMatch, getStatus, type ApiStatus } from '@/lib/importApi'
 import { applyDecisions, decisionFor, loadDecisions, memberKey, membersOf, saveDecisions, upsertDecision, type Decision } from '@/lib/merges'
 import { DEFAULT_USC_PLAN, activityCounts, applyView, planLabel, type UscPlan, type ViewStudio } from '@/lib/plans'
 import { SyncNotSetUp, loadSyncConfig, saveSyncConfig, syncNow, type SyncConfig } from '@/lib/sync'
+import { addNote, applyEdits, deleteNote, editOf, loadProfile, loadUserData, notesOf, ratingOf, saveProfile, saveUserData, setEdit, setRating, type UserData } from '@/lib/userdata'
+import { SwipeDownSheet } from '@/components/detail/SwipeDownSheet'
+import type { StudioTexts } from '@/components/detail/StudioDetail'
 import { cn } from '@/lib/utils'
 import type { FieldChoices, Studio } from '@/types/studio'
 
@@ -46,6 +50,24 @@ export default function App() {
   const [syncStatus, setSyncStatus] = useState<{ state: 'idle' | 'busy' | 'ok' | 'error'; message?: string; at?: string; url?: string }>({ state: 'idle' })
   const decisionsRef = useRef(decisions)
   const localChange = useRef(false)
+  const [userData, setUserDataState] = useState<UserData>(loadUserData)
+  const userDataRef = useRef(userData)
+  const [profile, setProfileState] = useState<string>(loadProfile)
+  const [ratingFilter, setRatingFilter] = usePersistentState<RatingFilter>('ratingFilter', 'hideDisliked')
+  /** Eigene Änderung an Bewertungen/Notizen/Korrekturen – wird gespeichert und synchronisiert */
+  const updateUserData = useCallback((fn: (d: UserData) => UserData) => {
+    localChange.current = true
+    setUserDataState((prev) => {
+      const next = fn(prev)
+      saveUserData(next)
+      return next
+    })
+  }, [])
+  const setProfile = useCallback((p: string) => {
+    const name = p.trim() || 'Ich'
+    saveProfile(name)
+    setProfileState(name)
+  }, [])
   const [query, setQuery] = useState('')
   const deferredQuery = useDeferredValue(query)
 
@@ -67,18 +89,39 @@ export default function App() {
   const [message, setMessage] = useState<string | null>(null)
   const [api, setApi] = useState<ApiStatus>({ available: false, running: false, staging: null })
   const [bottomRef, bottomHeight] = useElementHeight<HTMLDivElement>()
+  const [texts, setTexts] = useState<StudioTexts | null>(null)
+
+  // Lange Texte (Beschreibung, Wichtige Infos, Öffnungszeiten) erst beim ersten Öffnen von Details laden
+  useEffect(() => {
+    if (!detailOpen || texts) return
+    fetch(`${import.meta.env.BASE_URL}data/texts.json`)
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((t: StudioTexts) => setTexts(t ?? {}))
+      .catch(() => setTexts({}))
+  }, [detailOpen, texts])
 
   useEffect(() => {
     void getStatus().then(setApi)
   }, [])
 
   // Datenbestand inkl. eigener Zusammenführungen
-  const dataset = useMemo(() => (rawDataset ? applyDecisions(rawDataset, decisions) : null), [rawDataset, decisions])
+  const dataset = useMemo(() => {
+    if (!rawDataset) return null
+    const merged = applyDecisions(rawDataset, decisions)
+    return { ...merged, studios: applyEdits(merged.studios, userData) }
+  }, [rawDataset, decisions, userData])
   const allStudios = useMemo(() => dataset?.studios ?? [], [dataset])
   const allById = useMemo(() => new Map(allStudios.map((s) => [s.id, s])), [allStudios])
 
   // Stufe, Plus und Aktivität anwenden
-  const studios = useMemo(() => applyView(allStudios, { plan, showPlus, activities }), [allStudios, plan, showPlus, activities])
+  const studios = useMemo(() => {
+    const view = applyView(allStudios, { plan, showPlus, activities })
+    if (ratingFilter === 'all') return view
+    return view.filter((s) => {
+      const r = ratingOf(userData, profile, s)
+      return ratingFilter === 'favorites' ? r === 'like' : r !== 'dislike'
+    })
+  }, [allStudios, plan, showPlus, activities, ratingFilter, userData, profile])
   const byId = useMemo(() => new Map<string, ViewStudio>(studios.map((s) => [s.id, s])), [studios])
   const actBase = useMemo(() => (scope === 'viewport' && view ? allStudios.filter((s) => inBounds(s, view.bounds)) : allStudios), [allStudios, scope, view])
   const actCounts = useMemo(() => activityCounts(actBase, plan, showPlus), [actBase, plan, showPlus])
@@ -207,22 +250,25 @@ export default function App() {
   // Synchronisation über GitHub-Issue: beim Start lesen, nach eigenen Änderungen schreiben
   useEffect(() => {
     decisionsRef.current = decisions
-  }, [decisions])
+    userDataRef.current = userData
+  }, [decisions, userData])
 
   const runSync = useCallback(async () => {
     setSyncStatus((s) => ({ ...s, state: 'busy' }))
     try {
-      const r = await syncNow(syncConfig, decisionsRef.current)
+      const r = await syncNow(syncConfig, { decisions: decisionsRef.current, userdata: userDataRef.current })
       if (r.issue !== syncConfig.issue) {
         const next = { ...syncConfig, issue: r.issue }
         saveSyncConfig(next)
         setSyncConfig(next)
       }
-      setDecisions(r.merged)
-      saveDecisions(r.merged)
+      setDecisions(r.merged.decisions)
+      saveDecisions(r.merged.decisions)
+      setUserDataState(r.merged.userdata)
+      saveUserData(r.merged.userdata)
       setSyncStatus({
         state: 'ok',
-        message: `Synchronisiert: ${r.merged.length} Zuordnungen${r.pushed ? ', hochgeladen' : ''}${syncConfig.token ? '' : ' (nur gelesen – ohne Token)'}`,
+        message: `Synchronisiert: ${r.merged.decisions.length} Zuordnungen, Bewertungen und Notizen${r.pushed ? ', hochgeladen' : ''}${syncConfig.token ? '' : ' (nur gelesen – ohne Token)'}`,
         at: new Date().toISOString(),
         url: r.url,
       })
@@ -242,7 +288,7 @@ export default function App() {
     localChange.current = false
     const t = window.setTimeout(() => void runSync(), 1500)
     return () => window.clearTimeout(t)
-  }, [decisions, syncConfig.token, runSync])
+  }, [decisions, userData, syncConfig.token, runSync])
 
   const closeMerge = useCallback(() => {
     if (mergeFor?.fromSettings) setSettingsOpen(true)
@@ -320,6 +366,16 @@ export default function App() {
       onRejectCandidate={rejectPair}
       onShowStudio={showStudio}
       className="h-full w-full"
+      rating={ratingOf(userData, profile, activeFull)}
+      onRate={(r) => updateUserData((d) => setRating(d, profile, activeFull, r))}
+      notes={notesOf(userData, activeFull)}
+      profile={profile}
+      onAddNote={(t) => updateUserData((d) => addNote(d, activeFull, t, profile))}
+      onDeleteNote={(id) => updateUserData((d) => deleteNote(d, id))}
+      canEditEntries={!!syncConfig.token || api.available}
+      editValues={editOf(userData, activeFull)}
+      onSaveEdit={(v) => updateUserData((d) => setEdit(d, activeFull, v, profile))}
+      texts={texts}
     />
   )
 
@@ -342,11 +398,16 @@ export default function App() {
               api={api}
               onDataChanged={reload}
               decisions={decisions}
-              onImportDecisions={(d) => {
+              userData={userData}
+              onImportDecisions={(p) => {
                 localChange.current = true
-                setDecisions(d)
-                saveDecisions(d)
+                setDecisions(p.decisions)
+                saveDecisions(p.decisions)
+                setUserDataState(p.userdata)
+                saveUserData(p.userdata)
               }}
+              profile={profile}
+              onProfileChange={setProfile}
               syncConfig={syncConfig}
               onSyncConfigChange={setSyncConfig}
               onSync={runSync}
@@ -370,6 +431,7 @@ export default function App() {
           <PlanSelect value={plan} onChange={setPlan} />
           <ActivityFilter value={activities} onChange={setActivities} counts={actCounts} planLabel={planLabel(plan)} />
           <PlusToggle value={showPlus} onChange={setShowPlus} />
+          <RatingFilterSelect value={ratingFilter} onChange={setRatingFilter} />
           <span className="mx-0.5 w-px shrink-0 self-stretch bg-border" aria-hidden />
           <ProviderFilter value={filter} counts={counts} onChange={setFilter} />
         </div>
@@ -468,6 +530,8 @@ export default function App() {
                   onClose={closeAll}
                   userLocation={userLocation}
                   highlight={activities}
+                  ratingOf={(st) => ratingOf(userData, profile, st)}
+                  hasNotes={(st) => notesOf(userData, st).length > 0}
                 />
               </div>
             )}
@@ -477,9 +541,9 @@ export default function App() {
 
       {/* Mobil: Details als großes Bottom-Sheet */}
       {!isDesktop && detail && (
-        <div className="fixed inset-x-0 bottom-0 z-40 flex h-[88dvh] flex-col pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgb(0_0_0/0.15)]">
+        <SwipeDownSheet onClose={() => setDetailOpen(false)} className="fixed inset-x-0 bottom-0 z-40 flex h-[88dvh] flex-col pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgb(0_0_0/0.15)]">
           {detail}
-        </div>
+        </SwipeDownSheet>
       )}
 
       {!isDesktop && (

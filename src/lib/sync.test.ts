@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Decision } from './merges'
 import { SyncNotSetUp, issueBody, mergeDecisionLists, parseIssueBody, sameDecisions, syncNow } from './sync'
+import { EMPTY_USERDATA } from './userdata'
 
 const d = (pair: string, decision: 'confirm' | 'reject', at: string): Decision => ({ pair, decision, decidedAt: at })
 
@@ -15,8 +16,10 @@ describe('Sync-Logik', () => {
   })
   it('schreibt und liest den JSON-Block im Issue', () => {
     const list = [d('a~1', 'confirm', '2026-11-09T10:00:00Z')]
-    expect(parseIssueBody(issueBody(list))).toEqual(list)
-    expect(parseIssueBody('kein Block')).toEqual([])
+    expect(parseIssueBody(issueBody(list)).decisions).toEqual(list)
+    expect(parseIssueBody('kein Block').decisions).toEqual([])
+    // altes Format: reine Liste
+    expect(parseIssueBody('```json\n' + JSON.stringify(list) + '\n```').decisions).toEqual(list)
     expect(() => parseIssueBody('```json\n{kaputt\n```')).toThrow()
   })
 })
@@ -32,9 +35,9 @@ describe('syncNow gegen GitHub (gemockt)', () => {
       return new Response(JSON.stringify({ number: 7, title: '', body: issueBody(remote), html_url: 'u' }))
     })
     vi.stubGlobal('fetch', fetchMock)
-    const r = await syncNow({ repo: 'o/r', issue: null, token: null }, [d('y~2', 'reject', '2026-11-09T10:00:00Z')])
+    const r = await syncNow({ repo: 'o/r', issue: null, token: null }, { decisions: [d('y~2', 'reject', '2026-11-09T10:00:00Z')], userdata: EMPTY_USERDATA })
     expect(r.issue).toBe(7)
-    expect(r.merged.map((x) => x.pair).sort()).toEqual(['x~1', 'y~2'])
+    expect(r.merged.decisions.map((x) => x.pair).sort()).toEqual(['x~1', 'y~2'])
     expect(r.pushed).toBe(false)
     expect(fetchMock.mock.calls.every(([, init]) => !init?.method || init.method === 'GET')).toBe(true)
   })
@@ -45,7 +48,7 @@ describe('syncNow gegen GitHub (gemockt)', () => {
       calls.push({ url, init })
       return new Response(JSON.stringify({ number: 7, title: '', body: issueBody([]), html_url: 'u' }))
     })
-    const r = await syncNow({ repo: 'o/r', issue: 7, token: 't' }, [d('y~2', 'confirm', '2026-11-09T10:00:00Z')])
+    const r = await syncNow({ repo: 'o/r', issue: 7, token: 't' }, { decisions: [d('y~2', 'confirm', '2026-11-09T10:00:00Z')], userdata: EMPTY_USERDATA })
     expect(r.pushed).toBe(true)
     const patch = calls.find((c) => c.init?.method === 'PATCH')!
     expect(JSON.parse(String(patch.init!.body)).body).toContain('y~2')
@@ -54,6 +57,6 @@ describe('syncNow gegen GitHub (gemockt)', () => {
 
   it('ohne Issue und ohne Token: „nicht eingerichtet“ statt Fehler', async () => {
     vi.stubGlobal('fetch', async () => new Response(JSON.stringify([])))
-    await expect(syncNow({ repo: 'o/r', issue: null, token: null }, [])).rejects.toBeInstanceOf(SyncNotSetUp)
+    await expect(syncNow({ repo: 'o/r', issue: null, token: null }, { decisions: [], userdata: EMPTY_USERDATA })).rejects.toBeInstanceOf(SyncNotSetUp)
   })
 })

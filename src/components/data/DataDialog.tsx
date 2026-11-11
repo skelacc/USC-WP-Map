@@ -15,7 +15,8 @@ import { ImportPanel } from './ImportPanel'
 import { InfoPanel } from './InfoPanel'
 import { MatchReview } from './MatchReview'
 import { SyncPanel } from './SyncPanel'
-import type { SyncConfig } from '@/lib/sync'
+import type { SyncConfig, SyncPayload } from '@/lib/sync'
+import type { UserData } from '@/lib/userdata'
 
 interface Props {
   open: boolean
@@ -24,10 +25,13 @@ interface Props {
   api: ApiStatus
   onDataChanged: () => void
   decisions: Decision[]
-  onImportDecisions: (d: Decision[]) => void
+  onImportDecisions: (p: SyncPayload) => void
+  userData: UserData
   onMergeCandidate: (c: MatchCandidate) => void
   onRejectCandidate: (pair: string) => void
   onShowStudio: (id: string) => void
+  profile: string
+  onProfileChange: (p: string) => void
   syncConfig: SyncConfig
   onSyncConfigChange: (c: SyncConfig) => void
   onSync: () => Promise<void>
@@ -76,7 +80,7 @@ export function DataDialog(props: Props) {
           {props.syncStatus.state === 'error' && props.syncConfig.token && <span className="absolute -top-1 -right-1 size-2.5 rounded-full bg-red-500" aria-label="Sync-Fehler" />}
         </Button>
       </DialogTrigger>
-      <DialogContent className="flex max-h-[90dvh] flex-col gap-3 sm:max-w-xl">
+      <DialogContent className="flex max-h-[90dvh] flex-col gap-3 sm:max-w-xl" onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Einstellungen & Info</DialogTitle>
           <DialogDescription className="sr-only">Hinweise, Synchronisation, Zuordnungen und Datenbestand.</DialogDescription>
@@ -94,9 +98,12 @@ export function DataDialog(props: Props) {
             </TabsContent>
             <TabsContent value="sync">
               <SyncPanel
+                profile={props.profile}
+                onProfileChange={props.onProfileChange}
                 config={props.syncConfig}
                 onConfigChange={props.onSyncConfigChange}
                 decisions={decisions}
+                userData={props.userData}
                 onImport={onImportDecisions}
                 onSync={props.onSync}
                 status={props.syncStatus}

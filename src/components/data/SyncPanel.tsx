@@ -3,18 +3,23 @@ import { CheckCircle2, Download, ExternalLink, Loader2, RefreshCw, Upload, XCirc
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { Decision } from '@/lib/merges'
-import { mergeDecisionLists, saveSyncConfig, type SyncConfig } from '@/lib/sync'
+import { issueBody, mergeDecisionLists, parseIssueBody, saveSyncConfig, type SyncConfig, type SyncPayload } from '@/lib/sync'
+import { mergeUserData, type UserData } from '@/lib/userdata'
 
 interface Props {
+  profile: string
+  onProfileChange: (p: string) => void
   config: SyncConfig
   onConfigChange: (c: SyncConfig) => void
   decisions: Decision[]
-  onImport: (d: Decision[]) => void
+  userData: UserData
+  onImport: (p: SyncPayload) => void
   onSync: () => Promise<void>
   status: { state: 'idle' | 'busy' | 'ok' | 'error'; message?: string; at?: string; url?: string }
 }
 
-export function SyncPanel({ config, onConfigChange, decisions, onImport, onSync, status }: Props) {
+export function SyncPanel({ profile, onProfileChange, config, onConfigChange, decisions, userData, onImport, onSync, status }: Props) {
+  const [name, setName] = useState(profile)
   const [repo, setRepo] = useState(config.repo)
   const [token, setToken] = useState(config.token ?? '')
   const fileRef = useRef<HTMLInputElement>(null)
@@ -27,7 +32,9 @@ export function SyncPanel({ config, onConfigChange, decisions, onImport, onSync,
   }
 
   const exportFile = () => {
-    const blob = new Blob([JSON.stringify(decisions, null, 1)], { type: 'application/json' })
+    // gleiches Format wie im Sync-Issue (JSON-Block)
+    const json = issueBody({ decisions, userdata: userData }).match(/```json\n([\s\S]*)\n```/)![1]
+    const blob = new Blob([json], { type: 'application/json' })
     const a = document.createElement('a')
     a.href = URL.createObjectURL(blob)
     a.download = `studio-map-zuordnungen-${new Date().toISOString().slice(0, 10)}.json`
@@ -37,13 +44,18 @@ export function SyncPanel({ config, onConfigChange, decisions, onImport, onSync,
 
   const importFile = async (f: File) => {
     try {
-      const data = JSON.parse(await f.text())
-      if (!Array.isArray(data) || !data.every((d) => d && typeof d.pair === 'string' && ['confirm', 'reject'].includes(d.decision))) {
-        throw new Error('Unerwartetes Format')
+      const text = await f.text()
+      JSON.parse(text) // Syntax prüfen
+      const incoming = parseIssueBody('```json\n' + text + '\n```')
+      if (!incoming.decisions.length && !Object.keys(incoming.userdata.notes).length && !Object.keys(incoming.userdata.ratings).length && !Object.keys(incoming.userdata.edits).length) {
+        throw new Error('Keine Daten gefunden')
       }
-      const merged = mergeDecisionLists(decisions, data as Decision[])
+      const merged: SyncPayload = {
+        decisions: mergeDecisionLists(decisions, incoming.decisions),
+        userdata: mergeUserData(userData, incoming.userdata),
+      }
       onImport(merged)
-      setNote(`Importiert: ${data.length} Einträge, zusammen jetzt ${merged.length}.`)
+      setNote(`Importiert und zusammengeführt: ${incoming.decisions.length} Zuordnungen sowie Bewertungen, Notizen und Korrekturen.`)
     } catch (e) {
       setNote(`Import fehlgeschlagen: ${(e as Error).message}`)
     }
@@ -54,9 +66,25 @@ export function SyncPanel({ config, onConfigChange, decisions, onImport, onSync,
   return (
     <div className="space-y-4 text-sm">
       <p className="text-xs text-muted-foreground">
-        Deine Zusammenführungen ({decisions.length}) sind im Browser dieses Geräts gespeichert. Damit sie auf allen Geräten gleich sind, synchronisiert die
+        Deine Zusammenführungen ({decisions.length}), Bewertungen, Notizen und Korrekturen sind im Browser dieses Geräts gespeichert. Damit sie auf allen Geräten gleich sind, synchronisiert die
         App sie über ein GitHub-Issue in deinem Repository oder per Datei.
       </p>
+
+      <section className="space-y-2 rounded-md border p-3">
+        <h3 className="font-semibold">Profil</h3>
+        <p className="text-xs text-muted-foreground">
+          Deine ♥/👎-Bewertungen werden unter diesem Namen gespeichert (getrennt je Profil); Notizen tragen ihn als Autor. Auf jedem deiner Geräte denselben
+          Namen verwenden.
+        </p>
+        <div className="flex gap-2">
+          <Input value={name} onChange={(e) => setName(e.target.value)} aria-label="Profilname" />
+          {name.trim() !== profile && (
+            <Button size="sm" className="h-8" onClick={() => onProfileChange(name)}>
+              Speichern
+            </Button>
+          )}
+        </div>
+      </section>
 
       <section className="space-y-2 rounded-md border p-3">
         <h3 className="font-semibold">Automatisch über GitHub</h3>
@@ -126,10 +154,10 @@ export function SyncPanel({ config, onConfigChange, decisions, onImport, onSync,
         <h3 className="font-semibold">Per Datei</h3>
         <p className="text-xs text-muted-foreground">
           Auf Gerät A exportieren, auf Gerät B importieren. Beim Import wird zusammengeführt, nichts geht verloren; bei Widersprüchen gilt die neuere
-          Entscheidung. Für das Projekt: Datei als <code>data/manual/match_decisions.json</code> committen.
+          Entscheidung. Enthält Zuordnungen, Bewertungen, Notizen und Korrekturen – auch als Grundlage, um Notizen später (z. B. mit KI) auszuwerten.
         </p>
         <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={exportFile} disabled={!decisions.length}>
+          <Button size="sm" variant="outline" onClick={exportFile}>
             <Download /> Exportieren
           </Button>
           <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()}>

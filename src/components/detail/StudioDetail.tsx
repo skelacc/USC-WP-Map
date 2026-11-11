@@ -9,6 +9,10 @@ import { USC_PLANS, formatLimit, minActivityPlan, minUscPlan, planLabel, planSiz
 import { cn } from '@/lib/utils'
 import type { Activity, Address, MatchCandidate, Member, ProviderDetail, ProviderKey, Studio } from '@/types/studio'
 import { ProviderBadges } from '../ProviderBadges'
+import { EditDialog, NotesSection, RatingButtons, UserHint } from './PersonalSection'
+import type { EditField, Note, Rating } from '@/lib/userdata'
+
+export type StudioTexts = Record<string, { description?: string; importantInfo?: string; openingHours?: string }>
 
 const PROVIDER_NAME: Record<ProviderKey, string> = { urbanSportsClub: 'Urban Sports Club', wellpass: 'Wellpass' }
 
@@ -40,6 +44,18 @@ interface Props {
   onRejectCandidate: (pair: string) => void
   onShowStudio: (id: string) => void
   className?: string
+  rating: Rating | null
+  onRate: (r: Rating | null) => void
+  notes: Note[]
+  profile: string
+  onAddNote: (text: string) => void
+  onDeleteNote: (id: string) => void
+  /** Korrigieren erlaubt (Gerät mit Sync-Token) */
+  canEditEntries: boolean
+  editValues: Partial<Record<EditField, string | null>>
+  onSaveEdit: (v: Partial<Record<EditField, string | null>>) => void
+  /** lange Texte je Eintrag (werden nachgeladen) */
+  texts: StudioTexts | null
 }
 
 export function StudioDetail(p: Props) {
@@ -67,6 +83,7 @@ export function StudioDetail(p: Props) {
             {members.length > 2 && <span className="text-xs text-muted-foreground">{members.length} Einträge</span>}
           </div>
         </div>
+        <RatingButtons value={p.rating} onChange={p.onRate} compact />
       </header>
 
       {members.length > 1 ? (
@@ -85,7 +102,7 @@ export function StudioDetail(p: Props) {
             </TabsContent>
             {members.map((m) => (
               <TabsContent key={memberKey(m)} value={memberKey(m)}>
-                <ProviderSection provider={m.provider} detail={m.detail} studioName={s.name} plan={plan} highlight={p.highlight} />
+                <ProviderSection provider={m.provider} detail={m.detail} studioName={s.name} plan={plan} highlight={p.highlight} texts={p.texts?.[memberKey(m)]} />
               </TabsContent>
             ))}
           </div>
@@ -94,7 +111,7 @@ export function StudioDetail(p: Props) {
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           <Overview {...p} />
           {members.map((m) => (
-            <ProviderSection key={memberKey(m)} provider={m.provider} detail={m.detail} studioName={s.name} plan={plan} highlight={p.highlight} compact />
+            <ProviderSection key={memberKey(m)} provider={m.provider} detail={m.detail} studioName={s.name} plan={plan} highlight={p.highlight} texts={p.texts?.[memberKey(m)]} compact />
           ))}
         </div>
       )}
@@ -147,13 +164,28 @@ function CombinedActivities({ s, plan, highlight }: { s: Studio; plan: UscPlan; 
   )
 }
 
-function Overview({ studio: view, full: s, plan, highlight, userLocation, candidates, onMerge, onUnmerge, onRejectCandidate, onShowStudio }: Props) {
+function Overview(props: Props) {
+  const { studio: view, full: s, plan, highlight, userLocation, candidates, onMerge, onUnmerge, onRejectCandidate, onShowStudio } = props
+  const [editing, setEditing] = useState(false)
   const [l1, l2] = addressLines(s.address)
   const dist = userLocation && s.coordinates ? distanceM(userLocation, { lat: s.coordinates.latitude, lng: s.coordinates.longitude }) : null
   const multi = membersOf(s).length > 1
   const uscMin = minUscPlan(s)
+  const first = membersOf(s)[0]?.detail
+  const original: Record<EditField, string> = {
+    name: first?.name ?? s.name,
+    street: first?.address?.street ?? '',
+    postalCode: first?.address?.postalCode ?? s.address.postalCode ?? '',
+    website: first?.website ?? '',
+    phone: first?.phone ?? '',
+    hint: '',
+  }
+  const current = Object.fromEntries(
+    (Object.keys(original) as EditField[]).map((f) => [f, props.editValues[f] ?? (f === 'hint' ? '' : original[f])]),
+  ) as Record<EditField, string>
   return (
     <div className="space-y-3 p-3 text-sm">
+      <UserHint hint={s.userHint} />
       {view.uscExcluded && s.providerDetails.urbanSportsClub && (
         <p className="rounded-md bg-muted p-2 text-xs">
           {view.uscExcluded === 'plan' && `Bei Urban Sports Club erst ab ${uscMin ? `${uscMin.size} (${uscMin.id})` : 'höherer Stufe'} – nicht mit deiner Stufe ${planLabel(plan)}.`}
@@ -192,6 +224,17 @@ function Overview({ studio: view, full: s, plan, highlight, userLocation, candid
         </p>
       )}
       <Contact website={s.website} phone={s.phone} />
+
+      <NotesSection notes={props.notes} profile={props.profile} onAdd={props.onAddNote} onDelete={props.onDeleteNote} />
+      {props.canEditEntries ? (
+        <Button size="sm" variant="outline" className="w-full" onClick={() => setEditing(true)}>
+          <Pencil /> Angaben korrigieren
+          {Object.keys(props.editValues).length > 0 && <span className="text-xs text-muted-foreground">(bearbeitet)</span>}
+        </Button>
+      ) : (
+        <p className="text-[11px] text-muted-foreground">Angaben korrigieren ist auf Geräten mit Sync-Token möglich (Einstellungen → Sync).</p>
+      )}
+      {editing && <EditDialog current={current} original={original} onSave={(v) => { props.onSaveEdit(v); setEditing(false) }} onClose={() => setEditing(false)} />}
 
       {multi && <CombinedActivities s={s} plan={plan} highlight={highlight} />}
 
@@ -287,6 +330,7 @@ function ProviderSection({
   plan,
   highlight,
   compact,
+  texts,
 }: {
   provider: ProviderKey
   detail: ProviderDetail
@@ -294,6 +338,7 @@ function ProviderSection({
   plan: UscPlan
   highlight: string[]
   compact?: boolean
+  texts?: { description?: string; importantInfo?: string; openingHours?: string }
 }) {
   const size = planSize(plan)
   const [l1, l2] = addressLines(d.address)
@@ -323,6 +368,25 @@ function ProviderSection({
           </a>
         )}
       </div>
+      {d.image && <img src={d.image} alt="" loading="lazy" className="aspect-video w-full rounded-md object-cover" />}
+      {texts?.importantInfo && (
+        <details className="rounded-md border p-2 text-xs" open>
+          <summary className="cursor-pointer font-semibold">Wichtige Infos</summary>
+          <p className="mt-1 whitespace-pre-line text-muted-foreground">{texts.importantInfo.replace(/\n\n/g, '\n')}</p>
+        </details>
+      )}
+      {texts?.openingHours && (
+        <details className="rounded-md border p-2 text-xs">
+          <summary className="cursor-pointer font-semibold">Öffnungszeiten</summary>
+          <p className="mt-1 whitespace-pre-line text-muted-foreground">{translateDays(texts.openingHours)}</p>
+        </details>
+      )}
+      {texts?.description && (
+        <details className="rounded-md border p-2 text-xs">
+          <summary className="cursor-pointer font-semibold">Beschreibung</summary>
+          <p className="mt-1 whitespace-pre-line text-muted-foreground">{texts.description}</p>
+        </details>
+      )}
       {!compact && (
         <>
           {d.name !== studioName && <p className="text-xs text-muted-foreground">Dort gelistet als „{d.name}“</p>}
@@ -381,4 +445,9 @@ function ProviderSection({
       </p>
     </div>
   )
+}
+
+const DAYS: Record<string, string> = { Monday: 'Mo', Tuesday: 'Di', Wednesday: 'Mi', Thursday: 'Do', Friday: 'Fr', Saturday: 'Sa', Sunday: 'So' }
+function translateDays(t: string) {
+  return t.replace(/\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b/g, (d) => DAYS[d])
 }

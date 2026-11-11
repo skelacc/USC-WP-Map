@@ -77,6 +77,25 @@ def _json_after(text: str, key: str) -> Any:
         return None
 
 
+_STR = r'"((?:[^"\\]|\\.)*)"'
+
+
+def _text_after_heading(raw: str, heading: str) -> str | None:
+    """Text des ersten mehrzeiligen Textblocks nach einer Überschrift
+    (z. B. „Wichtige Infos“, „Öffnungszeiten“) im RSC-Format."""
+    for src in (raw, raw.replace('\\"', '"')):
+        i = src.find(f'"children":"{heading}"}}')
+        if i < 0:
+            continue
+        m = re.search(r'"className":"[^"]*whitespace-pre-line[^"]*","children":' + _STR, src[i : i + 6000])
+        if m:
+            try:
+                return json.loads(f'"{m.group(1)}"').strip() or None
+            except json.JSONDecodeError:
+                return m.group(1).replace("\\n", "\n").strip() or None
+    return None
+
+
 def parse_venue_page(text: str) -> dict[str, Any]:
     t = _unescape_rsc(text)
     out: dict[str, Any] = {}
@@ -107,6 +126,20 @@ def parse_venue_page(text: str) -> dict[str, Any]:
         out["phone"] = ld.get("telephone")
         geo = ld.get("geo") or {}
         out["lat"], out["lng"] = geo.get("latitude"), geo.get("longitude")
+        if ld.get("description"):
+            out["description"] = str(ld["description"]).strip()
+        same = ld.get("sameAs")
+        if isinstance(same, list) and same:
+            out["website"] = same[0]
+        elif isinstance(same, str):
+            out["website"] = same
+        img = ld.get("image")
+        if isinstance(img, list) and img:
+            img = img[0]
+        if isinstance(img, dict):
+            img = img.get("url")
+        if isinstance(img, str):
+            out["image"] = img
         rating = ld.get("aggregateRating") or {}
         if rating.get("ratingValue") is not None:
             out["rating"] = rating.get("ratingValue")
@@ -127,6 +160,15 @@ def parse_venue_page(text: str) -> dict[str, Any]:
             if isinstance(p, dict)
         ]
     out["serviceTypes"] = sorted(set(re.findall(r'"serviceType":"([a-z_]+)"', t)))
+    m = re.search(r'"venueId":(\d+)', t)
+    if m:
+        out["venueId"] = int(m.group(1))
+    info = _text_after_heading(text, "Wichtige Infos")
+    if info:
+        out["importantInfo"] = info
+    hours = _text_after_heading(text, "Öffnungszeiten")
+    if hours:
+        out["openingHours"] = hours
     return out
 
 

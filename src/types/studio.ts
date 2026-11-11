@@ -62,6 +62,11 @@ export interface ProviderDetail {
   ratingCount?: number | null
   /** USC: Besuche pro Monat je Stufe (-1 unbegrenzt, 0 nicht enthalten) */
   visitLimits?: Partial<Record<PlanSize, number | null>> | null
+  /** USC: Beschreibung, „Wichtige Infos“, Öffnungszeiten, Bild */
+  description?: string
+  importantInfo?: string
+  openingHours?: string
+  image?: string
   fetchedAt: string | null
   detailsFetchedAt?: string | null
 }
@@ -112,6 +117,8 @@ export interface Studio {
   match: MatchInfo | null
   /** bei manueller Zusammenführung: gewählte Quelle je Feld */
   fieldChoices?: FieldChoices
+  /** eigener Hinweis aus Korrekturen (z. B. „Massage nur mit 20 € Zuzahlung“) */
+  userHint?: string
   // Erweiterungen (Phase 4) können hier optional ergänzt werden:
   // openingHours?, images?, amenities?, courses? …
 }
