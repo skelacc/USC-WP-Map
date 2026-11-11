@@ -256,6 +256,12 @@ def fetch_details(
                 info = parse_venue_page(client.get(BASE + slug))
             info["fetchedAt"] = now_iso()
             info["schema"] = SCHEMA
+            # Felder, die diese Antwort nicht enthält (ältere Seitenvariante,
+            # Aussetzer), aus dem bisherigen Stand übernehmen statt verlieren
+            prev = cache.get(slug) or {}
+            for k, v in prev.items():
+                if k not in info and v not in (None, "", [], {}):
+                    info[k] = v
             cache[slug] = info
         except FetchError as e:
             errors.append(f"{slug}: {e}")
