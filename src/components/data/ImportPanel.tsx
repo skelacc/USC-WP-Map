@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { AlertTriangle, CheckCircle2, Loader2, XCircle } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Loader2, Trash2, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ConfirmButton } from '@/components/ui/confirm-button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { applyImport, discardImport, runImport, type ImportEvent, type ImportReport } from '@/lib/importApi'
 import { cn } from '@/lib/utils'
@@ -178,9 +179,9 @@ npm run data:discard  # oder verwerfen`}</pre>
               {phase === 'applying' && <Loader2 className="animate-spin" />} Übernehmen
             </Button>
           )}
-          <Button variant="outline" onClick={discard} disabled={phase === 'applying'}>
+          <ConfirmButton icon={<Trash2 />} label="Import verwerfen (bisherigen Stand behalten)" confirmText="Verwerfen" onConfirm={() => void discard()} disabled={phase === 'applying'}>
             Verwerfen (bisherigen Stand behalten)
-          </Button>
+          </ConfirmButton>
         </div>
       )}
     </div>

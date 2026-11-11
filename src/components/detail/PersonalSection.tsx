@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AlertTriangle, Heart, Pencil, ThumbsDown, Trash2 } from 'lucide-react'
+import { AlertTriangle, ArrowUp, Check, Heart, Pencil, ThumbsDown, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -55,50 +55,126 @@ interface NotesProps {
   onDelete: (id: string) => void
 }
 
-/** Notizen zu einem Studio (geteilt per Sync, mit Autor und Datum). */
+/**
+ * Notizen als Verlauf: eigene rechts, andere links (mit Autor). Senden über
+ * den Pfeil. Löschen zweistufig: Mülleimer im Kopf → eigene Notizen
+ * auswählen → „Löschen“ bestätigen.
+ */
 export function NotesSection({ notes, profile, onAdd, onDelete }: NotesProps) {
   const [text, setText] = useState('')
+  const [selecting, setSelecting] = useState(false)
+  const [selected, setSelected] = useState<string[]>([])
+  const own = notes.filter((n) => n.author === profile)
+  const send = () => {
+    if (!text.trim()) return
+    onAdd(text)
+    setText('')
+  }
+  const stopSelecting = () => {
+    setSelecting(false)
+    setSelected([])
+  }
   return (
-    <div>
-      <h4 className="mb-1 text-xs font-semibold text-muted-foreground uppercase">Notizen</h4>
+    <section className="rounded-lg border bg-background p-3" aria-label="Notizen">
+      <div className="mb-2 flex min-h-7 items-center gap-2">
+        <h4 className="text-xs font-semibold text-muted-foreground uppercase">Notizen</h4>
+        <span className="ml-auto flex items-center gap-1">
+          {selecting ? (
+            <>
+              <span className="text-xs text-muted-foreground">{selected.length} ausgewählt</span>
+              <Button
+                size="sm"
+                variant="destructive"
+                disabled={!selected.length}
+                onClick={() => {
+                  selected.forEach(onDelete)
+                  stopSelecting()
+                }}
+              >
+                <Trash2 /> Löschen
+              </Button>
+              <Button size="icon-sm" variant="ghost" aria-label="Abbrechen" title="Abbrechen" onClick={stopSelecting}>
+                <X />
+              </Button>
+            </>
+          ) : (
+            own.length > 0 && (
+              <Button size="icon-sm" variant="ghost" aria-label="Notizen zum Löschen auswählen" title="Notizen löschen" onClick={() => setSelecting(true)}>
+                <Trash2 />
+              </Button>
+            )
+          )}
+        </span>
+      </div>
       {notes.length > 0 && (
-        <ul className="mb-2 space-y-1.5">
-          {notes.map((n) => (
-            <li key={n.id} className="rounded-md border bg-muted/40 p-2 text-xs">
-              <p className="whitespace-pre-line">{n.text}</p>
-              <p className="mt-1 flex items-center text-[11px] text-muted-foreground">
-                {n.author} · {new Date(n.at).toLocaleDateString('de-DE')}
-                {n.author === profile && (
-                  <button type="button" className="ml-auto inline-flex items-center gap-0.5 hover:text-foreground" onClick={() => onDelete(n.id)} aria-label="Notiz löschen">
-                    <Trash2 className="size-3" /> löschen
-                  </button>
+        <ul className="mb-2 flex flex-col gap-1.5">
+          {notes.map((n) => {
+            const mine = n.author === profile
+            const on = selected.includes(n.id)
+            const bubble = (
+              <div
+                className={cn(
+                  'max-w-[85%] rounded-2xl px-3 py-1.5 text-sm',
+                  mine ? 'rounded-br-sm bg-primary text-primary-foreground' : 'rounded-bl-sm bg-muted',
+                  selecting && mine && on && 'ring-2 ring-destructive ring-offset-1',
+                  selecting && !mine && 'opacity-50',
                 )}
-              </p>
-            </li>
-          ))}
+              >
+                <p className="whitespace-pre-line">{n.text}</p>
+                <p className={cn('mt-0.5 text-[11px]', mine ? 'text-primary-foreground/70' : 'text-muted-foreground')}>
+                  {!mine && `${n.author} · `}
+                  {new Date(n.at).toLocaleDateString('de-DE')}
+                </p>
+              </div>
+            )
+            return (
+              <li key={n.id} className={cn('flex', mine ? 'justify-end' : 'justify-start')}>
+                {selecting && mine ? (
+                  <button
+                    type="button"
+                    className="flex max-w-full items-center justify-end gap-2 text-left"
+                    aria-pressed={on}
+                    onClick={() => setSelected((sel) => (on ? sel.filter((x) => x !== n.id) : [...sel, n.id]))}
+                  >
+                    <span className={cn('flex size-4 shrink-0 items-center justify-center rounded-full border', on && 'border-destructive bg-destructive text-white')}>
+                      {on && <Check className="size-3" />}
+                    </span>
+                    {bubble}
+                  </button>
+                ) : (
+                  bubble
+                )}
+              </li>
+            )
+          })}
         </ul>
       )}
-      <textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        rows={2}
-        placeholder="z. B. „Massage nur mit 20 € Zuzahlung (laut Website)“"
-        className="w-full resize-y rounded-md border bg-background px-2.5 py-1.5 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-        aria-label="Neue Notiz"
-      />
-      <div className="mt-1 flex justify-end">
-        <Button
-          size="sm"
-          disabled={!text.trim()}
-          onClick={() => {
-            onAdd(text)
-            setText('')
-          }}
-        >
-          Notiz speichern
-        </Button>
-      </div>
-    </div>
+      {!selecting && (
+        <div className="relative">
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) send()
+            }}
+            rows={Math.min(4, Math.max(1, text.split('\n').length))}
+            placeholder={notes.length ? 'Notiz hinzufügen' : 'z. B. „Massage nur mit 20 € Zuzahlung“'}
+            className="block w-full resize-none rounded-2xl border bg-background py-2 pr-11 pl-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            aria-label="Neue Notiz"
+          />
+          <Button
+            size="icon-sm"
+            className="absolute right-1.5 bottom-1.5 rounded-full"
+            disabled={!text.trim()}
+            onClick={send}
+            aria-label="Notiz speichern"
+            title="Notiz speichern"
+          >
+            <ArrowUp />
+          </Button>
+        </div>
+      )}
+    </section>
   )
 }
 

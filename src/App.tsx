@@ -541,7 +541,7 @@ export default function App() {
 
       {/* Mobil: Details als großes Bottom-Sheet */}
       {!isDesktop && detail && (
-        <SwipeDownSheet onClose={() => setDetailOpen(false)} className="fixed inset-x-0 bottom-0 z-40 flex h-[88dvh] flex-col pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgb(0_0_0/0.15)]">
+        <SwipeDownSheet onClose={() => setDetailOpen(false)} className="fixed inset-x-0 bottom-0 z-40 flex h-[80dvh] flex-col pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgb(0_0_0/0.15)]">
           {detail}
         </SwipeDownSheet>
       )}

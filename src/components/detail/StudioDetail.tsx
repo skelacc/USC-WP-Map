@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { AlertTriangle, ArrowLeft, ExternalLink, Globe, Link2, MapPin, Pencil, Phone, Plus, Star, Unlink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -9,6 +9,7 @@ import { USC_PLANS, formatLimit, minActivityPlan, minUscPlan, planLabel, planSiz
 import { cn } from '@/lib/utils'
 import type { Activity, Address, MatchCandidate, Member, ProviderDetail, ProviderKey, Studio } from '@/types/studio'
 import { ProviderBadges } from '../ProviderBadges'
+import { ConfirmButton } from '@/components/ui/confirm-button'
 import { EditDialog, NotesSection, RatingButtons, UserHint } from './PersonalSection'
 import type { EditField, Note, Rating } from '@/lib/userdata'
 
@@ -63,6 +64,24 @@ export function StudioDetail(p: Props) {
   const members = membersOf(s)
   const [tab, setTab] = useState('overview')
   const category = categoryOf(view)
+  // Wischen nach links/rechts wechselt den Tab (Übersicht → USC → Wellpass …)
+  const tabOrder = ['overview', ...members.map(memberKey)]
+  const touch = useRef<{ x: number; y: number; ok: boolean } | null>(null)
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.target as HTMLElement
+    const ok = !t.closest('input, textarea, [role="tablist"], .overflow-x-auto')
+    touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, ok }
+  }
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const t0 = touch.current
+    touch.current = null
+    if (!t0?.ok) return
+    const dx = e.changedTouches[0].clientX - t0.x
+    const dy = e.changedTouches[0].clientY - t0.y
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return
+    const i = tabOrder.indexOf(tab) + (dx < 0 ? 1 : -1)
+    if (i >= 0 && i < tabOrder.length) setTab(tabOrder[i])
+  }
   const label = (m: Member) => {
     const same = members.filter((x) => x.provider === m.provider)
     const short = m.provider === 'urbanSportsClub' ? 'USC' : 'Wellpass'
@@ -88,7 +107,7 @@ export function StudioDetail(p: Props) {
 
       {members.length > 1 ? (
         <Tabs value={tab} onValueChange={setTab} className="min-h-0 flex-1 gap-0">
-          <TabsList className="mx-3 mt-2 flex w-auto justify-start overflow-x-auto [scrollbar-width:none]">
+          <TabsList className="mx-3 my-2 flex w-auto justify-start overflow-x-auto [scrollbar-width:none]">
             <TabsTrigger value="overview" className="flex-none px-3">Übersicht</TabsTrigger>
             {members.map((m) => (
               <TabsTrigger key={memberKey(m)} value={memberKey(m)} className="flex-none px-3">
@@ -96,7 +115,7 @@ export function StudioDetail(p: Props) {
               </TabsTrigger>
             ))}
           </TabsList>
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-muted/50" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <TabsContent value="overview">
               <Overview {...p} />
             </TabsContent>
@@ -108,7 +127,7 @@ export function StudioDetail(p: Props) {
           </div>
         </Tabs>
       ) : (
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-muted/50">
           <Overview {...p} />
           {members.map((m) => (
             <ProviderSection key={memberKey(m)} provider={m.provider} detail={m.detail} studioName={s.name} plan={plan} highlight={p.highlight} texts={p.texts?.[memberKey(m)]} compact />
@@ -147,7 +166,7 @@ function CombinedActivities({ s, plan, highlight }: { s: Studio; plan: UscPlan; 
   return (
     <div>
       <h4 className="mb-1 text-xs font-semibold text-muted-foreground uppercase">Aktivitäten (alle Anbieter)</h4>
-      <ul className="divide-y rounded-md border text-xs">
+      <ul className="divide-y rounded-lg border bg-background text-xs">
         {list.map(([name, r]) => (
           <li key={name} className={cn('flex items-center gap-2 px-2 py-1.5', highlight.includes(name) && 'bg-amber-50 font-medium')}>
             <span className="flex-1">{name}</span>
@@ -193,6 +212,7 @@ function Overview(props: Props) {
           {view.uscExcluded === 'activity' && `Die gewählte Aktivität ist bei Urban Sports Club hier nicht mit ${planLabel(plan)} buchbar.`}
         </p>
       )}
+      <div className="space-y-2 rounded-lg border bg-background p-3">
       <div className="flex gap-2">
         <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
         <div className="min-w-0">
@@ -224,10 +244,11 @@ function Overview(props: Props) {
         </p>
       )}
       <Contact website={s.website} phone={s.phone} />
+      </div>
 
       <NotesSection notes={props.notes} profile={props.profile} onAdd={props.onAddNote} onDelete={props.onDeleteNote} />
       {props.canEditEntries ? (
-        <Button size="sm" variant="outline" className="w-full" onClick={() => setEditing(true)}>
+        <Button size="sm" variant="outline" className="w-full bg-background" onClick={() => setEditing(true)}>
           <Pencil /> Angaben korrigieren
           {Object.keys(props.editValues).length > 0 && <span className="text-xs text-muted-foreground">(bearbeitet)</span>}
         </Button>
@@ -239,7 +260,7 @@ function Overview(props: Props) {
       {multi && <CombinedActivities s={s} plan={plan} highlight={highlight} />}
 
       {multi && (
-        <div className="rounded-md border p-2 text-xs">
+        <div className="rounded-lg border bg-background p-3 text-xs">
           <p className="font-medium">
             {s.matchConfidence === 'verified' ? 'Von dir zusammengeführt' : 'Automatisch zusammengeführt'} ({membersOf(s).length} Einträge) – Details je Eintrag in den Tabs.
           </p>
@@ -260,9 +281,9 @@ function Overview(props: Props) {
             <Button size="sm" variant="outline" onClick={() => onMerge({})}>
               <Plus /> Weitere hinzufügen
             </Button>
-            <Button size="sm" variant="outline" onClick={onUnmerge}>
-              <Unlink /> Trennen
-            </Button>
+            <ConfirmButton icon={<Unlink />} label="Zusammenführung trennen" confirmText="Trennen" onConfirm={onUnmerge}>
+              Trennen
+            </ConfirmButton>
           </div>
         </div>
       )}
@@ -294,7 +315,7 @@ function Overview(props: Props) {
               </div>
             )
           })}
-          <Button size="sm" variant="outline" className="w-full" onClick={() => onMerge({})}>
+          <Button size="sm" variant="outline" className="w-full bg-background" onClick={() => onMerge({})}>
             <Link2 /> Mit anderen Einträgen zusammenführen…
           </Button>
         </div>
@@ -345,7 +366,7 @@ function ProviderSection({
   const acts: Activity[] = d.activities ?? (d.categories ?? []).map((name) => ({ name, limits: null }))
   const sorted = [...acts].sort((a, b) => Number(highlight.includes(b.name)) - Number(highlight.includes(a.name)))
   return (
-    <div className={cn('space-y-3 p-3 text-sm', compact && 'border-t')}>
+    <div className="m-3 space-y-3 rounded-lg border bg-background p-3 text-sm">
       <div className="flex items-center gap-2">
         <span className="font-semibold" style={{ color: CATEGORY_META[provider === 'urbanSportsClub' ? 'usc' : 'wellpass'].color }}>
           {PROVIDER_NAME[provider]}
@@ -370,19 +391,19 @@ function ProviderSection({
       </div>
       {d.image && <img src={d.image} alt="" loading="lazy" className="aspect-video w-full rounded-md object-cover" />}
       {texts?.importantInfo && (
-        <details className="rounded-md border p-2 text-xs" open>
+        <details className="rounded-md bg-muted/60 p-2 text-xs" open>
           <summary className="cursor-pointer font-semibold">Wichtige Infos</summary>
           <p className="mt-1 whitespace-pre-line text-muted-foreground">{texts.importantInfo.replace(/\n\n/g, '\n')}</p>
         </details>
       )}
       {texts?.openingHours && (
-        <details className="rounded-md border p-2 text-xs">
+        <details className="rounded-md bg-muted/60 p-2 text-xs">
           <summary className="cursor-pointer font-semibold">Öffnungszeiten</summary>
           <p className="mt-1 whitespace-pre-line text-muted-foreground">{translateDays(texts.openingHours)}</p>
         </details>
       )}
       {texts?.description && (
-        <details className="rounded-md border p-2 text-xs">
+        <details className="rounded-md bg-muted/60 p-2 text-xs">
           <summary className="cursor-pointer font-semibold">Beschreibung</summary>
           <p className="mt-1 whitespace-pre-line text-muted-foreground">{texts.description}</p>
         </details>

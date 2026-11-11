@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
-import { CheckCircle2, Download, ExternalLink, Loader2, RefreshCw, Upload, XCircle } from 'lucide-react'
+import { CheckCircle2, Download, ExternalLink, KeyRound, Loader2, RefreshCw, Upload, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ConfirmButton } from '@/components/ui/confirm-button'
 import { Input } from '@/components/ui/input'
 import type { Decision } from '@/lib/merges'
 import { issueBody, mergeDecisionLists, parseIssueBody, saveSyncConfig, type SyncConfig, type SyncPayload } from '@/lib/sync'
@@ -117,10 +118,11 @@ export function SyncPanel({ profile, onProfileChange, config, onConfigChange, de
             {status.state === 'busy' ? <Loader2 className="animate-spin" /> : <RefreshCw />} Jetzt synchronisieren
           </Button>
           {config.token && (
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
+            <ConfirmButton
+              icon={<KeyRound />}
+              label="Token von diesem Gerät entfernen"
+              confirmText="Entfernen"
+              onConfirm={() => {
                 setToken('')
                 const next = { ...config, token: null }
                 saveSyncConfig(next)
@@ -128,7 +130,7 @@ export function SyncPanel({ profile, onProfileChange, config, onConfigChange, de
               }}
             >
               Token entfernen
-            </Button>
+            </ConfirmButton>
           )}
         </div>
         {status.message && (
