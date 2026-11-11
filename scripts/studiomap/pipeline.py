@@ -454,7 +454,7 @@ def cmd_enrich_usc(max_age_days: int = 30, limit: int | None = None) -> int:
     try:
         cache, errors = usc_details.fetch_details(
             slugs, cache, client, lambda m: emit("progress", m), should_stop,
-            lambda c: write_json_atomic(USC_DETAILS, c), max_age_days,
+            lambda c: write_json_atomic(USC_DETAILS, c, compact=True), max_age_days,
         )
     except InterruptedError:
         emit("cancelled", "Abgebrochen – bisher geladene Details sind gespeichert.")

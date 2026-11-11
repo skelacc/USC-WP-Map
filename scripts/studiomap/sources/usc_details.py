@@ -24,6 +24,8 @@ from ..http import FetchError, PoliteClient
 from ..io import now_iso
 
 BASE = "https://urbansportsclub.com/de/venues/"
+# Version des gespeicherten Formats – ältere Einträge werden beim nächsten Lauf neu geholt
+SCHEMA = 2
 
 
 def _unescape_rsc(text: str) -> str:
@@ -119,6 +121,8 @@ def parse_venue_page(text: str) -> dict[str, Any]:
         except json.JSONDecodeError:
             ld = None
     if isinstance(ld, dict):
+        # vollständige schema.org-Daten der Seite (Beschreibung steht separat)
+        out["ld"] = {k: v for k, v in ld.items() if k != "description"}
         addr = ld.get("address") or {}
         out["name"] = ld.get("name")
         out["street"] = addr.get("streetAddress")
@@ -146,6 +150,19 @@ def parse_venue_page(text: str) -> dict[str, Any]:
             out["ratingCount"] = rating.get("reviewCount")
 
     limits = _json_after(t, "venueLimits")
+    if isinstance(limits, dict) and isinstance(limits.get("b2e"), list):
+        out["limitsB2e"] = [
+            {
+                "plan": p.get("planName"),
+                "size": p.get("name"),
+                "included": bool(p.get("isProvidedByVenue")),
+                "perMonth": p.get("monthlyLimitVenue"),
+                "perMonthThisAddress": p.get("monthlyLimitVenueAddress"),
+                "categories": [{"name": c.get("name"), "perMonth": c.get("limit")} for c in (p.get("categoryLimits") or [])],
+            }
+            for p in limits["b2e"]
+            if isinstance(p, dict)
+        ]
     if isinstance(limits, dict) and isinstance(limits.get("b2c"), list):
         out["limits"] = [
             {
@@ -160,6 +177,39 @@ def parse_venue_page(text: str) -> dict[str, Any]:
             if isinstance(p, dict)
         ]
     out["serviceTypes"] = sorted(set(re.findall(r'"serviceType":"([a-z_]+)"', t)))
+    # Angebote aus dem Zeitplan (Stichprobe der nächsten Tage), je Titel+Kategorie einmal
+    acts = None
+    k = t.find('"activities":{"classes"')
+    if k >= 0:
+        raw_acts = _balanced(t, k + len('"activities":'))
+        try:
+            acts = json.loads(raw_acts) if raw_acts else None
+        except json.JSONDecodeError:
+            acts = None
+    services: dict[str, dict[str, Any]] = {}
+    if isinstance(acts, dict):
+        for kind in ("classes", "freeTrainings"):
+            for c in acts.get(kind) or []:
+                if not isinstance(c, dict):
+                    continue
+                title = (c.get("title") or "").strip()
+                cat = (c.get("category") or {}).get("name")
+                key = f"{title}|{cat}"
+                if not title or key in services:
+                    continue
+                flags = c.get("flags") or {}
+                services[key] = {
+                    "title": title,
+                    "category": cat,
+                    "type": c.get("serviceType"),
+                    "booking": c.get("bookingType"),
+                    "b2c": c.get("planTypesB2C"),
+                    "b2b": c.get("planTypesB2B"),
+                    "plus": bool(flags.get("isPlusCheckin")),
+                    "online": bool(flags.get("isOnline")),
+                }
+    if services:
+        out["services"] = list(services.values())
     m = re.search(r'"venueId":(\d+)', t)
     if m:
         out["venueId"] = int(m.group(1))
@@ -173,6 +223,8 @@ def parse_venue_page(text: str) -> dict[str, Any]:
 
 
 def _stale(entry: dict, max_age_days: int) -> bool:
+    if entry.get("schema", 1) < SCHEMA:
+        return True
     try:
         ts = datetime.fromisoformat(entry["fetchedAt"].replace("Z", "+00:00"))
     except (KeyError, ValueError):
@@ -187,7 +239,7 @@ def fetch_details(
     progress: Callable[[str], None],
     should_stop: Callable[[], bool],
     save: Callable[[dict[str, dict]], None],
-    max_age_days: int = 30,
+    max_age_days: int = 90,
 ) -> tuple[dict[str, dict], list[str]]:
     todo = [s for s in slugs if s not in cache or _stale(cache[s], max_age_days)]
     errors: list[str] = []
@@ -203,6 +255,7 @@ def fetch_details(
                 # Fallback: normale HTML-Seite
                 info = parse_venue_page(client.get(BASE + slug))
             info["fetchedAt"] = now_iso()
+            info["schema"] = SCHEMA
             cache[slug] = info
         except FetchError as e:
             errors.append(f"{slug}: {e}")

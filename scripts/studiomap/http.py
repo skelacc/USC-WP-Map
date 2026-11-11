@@ -33,20 +33,19 @@ class PoliteClient:
         last_err: Exception | None = None
         for attempt in range(1, self.retries + 1):
             self._wait()
+            # Abstand zählt ab Beginn der Anfrage: höchstens 1 Anfrage je `delay` Sekunden
+            self._last = time.monotonic()
             req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, **(headers or {})})
             try:
                 with urllib.request.urlopen(req, timeout=self.timeout) as resp:
-                    self._last = time.monotonic()
                     self.requests += 1
                     return resp.read().decode("utf-8", errors="replace")
             except urllib.error.HTTPError as e:
-                self._last = time.monotonic()
                 last_err = e
                 # 4xx (außer 429) nicht wiederholen
                 if 400 <= e.code < 500 and e.code != 429:
                     break
             except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
-                self._last = time.monotonic()
                 last_err = e
             time.sleep(min(2**attempt, 16))
         raise FetchError(f"Abruf fehlgeschlagen: {url} ({last_err})")

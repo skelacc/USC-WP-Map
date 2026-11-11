@@ -8,8 +8,9 @@ interface Props {
 
 /**
  * Bottom-Sheet, das sich durch Wischen nach unten schließen lässt – wie in
- * nativen Apps. Gezogen wird am oberen Rand oder überall, solange der Inhalt
- * ganz nach oben gescrollt ist.
+ * nativen Apps. Gezogen werden kann überall im Sheet (nicht nur am Griff),
+ * sobald der Inhalt ganz nach oben gescrollt ist; vorher scrollt der Inhalt.
+ * Schließt ab 110 px Zug oder bei schnellem Wischen (> 40 px).
  */
 export function SwipeDownSheet({ onClose, className, children }: Props) {
   const ref = useRef<HTMLDivElement>(null)
@@ -53,16 +54,16 @@ export function SwipeDownSheet({ onClose, className, children }: Props) {
       const ddy = e.touches[0].clientY - y0
       const ddx = e.touches[0].clientX - x0
       if (!decided) {
-        if (Math.abs(ddy) < 6 && Math.abs(ddx) < 6) return
+        // sofort entscheiden – sonst übernimmt der Browser die Geste (Scrollen/Neu laden)
+        if (ddy === 0 && ddx === 0) return
         decided = true
-        // nur senkrecht nach unten ziehen
-        if (ddy <= 0 || Math.abs(ddx) > Math.abs(ddy)) {
+        if (ddy < 0 || Math.abs(ddx) > Math.abs(ddy)) {
           active = false
           return
         }
       }
       dy = Math.max(0, ddy)
-      e.preventDefault()
+      if (e.cancelable) e.preventDefault()
       el.style.transition = 'none'
       el.style.transform = `translateY(${dy}px)`
     }

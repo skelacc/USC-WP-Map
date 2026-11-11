@@ -34,7 +34,7 @@ def main(argv: list[str] | None = None) -> int:
     d.add_argument("--fields", default=None, help='JSON, z. B. {"name": "wellpass", "address": "urbanSportsClub"}')
 
     e = sub.add_parser("enrich-usc", help="USC-Detailseiten laden (Plus, Limits je Stufe/Aktivität, PLZ, Bewertung)")
-    e.add_argument("--max-age-days", type=int, default=30)
+    e.add_argument("--max-age-days", type=int, default=90, help="nur Einträge neu holen, die fehlen oder älter sind (Standard 90 Tage)")
     e.add_argument("--limit", type=int, default=None)
 
     for cmd in ("enrich-addresses", "enrich-wellpass"):  # enrich-wellpass: früherer Name

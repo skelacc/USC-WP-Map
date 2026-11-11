@@ -128,3 +128,9 @@
     @apply font-sans;
     }
 }
+/* App-Verhalten: kein „Ziehen zum Aktualisieren“ der Seite (würde das
+   Herunterwischen der Details abfangen) */
+html,
+body {
+  overscroll-behavior-y: none;
+}
