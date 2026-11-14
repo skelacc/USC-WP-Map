@@ -1,0 +1,9 @@
+.git
+node_modules
+data/raw
+data/staging
+scripts/**/__pycache__
+*.md
+.env
+.env.*
+dist
