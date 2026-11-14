@@ -1,0 +1,115 @@
+# Baut das Docker-Image für den Server (usc-wp-map.skela.cc, Bauplan skelA-private/hub-SWA) und pusht es nach GHCR.
+# Der Server holt es sich selbst (Updater); GitHub braucht keinen Zugang zum Server.
+name: Image
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: image-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+  # Nach grüner Prüfung auf main: Image bauen und nach GHCR pushen (ADR 0026 im Repo skelA-private/hub).
+  # Der Server holt es sich selbst (Updater im Repo hub-SWA), GitHub braucht keinen Zugang zum Server.
+  image:
+    needs: [check]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      packages: write
+      pull-requests: read
+    steps:
+      # Bei PRs nur dann bauen, wenn sich etwas am Image ändern kann; Code-Fehler fängt schon „check“ (Build läuft dort).
+      # Auf dem Standard-Branch wird immer gebaut und gepusht.
+      - name: Image-Bau nötig?
+        id: need
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" != pull_request ]; then echo "build=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          files=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/files" --paginate --jq '.[].filename')
+          if echo "$files" | grep -qE '^(Dockerfile|\.dockerignore|deploy/|package(-lock)?\.json|\.github/workflows/image\.yml)'; then
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "build=false" >> "$GITHUB_OUTPUT"
+            echo "Image-Bau übersprungen: Dockerfile, Abhängigkeiten und CI unverändert." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - if: steps.need.outputs.build == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Für amd64 und arm64 (Server des Freundes ist arm64, ADR 0031). arm64 wird per QEMU emuliert.
+      # Offizielle Docker-Action, auf einen Commit gepinnt (apt war von den Runnern aus nicht zuverlässig erreichbar).
+      - name: Emulation für arm64 einrichten
+        if: steps.need.outputs.build == 'true'
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+        with:
+          platforms: arm64
+      - name: Builder einrichten
+        if: steps.need.outputs.build == 'true'
+        run: docker buildx create --name multi --driver docker-container --use
+      # Bei PRs nur bauen (prüft, dass beide Plattformen gehen); gepusht wird nur auf dem Standard-Branch.
+      # Schichten-Cache in GHCR (`:buildcache`): `npm ci` unter arm64-Emulation ist der langsamste Schritt und
+      # muss nur laufen, wenn sich package-lock.json ändert. Geschrieben wird der Cache nur vom Standard-Branch.
+      - name: Image bauen (und auf main pushen)
+        if: steps.need.outputs.build == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUSH: ${{ github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+        run: |
+          set -euo pipefail
+          image="ghcr.io/$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')"
+          # Abmelden in jedem Fall, auch wenn Bau oder Prüfung scheitern: keine Anmeldedaten auf dem Runner zurücklassen.
+          trap 'docker logout ghcr.io' EXIT
+          echo "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          cache=(--cache-from "type=registry,ref=$image:buildcache")
+          if [ "$PUSH" = true ]; then
+            out=--push
+            cache+=(--cache-to "type=registry,ref=$image:buildcache,mode=max")
+          else
+            out=--output=type=cacheonly
+          fi
+          docker buildx build --platform linux/amd64,linux/arm64 "$out" "${cache[@]}" \
+            --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
+            --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+            -t "$image:main" -t "$image:$GITHUB_SHA" .
+          if [ "$PUSH" = true ]; then
+            # Prüfen, was wirklich in der Registry liegt. Das Paket ist privat, deshalb noch angemeldet
+            # (abgemeldet antwortet GHCR mit 401, und der Lauf war rot, obwohl das Image gepusht war).
+            # 1. Das Image enthält beide Plattformen. 2. `main` und der Commit-Tag zeigen auf dasselbe Image.
+            manifest() { docker buildx imagetools inspect "$1" --format '{{json .Manifest}}'; }
+            main_manifest=$(manifest "$image:main")
+            platforms=$(jq -r '[.manifests[].platform | "\(.os)/\(.architecture)"] | join(" ")' <<<"$main_manifest")
+            for want in linux/amd64 linux/arm64; do
+              case " $platforms " in
+                *" $want "*) ;;
+                *) echo "::error::$image:main enthält $want nicht (gefunden: $platforms)"; exit 1 ;;
+              esac
+            done
+            main_digest=$(jq -r .digest <<<"$main_manifest")
+            sha_digest=$(manifest "$image:$GITHUB_SHA" | jq -r .digest)
+            if [ -z "$main_digest" ] || [ "$main_digest" = null ] || [ "$main_digest" != "$sha_digest" ]; then
+              echo "::error::$image:main ($main_digest) und $image:$GITHUB_SHA ($sha_digest) zeigen nicht auf dasselbe Image"
+              exit 1
+            fi
+            echo "Gepusht: $image:main ($GITHUB_SHA, $main_digest) für amd64 und arm64" >> "$GITHUB_STEP_SUMMARY"
+          fi

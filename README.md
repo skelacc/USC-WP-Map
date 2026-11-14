@@ -15,6 +15,9 @@ Farbe **und** Form unterscheiden die Kategorien, damit sie auch bei Farbsehschw�
 - **Ganz Deutschland:** 17.175 Wellpass-Studios aus dem offiziellen Gym-Finder.
 - **Zuordnungen:** 170 unsichere Vorschläge warten auf eine manuelle Prüfung.
 
+
+**Online:** [usc-wp-map.skela.cc](https://usc-wp-map.skela.cc) als Docker-Dienst auf dem Server (Bauplan `skelA-private/hub-SWA`). Jeder Push auf den Standard-Branch baut das Image `ghcr.io/skelacc/usc-wp-map` (amd64 und arm64, Workflow `image.yml`); der Server holt es selbst. Die Import-API gibt es nur lokal mit `npm run dev`.
+
 ---
 
 ## Bedienung
