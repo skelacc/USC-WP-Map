@@ -26,6 +26,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      # Datenimport (Python, nur Standardbibliothek)
+      - run: npm run test:py
       - run: npm run build
 
   # Nach grüner Prüfung auf main: Image bauen und nach GHCR pushen (ADR 0026 im Repo skelA-private/hub).
