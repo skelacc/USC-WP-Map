@@ -115,18 +115,13 @@ npm run data:apply
   - Mit `--all` läuft es für ganz Deutschland (~16.000 Anfragen, ca. 5 Stunden).
 - Der direkte Abruf per `--wellpass-official` funktioniert technisch weiter. Die robots.txt von locations.egym.com untersagt automatisierte Zugriffe, deshalb ist der Browser-Export der vorgesehene Weg.
 
-## Online stellen (GitHub Pages)
+## Online stellen (Server)
 
-Das Repository ist öffentlich, GitHub Pages ist dafür kostenlos. Der Workflow `.github/workflows/pages.yml` baut die App bei jedem Push auf den Standard-Branch und veröffentlicht sie.
-
-1. Auf GitHub im Repository: **Settings → Pages → Build and deployment → Source: „GitHub Actions“** wählen (einmalig).
-2. Den Branch mit dem Code zum Standard-Branch machen bzw. in ihn mergen (Settings → General → Default branch, oder Pull Request mergen).
-3. Unter **Actions → GitHub Pages** läuft dann der Build (ca. 1 Minute). Danach ist die Seite unter `https://skelacc.github.io/USC-WP-Map/` erreichbar. Neu starten lässt er sich dort auch per „Run workflow“.
+Die Seite läuft als Docker-Dienst unter **https://usc-wp-map.skela.cc** auf Martins Server (Bauplan `skelA-private/hub-SWA`). Der Workflow `.github/workflows/image.yml` prüft jeden Pull Request (Job `check`: Tests, Python-Tests, Build) und baut nach jedem Push auf `main` das Image für amd64 und arm64; der Server holt es sich selbst.
 
 Hinweise:
 - Die Seite ist **öffentlich**, inklusive der Studiodaten.
-- Über HTTPS funktioniert am Handy auch der Standort-Knopf.
-- „Daten aktualisieren“ gibt es online nicht (kein Server). Aktualisiert wird lokal (siehe unten), danach committen und pushen, und die Seite baut sich neu.
+- „Daten aktualisieren“ gibt es online nicht. Aktualisiert wird lokal (siehe unten), danach committen und pushen, und das Image wird neu gebaut.
 
 ## Datenquellen – Ergebnis der Recherche
 
