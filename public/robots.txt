@@ -1,0 +1,3 @@
+# Studio Map ist öffentlich und darf indexiert werden (hub-161, Martin 2026-11-16).
+User-agent: *
+Allow: /

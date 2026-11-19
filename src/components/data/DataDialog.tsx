@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePersistentState } from '@/hooks/usePersistentState'
 import { loadSetting, saveSetting } from '@/lib/storage'
-import { Settings } from 'lucide-react'
+import { Download, Settings } from 'lucide-react'
+import { useInstallPrompt } from '@/hooks/useInstallPrompt'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -67,6 +68,7 @@ export function DataDialog(props: Props) {
     saveSetting('settingsScroll', { ...loadSetting<Record<string, number>>('settingsScroll', {}), [tab]: Math.round(el.scrollTop) })
   }
   const pending = dataset?.matchCandidates.length ?? 0
+  const install = useInstallPrompt()
 
   useEffect(() => {
     if (open) void getStatus().then(setStatus)
@@ -81,8 +83,14 @@ export function DataDialog(props: Props) {
         </Button>
       </DialogTrigger>
       <DialogContent className="flex max-h-[90dvh] flex-col gap-3 sm:max-w-xl" onOpenAutoFocus={(e) => e.preventDefault()}>
-        <DialogHeader>
+        <DialogHeader className="flex-row items-center justify-between gap-2 pr-8">
           <DialogTitle>Einstellungen & Info</DialogTitle>
+          {/* Nur solange der Browser das Installieren anbietet; fest im Kopf, damit der Eintrag in jedem Tab zu finden ist */}
+          {install.available && (
+            <Button variant="outline" size="sm" onClick={() => void install.install()}>
+              <Download /> App installieren
+            </Button>
+          )}
           <DialogDescription className="sr-only">Hinweise, Synchronisation, Zuordnungen und Datenbestand.</DialogDescription>
         </DialogHeader>
         <Tabs value={tab} onValueChange={setTab} className="min-h-0 flex-1">
